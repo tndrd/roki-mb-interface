@@ -1,0 +1,3 @@
+[submodule "deps/rcb4-base-class"]
+	path = deps/rcb4-base-class
+	url = https://github.com/tndrd/rcb4-base-class.git

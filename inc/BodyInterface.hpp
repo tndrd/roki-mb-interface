@@ -1,10 +1,9 @@
-#include "MotherboardInterface.hpp"
+#pragma once
+
+#include "MBInterface.hpp"
 
 namespace Roki {
 class BodyInterface {
-  bool HasError = false;
-  std::string Error;
-
 public:
   struct MessageMode {
     using Type = uint8_t;
@@ -14,58 +13,33 @@ public:
     static constexpr Type Notify = 2;
     static constexpr Type Priority = 3;
 
-    static uint8_t Serialize(MessageMode::Type mode) { return mode; }
-
-    static MessageMode::Type Deserialize(uint8_t data) { return data; }
+    static uint8_t Serialize(MessageMode::Type mode);
+    static MessageMode::Type Deserialize(uint8_t data);
   };
 
   struct Request {
-    const uint8_t* Data;
+    const uint8_t *Data;
     uint8_t RequestSize;
     uint8_t ResponceSize;
     MessageMode::Type Mode;
   };
 
   struct Responce {
-    const uint8_t* Data;
+    const uint8_t *Data;
     uint8_t ResponceSize;
     MessageMode::Type Mode;
   };
 
+private:
+  bool HasError = false;
+  std::string Error;
+
 public:
-  bool Send(MBInterface &mbi, Request request) {
-    MBInterface::OutPackage out {MBInterface::Periphery::Body, request.ResponceSize,
-                       MessageMode::Serialize(request.Mode), request.Data, request.RequestSize};
+  bool IsOk() const;
+  std::string GetError() const;
 
-    if (!mbi.Send(out)) {
-      HasError = true;
-      Error = mbi.GetError();
-      return false;
-    }
-
-    return true;
-  }
-
-  bool Recieve(uint8_t responceSize, MBInterface& mbi, Responce& responce) {
-    MBInterface::InPackage package;
-    
-    if (!mbi.Receive(responceSize, package)) {
-      HasError = true;
-      Error = mbi.GetError();
-      return false;
-    }
-
-    if (package.Error != 0) {
-      HasError = true;
-      Error = "Body request failed";
-    }
-
-    responce.Data = package.Data;
-    responce.ResponceSize = package.ResponceSize;
-    responce.Mode = MessageMode::Deserialize(package.MetaInfo);
-
-    return true;
-  }
+  bool Send(MBInterface &mbi, Request request);
+  bool Recieve(MBInterface &mbi, Responce &responce, uint8_t responceSize);
 };
 
 } // namespace Roki
