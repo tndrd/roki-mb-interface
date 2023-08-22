@@ -30,8 +30,8 @@ void MBInterface::SerializePackageToBuf(const OutPackage &package,
   *(ptr++) = package.ResponceSize;
   *(ptr++) = package.MetaInfo;
 
-  memcpy(ptr, package.Data, package.ResponceSize);
-  ptr += package.ResponceSize;
+  memcpy(ptr, package.Data, package.RequestSize);
+  ptr += package.RequestSize;
 
   *ptr = SOM::SOM3;
 }
@@ -125,7 +125,12 @@ bool MBInterface::Send(const OutPackage &package) {
 
   size_t size;
   SerializePackageToBuf(package, &size);
-
+  std::cout << "Sent: ";
+  for (int i = 0; i < size; ++i) {
+    std::cout << std::hex << +Buffer[i] << " ";
+  }
+  std::cout << std::dec << std::endl;
+  
   if (!Write(Buffer.data(), size))
     return false;
 
@@ -160,13 +165,20 @@ bool MBInterface::Receive(size_t responceSize, InPackage &package) {
     return false;
 
   package.Data = Buffer.data();
+  package.ResponceSize = responceSize;
+
+  std::cout << "Recieved: ";
+  for (int i = 0; i < responceSize; ++i) {
+    std::cout << std::hex << +Buffer[i] << " ";
+  }
+  std::cout << std::dec << std::endl;
 
   uint8_t som;
   if (!Read(&som, 1))
     return false;
 
   if (som != SOM::SOM3)
-    return MakeTTYError(TTY, "Unexpected end of package");
+    return MakeError("Port " + TTY.Port + "Unexpected end of package");
 
   return true;
 }
