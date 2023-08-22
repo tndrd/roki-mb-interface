@@ -1,29 +1,24 @@
-#pragma once
+#include "Helpers.hpp"
 
-#include <iostream>
-#include <unistd.h>
+namespace Roki::Helpers {
 
-struct DescriptorWrapper final {
-private:
-  int Fd = -1;
+DescriptorWrapper::DescriptorWrapper(int newFd) : Fd{newFd} {}
 
-public:
-  explicit DescriptorWrapper(int newFd) : Fd{newFd} {}
-  bool IsValid() const { return Fd >= 0; }
+bool DescriptorWrapper::IsValid() const { return Fd >= 0; }
+int DescriptorWrapper::Get() const { return Fd; }
 
-  int Get() const { return Fd; }
+DescriptorWrapper::DescriptorWrapper(DescriptorWrapper &&rhs) : Fd{rhs.Fd} {
+  rhs.Fd = -1;
+}
 
-  DescriptorWrapper(const DescriptorWrapper &) = delete;
-  DescriptorWrapper &operator=(const DescriptorWrapper &) = delete;
+DescriptorWrapper &DescriptorWrapper::operator=(DescriptorWrapper &&rhs) {
+  std::swap(Fd, rhs.Fd);
+  return *this;
+}
 
-  DescriptorWrapper(DescriptorWrapper &&rhs) : Fd{rhs.Fd} { rhs.Fd = -1; }
-  DescriptorWrapper &operator=(DescriptorWrapper &&rhs) {
-    std::swap(Fd, rhs.Fd);
-    return *this;
-  }
+DescriptorWrapper::~DescriptorWrapper() {
+  if (IsValid())
+    close(Fd);
+}
 
-  ~DescriptorWrapper() {
-    if (IsValid())
-      close(Fd);
-  }
-};
+} // namespace Roki::Helpers

@@ -10,24 +10,17 @@ private:
   int Fd = -1;
 
 public:
-  explicit DescriptorWrapper(int newFd) : Fd{newFd} {}
-  bool IsValid() const { return Fd >= 0; }
-
-  int Get() const { return Fd; }
+  explicit DescriptorWrapper(int newFd = -1);
+  bool IsValid() const;
+  int Get() const;
 
   DescriptorWrapper(const DescriptorWrapper &) = delete;
   DescriptorWrapper &operator=(const DescriptorWrapper &) = delete;
 
-  DescriptorWrapper(DescriptorWrapper &&rhs) : Fd{rhs.Fd} { rhs.Fd = -1; }
-  DescriptorWrapper &operator=(DescriptorWrapper &&rhs) {
-    std::swap(Fd, rhs.Fd);
-    return *this;
-  }
+  DescriptorWrapper(DescriptorWrapper &&rhs);
+  DescriptorWrapper &operator=(DescriptorWrapper &&rhs);
 
-  ~DescriptorWrapper() {
-    if (IsValid())
-      close(Fd);
-  }
+  ~DescriptorWrapper();
 };
 
 } // namespace Roki::Helpers
