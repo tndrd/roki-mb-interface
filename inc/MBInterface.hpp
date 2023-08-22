@@ -38,7 +38,7 @@ public:
   struct Periphery {
     using Type = uint8_t;
     static constexpr Type Body = 0;
-    static constexpr Type Imu = 0;
+    static constexpr Type Imu = 1;
   };
 
   struct OutPackage {
