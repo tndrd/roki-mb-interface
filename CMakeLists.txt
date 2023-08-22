@@ -3,10 +3,17 @@ project(RokiMotherboard)
 
 include_directories(inc/)
 
+add_library(Helpers src/Helpers.cpp)
+
 add_library(MBInterface src/MBInterface.cpp)
+target_link_libraries(MBInterface Helpers)
 
 add_library(IMUInterface src/IMUInterface.cpp)
 target_link_libraries(IMUInterface PUBLIC MBInterface)
 
 add_library(BodyInterface src/BodyInterface.cpp)
 target_link_libraries(BodyInterface PUBLIC MBInterface)
+
+# Tests
+
+include(tests/tests.cmake)
