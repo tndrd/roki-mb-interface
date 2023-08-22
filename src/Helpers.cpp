@@ -1,6 +1,7 @@
 #include "Helpers.hpp"
 
-namespace Roki::Helpers {
+namespace Roki {
+namespace Helpers {
 
 DescriptorWrapper::DescriptorWrapper(int newFd) : Fd{newFd} {}
 
@@ -20,5 +21,5 @@ DescriptorWrapper::~DescriptorWrapper() {
   if (IsValid())
     close(Fd);
 }
-
+}
 } // namespace Roki::Helpers

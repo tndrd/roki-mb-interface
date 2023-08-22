@@ -3,7 +3,8 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace Roki::Helpers {
+namespace Roki {
+namespace Helpers {
 
 struct DescriptorWrapper final {
 private:
@@ -22,5 +23,5 @@ public:
 
   ~DescriptorWrapper();
 };
-
-} // namespace Roki::Helpers
+} // namespace Helpers
+} // namespace Roki
