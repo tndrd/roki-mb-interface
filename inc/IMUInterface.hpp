@@ -41,7 +41,7 @@ private:
 public:
   bool IsOk() const;
   std::string GetError() const;
-  bool GetFrame(uint16_t seq, MBInterface &mbi, IMUFrame &dest);
+  bool GetFrame(MBInterface &mbi, uint16_t seq, IMUFrame &dest);
 };
 
 } // namespace Roki

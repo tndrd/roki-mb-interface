@@ -44,7 +44,7 @@ IMUInterface::Deserialize(const MBInterface::InPackage &package) {
 bool IMUInterface::IsOk() const { return !HasError; }
 std::string IMUInterface::GetError() const { return Error; }
 
-bool IMUInterface::GetFrame(uint16_t seq, MBInterface &mbi, IMUFrame &dest) {
+bool IMUInterface::GetFrame(MBInterface &mbi, uint16_t seq, IMUFrame &dest) {
   std::array<uint8_t, 2> buf{0, 0};
   *reinterpret_cast<uint16_t *>(buf.data()) = seq;
 
