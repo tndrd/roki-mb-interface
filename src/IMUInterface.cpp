@@ -3,6 +3,8 @@ namespace Roki {
 
 IMUInterface::IMUFrame
 IMUInterface::Deserialize(const MBInterface::InPackage &package) {
+  std::cout << +package.ResponceSize << std::endl;
+  std::cout << +ResponceSize << std::endl;
   assert(package.ResponceSize == ResponceSize);
 
   IMUFrame fr;
@@ -25,9 +27,11 @@ IMUInterface::Deserialize(const MBInterface::InPackage &package) {
 
   qt.W = *reinterpret_cast<const int16_t *>(ptr);
   ptr += sizeof(int16_t);
-
+  
+  /*
   qt.Accuracy = *reinterpret_cast<const float *>(ptr);
   ptr += sizeof(float);
+  */
 
   ts.TimeS = *reinterpret_cast<const uint32_t *>(ptr);
   ptr += sizeof(uint32_t);

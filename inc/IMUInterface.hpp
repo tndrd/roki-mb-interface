@@ -16,7 +16,7 @@ public:
     int16_t Z;
     int16_t W;
 
-    float Accuracy;
+    //float Accuracy;
   };
 
   struct IMUFrame {
@@ -27,7 +27,7 @@ public:
   };
 
 private:
-  static constexpr uint8_t ResponceSize = 4 * sizeof(int16_t) + sizeof(float) +
+  static constexpr uint8_t ResponceSize = 4 * sizeof(int16_t) + /* sizeof(float) + */
                                           2 * sizeof(uint32_t) +
                                           sizeof(uint8_t);
 
