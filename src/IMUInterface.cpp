@@ -15,17 +15,18 @@ IMUInterface::Deserialize(const MBInterface::InPackage &package) {
   auto &ts = fr.Timestamp;
 
   const uint8_t *ptr = package.Data;
+  const float norm = 16384; // 2**14 
 
-  qt.X = *reinterpret_cast<const int16_t *>(ptr);
+  qt.X = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
   ptr += sizeof(int16_t);
 
-  qt.Y = *reinterpret_cast<const int16_t *>(ptr);
+  qt.Y = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
   ptr += sizeof(int16_t);
 
-  qt.Z = *reinterpret_cast<const int16_t *>(ptr);
+  qt.Z = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
   ptr += sizeof(int16_t);
 
-  qt.W = *reinterpret_cast<const int16_t *>(ptr);
+  qt.W = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
   ptr += sizeof(int16_t);
   
   /*
@@ -36,7 +37,7 @@ IMUInterface::Deserialize(const MBInterface::InPackage &package) {
   ts.TimeS = *reinterpret_cast<const uint32_t *>(ptr);
   ptr += sizeof(uint32_t);
 
-  ts.TimeS = *reinterpret_cast<const uint32_t *>(ptr);
+  ts.TimeNS = *reinterpret_cast<const uint32_t *>(ptr);
   ptr += sizeof(uint32_t);
 
   fr.SensorID = *reinterpret_cast<const uint8_t *>(ptr);

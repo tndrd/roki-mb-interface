@@ -11,10 +11,10 @@ public:
   };
 
   struct Quaternion {
-    int16_t X;
-    int16_t Y;
-    int16_t Z;
-    int16_t W;
+    float X;
+    float Y;
+    float Z;
+    float W;
 
     //float Accuracy;
   };
