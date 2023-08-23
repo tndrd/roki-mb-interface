@@ -3,6 +3,8 @@ project(RokiMotherboard)
 
 set(CMAKE_CXX_STANDARD 17)
 
+#ADD_DEFINITIONS(-DDBGMB=1)
+
 include_directories(inc/)
 
 add_library(Helpers src/Helpers.cpp)
@@ -10,8 +12,11 @@ add_library(Helpers src/Helpers.cpp)
 add_library(MBInterface src/MBInterface.cpp)
 target_link_libraries(MBInterface Helpers)
 
+add_library(IMURPC src/IMURPC.cpp)
+target_link_libraries(IMURPC PUBLIC MBInterface)
+
 add_library(IMUInterface src/IMUInterface.cpp)
-target_link_libraries(IMUInterface PUBLIC MBInterface)
+target_link_libraries(IMUInterface PUBLIC MBInterface IMURPC)
 
 add_library(BodyInterface src/BodyInterface.cpp)
 target_link_libraries(BodyInterface PUBLIC MBInterface)
