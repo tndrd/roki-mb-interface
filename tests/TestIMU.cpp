@@ -57,7 +57,7 @@ int main()
   while (true)
   {
     i = (i + 1) % 500;
-    if (!imu.GetFrame(mbi, i, frame))
+    if (!imu.GetLastFrame(mbi, frame))
     {
       std::cout << imu.GetError() << std::endl;
       std::this_thread::sleep_for(std::chrono::seconds(1));
