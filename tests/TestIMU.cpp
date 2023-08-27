@@ -1,4 +1,5 @@
 #include "Motherboard.hpp"
+#include "MotherboardAliases.hpp"
 
 #include <chrono>
 #include <thread>
@@ -6,8 +7,8 @@
 int main()
 {
   Roki::Motherboard mb;
-  Roki::SerialInterface::TTYConfig serviceConfig;
-  Roki::SerialInterface::TTYConfig streamConfig;
+  Roki::TTYConfig serviceConfig;
+  Roki::TTYConfig streamConfig;
 
   serviceConfig.Port = "/dev/ttyAMA2";
   serviceConfig.Baudrate = 9600;
@@ -27,8 +28,8 @@ int main()
     exit(1);
   }
 
-  Roki::IMURPC::IMUInfo info;
-  Roki::IMURPC::IMUFrame frame;
+  Roki::IMUInfo info;
+  Roki::IMUFrame frame;
 
   uint8_t fr[5]{0, 1, 2, 3, 4};
   int i = -1;
