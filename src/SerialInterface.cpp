@@ -233,7 +233,7 @@ namespace Roki
 
 #ifdef DBGMB
     std::cout << "OK" << std::endl;
-    std::cout << "Package OK" << std::endl;
+    std::cout << "Package OK\n" << std::endl;
 #endif
 
     return true;
