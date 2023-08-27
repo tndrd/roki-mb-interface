@@ -1,11 +1,11 @@
 #pragma once
 
-#include "MBInterface.hpp"
+#include "SerialInterface.hpp"
 #include <type_traits>
 
 namespace Roki
 {
-  class IMURPCStub
+  class IMURPC
   {
   public:
     struct RequestMode
@@ -113,18 +113,17 @@ namespace Roki
     void SerializeToBuf(IMUResetRequest request);
 
     template <typename T>
-    MBInterface::OutPackage CreatePackage(T Request);
+    SerialInterface::OutPackage CreatePackage(T Request);
 
     template <typename T>
-    T DeserializeResponce(const MBInterface::InPackage &package);
+    T DeserializeResponce(const SerialInterface::InPackage &package);
 
     static const char *GetErrorDescription(ErrorCodes::Type errCode);
 
-  protected:
-    template <typename T, typename ResponceT>
-    bool PerformRPC(MBInterface &mbi, T Request, ResponceT &responce);
-
   public:
+    template <typename T, typename ResponceT>
+    bool PerformRPC(SerialInterface &si, T Request, ResponceT &responce);
+
     bool IsOk() const;
     std::string GetError() const;
   };

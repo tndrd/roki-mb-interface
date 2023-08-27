@@ -1,19 +1,19 @@
-#include "MBInterface.hpp"
+#include "SerialInterface.hpp"
 
 namespace Roki {
 
-bool MBInterface::MakeError(const std::string &msg) {
+bool SerialInterface::MakeError(const std::string &msg) {
   Error = msg;
   HasError = true;
   return false;
 }
 
-bool MBInterface::MakeTTYError(const TTYConfig &tty, const std::string &msg) {
+bool SerialInterface::MakeTTYError(const TTYConfig &tty, const std::string &msg) {
   return MakeError("Port " + tty.Port + ": " + msg + ": " +
                    std::string{strerror(errno)});
 }
 
-void MBInterface::SerializePackageToBuf(const OutPackage &package,
+void SerialInterface::SerializePackageToBuf(const OutPackage &package,
                                         size_t *size) {
   assert(package.Data);
   assert(size);
@@ -36,7 +36,7 @@ void MBInterface::SerializePackageToBuf(const OutPackage &package,
   *ptr = SOM::SOM3;
 }
 
-bool MBInterface::Read(uint8_t *buf, size_t size) {
+bool SerialInterface::Read(uint8_t *buf, size_t size) {
   size_t total = 0;
   do {
     int ret = read(Fd.Get(), buf, size - total);
@@ -47,7 +47,7 @@ bool MBInterface::Read(uint8_t *buf, size_t size) {
   return true;
 }
 
-bool MBInterface::Write(const uint8_t *buf, size_t size) {
+bool SerialInterface::Write(const uint8_t *buf, size_t size) {
   size_t total = 0;
   do {
     int ret = write(Fd.Get(), buf, size - total);
@@ -58,9 +58,9 @@ bool MBInterface::Write(const uint8_t *buf, size_t size) {
   return true;
 }
 
-bool MBInterface::ReadToBuf(size_t size) { return Read(Buffer.data(), size); }
+bool SerialInterface::ReadToBuf(size_t size) { return Read(Buffer.data(), size); }
 
-bool MBInterface::EnsureSOM1(size_t windowSize) {
+bool SerialInterface::EnsureSOM1(size_t windowSize) {
   if (Buffer[0] == SOM::SOM1)
     return true;
 
@@ -76,10 +76,10 @@ bool MBInterface::EnsureSOM1(size_t windowSize) {
   return Buffer[0] == SOM::SOM1;
 }
 
-bool MBInterface::IsOk() const { return !HasError; }
-std::string MBInterface::GetError() const { return Error; }
+bool SerialInterface::IsOk() const { return !HasError; }
+std::string SerialInterface::GetError() const { return Error; }
 
-bool MBInterface::Configure(const TTYConfig &ttyConfig) {
+bool SerialInterface::Configure(const TTYConfig &ttyConfig) {
 
   Helpers::DescriptorWrapper newFd{open(ttyConfig.Port.c_str(), O_RDWR)};
 
@@ -119,7 +119,7 @@ bool MBInterface::Configure(const TTYConfig &ttyConfig) {
   return true;
 }
 
-bool MBInterface::Send(const OutPackage &package) {
+bool SerialInterface::Send(const OutPackage &package) {
   if (!Fd.IsValid())
     return MakeError("TTY Interface is not set up");
 
@@ -137,7 +137,7 @@ bool MBInterface::Send(const OutPackage &package) {
   return true;
 }
 
-bool MBInterface::Receive(size_t responceSize, InPackage &package) {
+bool SerialInterface::Receive(size_t responceSize, InPackage &package) {
   if (!ReadToBuf(1))
     return false;
 

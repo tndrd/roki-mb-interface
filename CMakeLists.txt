@@ -9,17 +9,17 @@ include_directories(inc/)
 
 add_library(Helpers src/Helpers.cpp)
 
-add_library(MBInterface src/MBInterface.cpp)
-target_link_libraries(MBInterface Helpers)
+add_library(SerialInterface src/SerialInterface.cpp)
+target_link_libraries(SerialInterface Helpers)
 
 add_library(IMURPC src/IMURPC.cpp)
-target_link_libraries(IMURPC PUBLIC MBInterface)
+target_link_libraries(IMURPC PUBLIC SerialInterface)
 
-add_library(IMUInterface src/IMUInterface.cpp)
-target_link_libraries(IMUInterface PUBLIC MBInterface IMURPC)
+add_library(BodyRPC src/BodyRPC.cpp)
+target_link_libraries(BodyRPC PUBLIC SerialInterface)
 
-add_library(BodyInterface src/BodyInterface.cpp)
-target_link_libraries(BodyInterface PUBLIC MBInterface)
+add_library(Motherboard src/Motherboard.cpp)
+target_link_libraries(Motherboard PUBLIC IMURPC BodyRPC)
 
 # Tests
 

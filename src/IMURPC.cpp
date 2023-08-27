@@ -2,38 +2,38 @@
 namespace Roki
 {
 
-  void IMURPCStub::SerializeToBuf(IMUFrameRequest request)
+  void IMURPC::SerializeToBuf(IMUFrameRequest request)
   {
     *reinterpret_cast<uint16_t *>(RequestBuffer.data()) = request.seq;
   }
 
-  void IMURPCStub::SerializeToBuf(IMUInfoRequest request)
+  void IMURPC::SerializeToBuf(IMUInfoRequest request)
   {
     RequestBuffer[0] = 0;
   }
 
-  void IMURPCStub::SerializeToBuf(IMULatestRequest request)
+  void IMURPC::SerializeToBuf(IMULatestRequest request)
   {
     RequestBuffer[0] = 0;
   }
   
-  void IMURPCStub::SerializeToBuf(IMUResetRequest request)
+  void IMURPC::SerializeToBuf(IMUResetRequest request)
   {
     RequestBuffer[0] = 0;
   }
 
   template <typename T>
-  MBInterface::OutPackage IMURPCStub::CreatePackage(T Request)
+  SerialInterface::OutPackage IMURPC::CreatePackage(T Request)
   {
     SerializeToBuf(Request);
-    MBInterface::OutPackage outPackage{MBInterface::Periphery::Imu, T::ResponceType::Size,
+    SerialInterface::OutPackage outPackage{SerialInterface::Periphery::Imu, T::ResponceType::Size,
                                        RequestMode::Serialize(T::Mode), RequestBuffer.data(), T::Size};
     return outPackage;
   }
 
   template <>
-  IMURPCStub::IMUFrame
-  IMURPCStub::DeserializeResponce(const MBInterface::InPackage &package)
+  IMURPC::IMUFrame
+  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
   {
     assert(package.ResponceSize == IMUFrame::Size);
 
@@ -77,8 +77,8 @@ namespace Roki
   }
 
   template <>
-  IMURPCStub::IMUInfo
-  IMURPCStub::DeserializeResponce(const MBInterface::InPackage &package)
+  IMURPC::IMUInfo
+  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
   {
     assert(package.ResponceSize == IMUInfo::Size);
 
@@ -95,32 +95,32 @@ namespace Roki
   }
 
   template <>
-  IMURPCStub::Empty
-  IMURPCStub::DeserializeResponce(const MBInterface::InPackage &package)
+  IMURPC::Empty
+  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
   {
     assert(package.ResponceSize == Empty::Size);
     return Empty{};
   }
 
   template <typename T, typename ResponceT>
-  bool IMURPCStub::PerformRPC(MBInterface &mbi, T request, ResponceT &responce)
+  bool IMURPC::PerformRPC(SerialInterface &si, T request, ResponceT &responce)
   {
     static_assert(std::is_same_v<ResponceT, typename T::ResponceType>, "Bad instantiation");
 
-    MBInterface::OutPackage outPackage = CreatePackage(request);
+    SerialInterface::OutPackage outPackage = CreatePackage(request);
 
-    if (!mbi.Send(outPackage))
+    if (!si.Send(outPackage))
     {
       HasError = true;
-      Error = mbi.GetError();
+      Error = si.GetError();
       return false;
     }
 
-    MBInterface::InPackage inPackage;
-    if (!mbi.Receive(T::ResponceType::Size, inPackage))
+    SerialInterface::InPackage inPackage;
+    if (!si.Receive(T::ResponceType::Size, inPackage))
     {
       HasError = true;
-      Error = mbi.GetError();
+      Error = si.GetError();
       return false;
     }
 
@@ -135,10 +135,10 @@ namespace Roki
     return true;
   }
 
-  bool IMURPCStub::IsOk() const { return !HasError; }
-  std::string IMURPCStub::GetError() const { return Error; }
+  bool IMURPC::IsOk() const { return !HasError; }
+  std::string IMURPC::GetError() const { return Error; }
 
-  const char *IMURPCStub::GetErrorDescription(ErrorCodes::Type errCode)
+  const char *IMURPC::GetErrorDescription(ErrorCodes::Type errCode)
   {
     switch (errCode)
     {
@@ -155,9 +155,9 @@ namespace Roki
     }
   }
 
-  template bool IMURPCStub::PerformRPC(MBInterface &, IMUFrameRequest, IMUFrameRequest::ResponceType &);
-  template bool IMURPCStub::PerformRPC(MBInterface &, IMUInfoRequest, IMUInfoRequest::ResponceType &);
-  template bool IMURPCStub::PerformRPC(MBInterface &, IMULatestRequest, IMULatestRequest::ResponceType &);
-  template bool IMURPCStub::PerformRPC(MBInterface &, IMUResetRequest, IMUResetRequest::ResponceType &);
+  template bool IMURPC::PerformRPC(SerialInterface &, IMUFrameRequest, IMUFrameRequest::ResponceType &);
+  template bool IMURPC::PerformRPC(SerialInterface &, IMUInfoRequest, IMUInfoRequest::ResponceType &);
+  template bool IMURPC::PerformRPC(SerialInterface &, IMULatestRequest, IMULatestRequest::ResponceType &);
+  template bool IMURPC::PerformRPC(SerialInterface &, IMUResetRequest, IMUResetRequest::ResponceType &);
 
 } // namespace Roki

@@ -16,7 +16,7 @@
 
 namespace Roki {
 
-class MBInterface final {
+class SerialInterface final {
 public:
   struct TTYConfig final {
     std::string Port;
@@ -80,13 +80,13 @@ private:
   bool EnsureSOM1(size_t windowSize);
 
 public:
-  MBInterface() = default;
+  SerialInterface() = default;
 
-  MBInterface(const MBInterface &) = delete;
-  MBInterface &operator=(const MBInterface &) = delete;
+  SerialInterface(const SerialInterface &) = delete;
+  SerialInterface &operator=(const SerialInterface &) = delete;
 
-  MBInterface(MBInterface &&) = default;
-  MBInterface &operator=(MBInterface &&) = default;
+  SerialInterface(SerialInterface &&) = default;
+  SerialInterface &operator=(SerialInterface &&) = default;
 
   bool IsOk() const;
   std::string GetError() const;
