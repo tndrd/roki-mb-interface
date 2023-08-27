@@ -11,13 +11,13 @@ int main()
   Roki::TTYConfig streamConfig;
 
   serviceConfig.Port = "/dev/ttyAMA2";
-  serviceConfig.Baudrate = 9600;
+  serviceConfig.Baudrate = 115200;
   serviceConfig.ParityBit = true;
   serviceConfig.Stopbits = serviceConfig.STOPBITS_ONE;
   serviceConfig.Timeout = 2;
 
   streamConfig.Port = "/dev/ttyAMA1";
-  streamConfig.Baudrate = 9600;
+  streamConfig.Baudrate = 115200;
   streamConfig.ParityBit = true;
   streamConfig.Stopbits = streamConfig.STOPBITS_ONE;
   streamConfig.Timeout = 2;
