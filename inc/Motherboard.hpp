@@ -11,7 +11,6 @@ private:
   std::string Error;
 
   SerialInterface Service;
-  SerialInterface Stream;
 
   IMURPC IMU;
   BodyRPC Body;
@@ -19,16 +18,13 @@ private:
 private:
   bool MakeError(const std::string &msg);
   bool ServiceError();
-  bool StreamError();
   bool IMUError();
   bool BodyError();
 
 public:
   Motherboard() = default;
 
-  bool Configure(const SerialInterface::TTYConfig &ServiceConfig,
-                 const SerialInterface::TTYConfig &StreamConfig);
-
+  bool Configure(const SerialInterface::TTYConfig &serviceConfig);
   bool GetOrientation(uint16_t seq, IMURPC::IMUFrame &result);
   bool GetOrientation(IMURPC::IMUFrame &result);
   bool GetIMUInfo(IMURPC::IMUInfo &result);
@@ -39,6 +35,8 @@ public:
   bool BodySendAsync(const uint8_t *requestData, uint8_t requestSize,
                      uint8_t responceSize);
 
+  bool GetQueueInfo(BodyRPC::Info& result);
+  
   bool IsOk() const;
   std::string GetError() const;
 };

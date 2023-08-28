@@ -12,21 +12,13 @@ bool Motherboard::ServiceError() {
   return MakeError("Service: " + Service.GetError());
 }
 
-bool Motherboard::StreamError() {
-  return MakeError("Stream: " + Stream.GetError());
-}
-
 bool Motherboard::IMUError() { return MakeError("IMU: " + IMU.GetError()); }
 
 bool Motherboard::BodyError() { return MakeError("Body: " + Body.GetError()); }
 
-bool Motherboard::Configure(const SerialInterface::TTYConfig &ServiceConfig,
-                            const SerialInterface::TTYConfig &StreamConfig) {
+bool Motherboard::Configure(const SerialInterface::TTYConfig &ServiceConfig) {
   if (!Service.Configure(ServiceConfig))
     return ServiceError();
-
-  if (!Stream.Configure(StreamConfig))
-    return StreamError();
 
   return true;
 }
@@ -103,6 +95,13 @@ bool Motherboard::BodySendAsync(const uint8_t *requestData, uint8_t requestSize,
   if (!Body.Send(Service, request))
     return BodyError();
 
+  return true;
+}
+
+bool Motherboard::GetQueueInfo(BodyRPC::Info& result) {
+  if (!Body.GetInfo(Service, result))
+    return BodyError();
+  
   return true;
 }
 
