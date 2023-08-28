@@ -10,7 +10,7 @@ int main()
   Roki::TTYConfig serviceConfig;
 
   serviceConfig.Port = "/dev/ttyAMA2";
-  serviceConfig.Baudrate = 115200;
+  serviceConfig.Baudrate = 1250000;
   serviceConfig.ParityBit = true;
   serviceConfig.Stopbits = serviceConfig.STOPBITS_ONE;
   serviceConfig.Timeout = 2;

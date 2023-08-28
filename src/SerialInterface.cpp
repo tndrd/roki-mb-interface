@@ -83,13 +83,15 @@ namespace Roki
     if (!newFd.IsValid())
       return MakeTTYError(ttyConfig, "Failed to open");
 
-    termios tty;
+    termios2 tty;
 
-    if (tcgetattr(newFd.Get(), &tty))
+    if (ioctl(newFd.Get(), TCGETS2, &tty))
       return MakeTTYError(ttyConfig, "Failed to get tty settings");
 
-    if (cfsetspeed(&tty, ttyConfig.Baudrate))
-      return MakeTTYError(ttyConfig, "Failed to set baudrate");
+    tty.c_cflag &= ~CBAUD;
+    tty.c_cflag |= CBAUDEX;
+    tty.c_ispeed = ttyConfig.Baudrate;
+    tty.c_ospeed = ttyConfig.Baudrate;
 
     if (ttyConfig.Stopbits == TTYConfig::STOPBITS_ONE)
       tty.c_cflag &= ~CSTOPB;
@@ -120,7 +122,7 @@ namespace Roki
     tty.c_oflag &= ~OPOST;                                                       // Prevent special interpretation of output bytes (e.g. newline chars)
     tty.c_oflag &= ~ONLCR;                                                       // Prevent conversion of newline to carriage return/line feed
 
-    if (tcsetattr(newFd.Get(), TCSANOW, &tty))
+    if (ioctl(newFd.Get(), TCSETS2, &tty))
       return MakeTTYError(ttyConfig, "Failed to set up");
 
     Fd = std::move(newFd);

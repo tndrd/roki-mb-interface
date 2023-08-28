@@ -3,7 +3,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
-#include <termios.h>
+#include <sys/ioctl.h>
+#include <asm/termbits.h>
 #include <unistd.h>
 
 #include <array>
