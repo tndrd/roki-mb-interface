@@ -16,7 +16,7 @@ namespace Roki
   {
     RequestBuffer[0] = 0;
   }
-  
+
   void IMURPC::SerializeToBuf(IMUResetRequest request)
   {
     RequestBuffer[0] = 0;
@@ -27,7 +27,7 @@ namespace Roki
   {
     SerializeToBuf(Request);
     SerialInterface::OutPackage outPackage{SerialInterface::Periphery::Imu, T::ResponceType::Size,
-                                       RequestMode::Serialize(T::Mode), RequestBuffer.data(), T::Size};
+                                           RequestMode::Serialize(T::Mode), RequestBuffer.data(), T::Size};
     return outPackage;
   }
 
@@ -37,43 +37,9 @@ namespace Roki
   {
     assert(package.ResponceSize == IMUFrame::Size);
 
-    IMUFrame fr;
-    // cppcheck-suppress uninitStructMember
-    auto &qt = fr.Orientation;
-
-    // cppcheck-suppress uninitStructMember
-    auto &ts = fr.Timestamp;
-
     const uint8_t *ptr = package.Data;
-    const float norm = 16384; // 2**14
-
-    qt.X = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    qt.Y = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    qt.Z = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    qt.W = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    /*
-    qt.Accuracy = *reinterpret_cast<const float *>(ptr);
-    ptr += sizeof(float);
-    */
-
-    ts.TimeS = *reinterpret_cast<const uint32_t *>(ptr);
-    ptr += sizeof(uint32_t);
-
-    ts.TimeNS = *reinterpret_cast<const uint32_t *>(ptr);
-    ptr += sizeof(uint32_t);
-
-    fr.SensorID = *reinterpret_cast<const uint8_t *>(ptr);
-    ptr += sizeof(uint8_t);
-
-    return fr;
+    
+    return IMUFrame::DeserializeFrom(&ptr);
   }
 
   template <>
@@ -81,17 +47,8 @@ namespace Roki
   IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
   {
     assert(package.ResponceSize == IMUInfo::Size);
-
-    IMUInfo fr;
     const uint8_t *ptr = package.Data;
-
-    fr.First = *reinterpret_cast<const uint16_t *>(ptr);
-    ptr += sizeof(uint16_t);
-
-    fr.NumAv = *reinterpret_cast<const uint16_t *>(ptr);
-    ptr += sizeof(uint16_t);
-
-    return fr;
+    return IMUInfo::DeserializeFrom(&ptr);
   }
 
   template <>
@@ -153,6 +110,69 @@ namespace Roki
     default:
       return "Unknown error";
     }
+  }
+
+  IMURPC::IMUInfo IMURPC::IMUInfo::DeserializeFrom(uint8_t const **ptr)
+  {
+    assert(ptr);
+    assert(*ptr);
+
+    IMUInfo info;
+    info.First = *reinterpret_cast<const uint16_t *>(ptr);
+    ptr += sizeof(uint16_t);
+
+    info.NumAv = *reinterpret_cast<const uint16_t *>(ptr);
+    ptr += sizeof(uint16_t);
+
+    info.MaxFrames = *reinterpret_cast<const uint16_t *>(ptr);
+    ptr += sizeof(uint16_t);
+
+    return info;
+  }
+
+  IMURPC::IMUFrame IMURPC::IMUFrame::DeserializeFrom(uint8_t const **data)
+  {
+    assert(data);
+    assert(*data);
+
+    const uint8_t* ptr = *data;
+    
+    IMUFrame fr;
+    // cppcheck-suppress uninitStructMember
+    auto &qt = fr.Orientation;
+
+    // cppcheck-suppress uninitStructMember
+    auto &ts = fr.Timestamp;
+
+    const float norm = 16384; // 2**14
+
+    qt.X = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+    ptr += sizeof(int16_t);
+
+    qt.Y = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+    ptr += sizeof(int16_t);
+
+    qt.Z = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+    ptr += sizeof(int16_t);
+
+    qt.W = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+    ptr += sizeof(int16_t);
+
+    /*
+    qt.Accuracy = *reinterpret_cast<const float *>(ptr);
+    ptr += sizeof(float);
+    */
+
+    ts.TimeS = *reinterpret_cast<const uint32_t *>(ptr);
+    ptr += sizeof(uint32_t);
+
+    ts.TimeNS = *reinterpret_cast<const uint32_t *>(ptr);
+    ptr += sizeof(uint32_t);
+
+    fr.SensorID = *reinterpret_cast<const uint8_t *>(ptr);
+    ptr += sizeof(uint8_t);
+
+    return fr;
   }
 
   template bool IMURPC::PerformRPC(SerialInterface &, IMUFrameRequest, IMUFrameRequest::ResponceType &);

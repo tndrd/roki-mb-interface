@@ -55,14 +55,18 @@ namespace Roki
       static constexpr size_t Size = 4 * sizeof(int16_t) + /* sizeof(float) + */
                                      2 * sizeof(uint32_t) +
                                      sizeof(uint8_t);
+      static IMUFrame DeserializeFrom(uint8_t const**ptr);
     };
 
     struct IMUInfo
     {
-      int16_t First;
-      int16_t NumAv;
+      uint16_t First;
+      uint16_t NumAv;
+      uint16_t MaxFrames;
 
-      static constexpr size_t Size = 2 * sizeof(uint16_t);
+      static constexpr size_t Size = 3 * sizeof(uint16_t);
+
+      static IMUInfo DeserializeFrom(uint8_t const**ptr);
     };
 
     struct Empty
