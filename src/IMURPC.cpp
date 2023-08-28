@@ -38,7 +38,7 @@ namespace Roki
     assert(package.ResponceSize == IMUFrame::Size);
 
     const uint8_t *ptr = package.Data;
-    
+
     return IMUFrame::DeserializeFrom(&ptr);
   }
 
@@ -112,10 +112,12 @@ namespace Roki
     }
   }
 
-  IMURPC::IMUInfo IMURPC::IMUInfo::DeserializeFrom(uint8_t const **ptr)
+  IMURPC::IMUInfo IMURPC::IMUInfo::DeserializeFrom(uint8_t const **data)
   {
-    assert(ptr);
-    assert(*ptr);
+    assert(data);
+    assert(*data);
+
+    const uint8_t *ptr = *data;
 
     IMUInfo info;
     info.First = *reinterpret_cast<const uint16_t *>(ptr);
@@ -135,8 +137,8 @@ namespace Roki
     assert(data);
     assert(*data);
 
-    const uint8_t* ptr = *data;
-    
+    const uint8_t *ptr = *data;
+
     IMUFrame fr;
     // cppcheck-suppress uninitStructMember
     auto &qt = fr.Orientation;
