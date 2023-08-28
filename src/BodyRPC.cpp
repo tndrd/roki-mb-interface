@@ -74,4 +74,39 @@ namespace Roki
     return true;
   }
 
+  BodyRPC::Info BodyRPC::Info::DeserializeFrom(uint8_t const **ptr)
+  {
+    Info info;
+
+    assert(ptr);
+    assert(*ptr);
+
+    info.NumRequests = *reinterpret_cast<const uint16_t *>(*ptr);
+    *ptr += sizeof(uint16_t);
+
+    info.NumResponces = *reinterpret_cast<const uint16_t *>(*ptr);
+    *ptr += sizeof(uint16_t);
+
+    return info;
+  }
+
+  bool BodyRPC::GetInfo(SerialInterface& si, Info& result) {
+    std::array<uint8_t, 1> buf {0};
+    SerialInterface::OutPackage out{
+        SerialInterface::Periphery::Body, Info::Size,
+        MessageMode::Serialize(MessageMode::Info), buf.data(), buf.size()};
+
+    if (!si.Send(out))
+      return MakeError(si.GetError());
+
+    SerialInterface::InPackage package;
+
+    if (!si.Receive(Info::Size, package))
+      return MakeError(si.GetError());
+
+    const uint8_t* ptr = package.Data;
+    result = Info::DeserializeFrom(&ptr);
+    return true;
+  }
+
 } // namespace Roki

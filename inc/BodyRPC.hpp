@@ -13,6 +13,7 @@ namespace Roki
 
       static constexpr Type Sync = 0;
       static constexpr Type Async = 1;
+      static constexpr Type Info = 2;
 
       static uint8_t Serialize(MessageMode::Type mode);
       static Type Deserialize(uint8_t data);
@@ -29,6 +30,16 @@ namespace Roki
       static Type Deserialize(uint8_t val);
 
       static std::string GetDescription(Type error);
+    };
+
+    struct Info
+    {
+      uint16_t NumRequests;
+      uint16_t NumResponces;
+
+      static constexpr size_t Size = 2 * sizeof(uint16_t);
+
+      static Info DeserializeFrom(uint8_t const**ptr);
     };
 
     struct Request
@@ -59,6 +70,7 @@ namespace Roki
 
     bool Send(SerialInterface &si, Request request);
     bool Recieve(SerialInterface &si, Responce &responce, uint8_t responceSize);
+    bool GetInfo(SerialInterface& si, Info& result);
   };
 
 } // namespace Roki
