@@ -10,7 +10,6 @@ int main()
 {
   Roki::Motherboard mb;
   Roki::TTYConfig serviceConfig;
-  Roki::TTYConfig streamConfig;
 
   serviceConfig.Port = "/dev/ttyAMA2";
   serviceConfig.Baudrate = 115200;
@@ -18,17 +17,13 @@ int main()
   serviceConfig.Stopbits = serviceConfig.STOPBITS_ONE;
   serviceConfig.Timeout = 5;
 
-  streamConfig.Port = "/dev/ttyAMA1";
-  streamConfig.Baudrate = 115200;
-  streamConfig.ParityBit = true;
-  streamConfig.Stopbits = streamConfig.STOPBITS_ONE;
-  streamConfig.Timeout = 5;
-
-  if (!mb.Configure(serviceConfig, streamConfig))
+  if (!mb.Configure(serviceConfig))
   {
     std::cout << mb.GetError() << std::endl;
     exit(1);
   }
+
+  Roki::QueueInfo qi;
 
   Roki::Rcb4Adapter rcb4;
 
@@ -47,25 +42,47 @@ int main()
   sd.Sio = 1;
 
   int x = 0;
-  while (x < 500)
+  while (true)
   {
-    sd.Data = 7500 + int(500 * sin(0.1 * x));
-    rcb4.setServoPos(&sd, 1, 5);
-    bool ret = mb.BodySendAsync(rcb4.GetRequestData(), rcb4.GetRequestSize(), rcb4.GetResponceSize());
+    if (x < 500)
+    {
+      sd.Data = 7500 + int(500 * sin(0.1 * x));
+      rcb4.setServoPos(&sd, 1, 5);
+      if (!mb.BodySendAsync(rcb4.GetRequestData(), rcb4.GetRequestSize(), rcb4.GetResponceSize()))
+      {
+        std::cout << mb.GetError() << std::endl;
+        exit(1);
+      }
+    }
+
     x += 1;
 
-    if (!ret)
+    if (x > 500)
+    {
+      rcb4.checkAcknowledge();
+      ack = mb.BodySendSync(rcb4.GetRequestData(), rcb4.GetRequestSize(), rcb4.GetResponceData(), rcb4.GetResponceSize());
+      if (!ack)
+      {
+        std::cout << mb.GetError() << std::endl;
+        exit(1);
+      }
+    }
+
+    if (!mb.GetQueueInfo(qi))
+    {
       std::cout << mb.GetError() << std::endl;
+      exit(1);
+    }
+
+    std::cout << "Body info: " << std::endl;
+    std::cout << " Requests: " << qi.NumRequests << std::endl;
+    std::cout << " Responces: " << qi.NumResponces << std::endl;
+    std::cout << std::endl;
+
+    if (qi.NumRequests == 0)
+      break;
+
     // std::this_thread::sleep_for(std::chrono::seconds(1));
-  }
-
-  rcb4.checkAcknowledge();
-  ack = mb.BodySendSync(rcb4.GetRequestData(), rcb4.GetRequestSize(), rcb4.GetResponceData(), rcb4.GetResponceSize());
-
-  if (!ack)
-  {
-    std::cout << mb.GetError() << std::endl;
-    exit(1);
   }
 
   return 0;
