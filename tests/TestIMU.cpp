@@ -8,7 +8,6 @@ int main()
 {
   Roki::Motherboard mb;
   Roki::TTYConfig serviceConfig;
-  Roki::TTYConfig streamConfig;
 
   serviceConfig.Port = "/dev/ttyAMA2";
   serviceConfig.Baudrate = 115200;
@@ -16,13 +15,7 @@ int main()
   serviceConfig.Stopbits = serviceConfig.STOPBITS_ONE;
   serviceConfig.Timeout = 2;
 
-  streamConfig.Port = "/dev/ttyAMA1";
-  streamConfig.Baudrate = 115200;
-  streamConfig.ParityBit = true;
-  streamConfig.Stopbits = streamConfig.STOPBITS_ONE;
-  streamConfig.Timeout = 2;
-
-  if (!mb.Configure(serviceConfig, streamConfig))
+  if (!mb.Configure(serviceConfig))
   {
     std::cout << mb.GetError() << std::endl;
     exit(1);
@@ -70,7 +63,7 @@ int main()
       continue;
     }
 
-    std::cout << "Quaternion: " << +i << std::endl;
+    std::cout << "Quaternion: " << std::endl;
     std::cout << "  x:  " << frame.Orientation.X << std::endl;
     std::cout << "  y:  " << frame.Orientation.Y << std::endl;
     std::cout << "  z:  " << frame.Orientation.Z << std::endl;
@@ -82,7 +75,7 @@ int main()
     std::cout << "  ns: " << frame.Timestamp.TimeNS << std::endl;
 
     std::cout << "Sensor ID: " << +frame.SensorID << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
   }
   return 0;
 }
