@@ -1,5 +1,6 @@
 import sys
-sys.path.append('/home/tndrd/starkit/kondo_2023/roki-mb-interface/build')
+sys.path.append('/home/pi/Tndrd/roki-mb-interface/build')
+import time
 
 import Roki
 
@@ -14,18 +15,30 @@ conf.ParityBit = True
 conf.Timeout = 2
 
 mb.Configure(conf)
+#mb.ResetIMUCounter()
 
 while True:
     fr = mb.GetCurrentOrientation()
+    #fr = mb.GetOrientationBySeq(150)
 
     print("Quaternion: ")
-    print("  X:  " + fr.Orientation.X)
-    print("  Y:  " + fr.Orientation.Y)
-    print("  Z:  " + fr.Orientation.Z)
-    print("  W:  " + fr.Orientation.W)
+    print("  X:  " + str(fr.Orientation.X))
+    print("  Y:  " + str(fr.Orientation.Y))
+    print("  Z:  " + str(fr.Orientation.Z))
+    print("  W:  " + str(fr.Orientation.W))
     print("Timestamp: ")
-    print("  S:  " + fr.Timestamp.TimeS)
-    print("  NS: " + fr.Timestamp.TimeNS)
-    print("SensorID: " + fr.SensorID)
+    print("  S:  " + str(fr.Timestamp.TimeS))
+    print("  NS: " + str(fr.Timestamp.TimeNS))
+    print("SensorID: " + str(fr.SensorID))
     print("\n")
+
+    info = mb.GetIMUInfo()
+
+    print("Imu info: ")
+    print("  First: " + str(info.First))
+    print("  NumAv: " + str(info.NumAv))
+    print("  MaxFr: " + str(info.MaxFrames))
+    print("\n")
+
+    time.sleep(0.5)
 
