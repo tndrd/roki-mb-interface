@@ -7,7 +7,7 @@ MotherboardException::MotherboardException(const std::string &source,
 
 void MotherboardAdapter::Configure(
     const SerialInterface::TTYConfig &serviceConfig) {
-  static const char *FooName = "GetOrientationBySeq";
+  static const char *FooName = "Configure";
 
   if (!Motherboard::Configure(serviceConfig))
     throw ForwardException(FooName);
@@ -32,7 +32,7 @@ IMUFrame MotherboardAdapter::GetOrientationBySeq(int seq) {
 }
 
 IMUFrame MotherboardAdapter::GetCurrentOrientation() {
-  static const char *FooName = "GetOrientationBySeq";
+  static const char *FooName = "GetCurrentOrientation";
 
   IMUFrame result;
 
