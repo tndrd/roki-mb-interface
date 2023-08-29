@@ -9,9 +9,9 @@ PYBIND11_MODULE(Roki, m) {
   py::class_<Quaternion>(m, "Quaternion")
     .def(py::init<>())
     .def_readwrite("X", &Quaternion::X)
-    .def_readwrite("Y", &Quaternion::X)
-    .def_readwrite("Z", &Quaternion::X)
-    .def_readwrite("W", &Quaternion::X);
+    .def_readwrite("Y", &Quaternion::Y)
+    .def_readwrite("Z", &Quaternion::Z)
+    .def_readwrite("W", &Quaternion::W);
 
   py::class_<Timestamp>(m, "Timestamp")
     .def(py::init<>()) 
