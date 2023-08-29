@@ -24,11 +24,11 @@ target_link_libraries(BodyRPC PUBLIC SerialInterface)
 add_library(Motherboard src/Motherboard.cpp)
 target_link_libraries(Motherboard PUBLIC IMURPC BodyRPC)
 
-add_library(Rcb4Adapter src/Rcb4Adapter.cpp)
-target_link_libraries(Rcb4Adapter PUBLIC rcb4base)
+add_library(RokiRcb4 src/RokiRcb4.cpp)
+target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
 
 add_library(MotherboardAdapter src/MotherboardAdapter.cpp)
-target_link_libraries(Rcb4Adapter PUBLIC Motherboard)
+target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
 
 # Tests
 

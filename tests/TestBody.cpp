@@ -1,6 +1,6 @@
 #include "Motherboard.hpp"
 #include "MotherboardAliases.hpp"
-#include "Rcb4Adapter.hpp"
+#include "RokiRcb4.hpp"
 #include <cmath>
 
 #include <chrono>
@@ -25,17 +25,13 @@ int main()
 
   Roki::QueueInfo qi;
 
-  Roki::Rcb4Adapter rcb4;
+  Roki::RokiRcb4 rcb4 (mb);
 
-  rcb4.checkAcknowledge();
-
-  bool ack = mb.BodySendSync(rcb4.GetRequestData(), rcb4.GetRequestSize(), rcb4.GetResponceData(), rcb4.GetResponceSize());
-
-  if (!ack)
-  {
-    std::cout << mb.GetError() << std::endl;
+  if(!rcb4.checkAcknowledge()) {
+    std::cout << rcb4.GetError() << std::endl;
     exit(1);
   }
+
 
   Rcb4BaseClass::ServoData sd;
   sd.Id = 8;
@@ -47,10 +43,8 @@ int main()
     if (x < 500)
     {
       sd.Data = 7500 + int(500 * sin(0.1 * x));
-      rcb4.setServoPos(&sd, 1, 5);
-      if (!mb.BodySendAsync(rcb4.GetRequestData(), rcb4.GetRequestSize(), rcb4.GetResponceSize()))
-      {
-        std::cout << mb.GetError() << std::endl;
+      if(!rcb4.SetServoPosAsync(&sd, 1, 5)) {
+        std::cout << rcb4.GetError() << std::endl;
         exit(1);
       }
     }
@@ -59,11 +53,8 @@ int main()
 
     if (x > 500)
     {
-      rcb4.checkAcknowledge();
-      ack = mb.BodySendSync(rcb4.GetRequestData(), rcb4.GetRequestSize(), rcb4.GetResponceData(), rcb4.GetResponceSize());
-      if (!ack)
-      {
-        std::cout << mb.GetError() << std::endl;
+      if(!rcb4.checkAcknowledge()) {
+        std::cout << rcb4.GetError() << std::endl;
         exit(1);
       }
     }
