@@ -3,6 +3,7 @@ project(RokiMotherboard)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(deps/pybind11)
 add_subdirectory(deps/rcb4-base-class)
 
 #ADD_DEFINITIONS(-DDBGMB=1)
@@ -25,6 +26,9 @@ target_link_libraries(Motherboard PUBLIC IMURPC BodyRPC)
 
 add_library(Rcb4Adapter src/Rcb4Adapter.cpp)
 target_link_libraries(Rcb4Adapter PUBLIC rcb4base)
+
+add_library(MotherboardAdapter src/MotherboardAdapter.cpp)
+target_link_libraries(Rcb4Adapter PUBLIC Motherboard)
 
 # Tests
 
