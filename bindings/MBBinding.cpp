@@ -35,6 +35,10 @@ PYBIND11_MODULE(Roki, m) {
     .def_readwrite("NumRequests", &QueueInfo::NumRequests)
     .def_readwrite("NumResponces", &QueueInfo::NumResponces);
 
+  py::enum_<SerialInterface::TTYConfig::StopbitsCount>(m, "Stopbits", py::arithmetic())
+    .value("One", SerialInterface::TTYConfig::StopbitsCount::One)
+    .value("Two", SerialInterface::TTYConfig::StopbitsCount::Two);
+
   py::class_<SerialInterface::TTYConfig>(m, "TTYConfig")
     .def(py::init<>())
     .def_readwrite("Port", &SerialInterface::TTYConfig::Port)
