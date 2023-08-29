@@ -13,7 +13,7 @@ public:
   MotherboardException(const std::string &source, const std::string &msg);
 };
 
-class MotherboardAdapter : private Motherboard {
+class MotherboardAdapter : public Motherboard {
 private:
   MotherboardException ForwardException(const std::string &source) const;
 
