@@ -93,9 +93,9 @@ namespace Roki
     tty.c_ispeed = ttyConfig.Baudrate;
     tty.c_ospeed = ttyConfig.Baudrate;
 
-    if (ttyConfig.Stopbits == TTYConfig::STOPBITS_ONE)
+    if (ttyConfig.Stopbits == TTYConfig::StopbitsCount::One)
       tty.c_cflag &= ~CSTOPB;
-    if (ttyConfig.Stopbits == TTYConfig::STOPBITS_TWO)
+    if (ttyConfig.Stopbits == TTYConfig::StopbitsCount::Two)
       tty.c_cflag |= CSTOPB;
 
     if (!ttyConfig.ParityBit)

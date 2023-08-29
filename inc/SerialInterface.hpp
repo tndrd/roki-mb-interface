@@ -23,7 +23,8 @@ public:
     std::string Port;
     size_t Baudrate;
 
-    enum { STOPBITS_ONE, STOPBITS_TWO } Stopbits;
+    enum class StopbitsCount { One, Two }; 
+    StopbitsCount Stopbits;
 
     bool ParityBit;
     float Timeout;

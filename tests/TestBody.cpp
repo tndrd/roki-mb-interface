@@ -14,7 +14,7 @@ int main()
   serviceConfig.Port = "/dev/ttyAMA2";
   serviceConfig.Baudrate = 1250000;
   serviceConfig.ParityBit = true;
-  serviceConfig.Stopbits = serviceConfig.STOPBITS_ONE;
+  serviceConfig.Stopbits = Roki::TTYConfig::StopbitsCount::One;;
   serviceConfig.Timeout = 5;
 
   if (!mb.Configure(serviceConfig))
