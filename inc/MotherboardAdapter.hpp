@@ -4,7 +4,7 @@
 #include "MotherboardAliases.hpp"
 
 #include <stdexcept>
-#include <type_traits>
+#include <limits>
 
 namespace Roki {
 
