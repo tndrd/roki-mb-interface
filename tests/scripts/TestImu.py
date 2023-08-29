@@ -9,7 +9,7 @@ conf = Roki.TTYConfig()
 
 conf.Port = "/dev/ttyAMA2"
 conf.Baudrate = 1250000
-conf.Stopbits = conf.STOPBITS_ONE
+conf.Stopbits = Roki.Stopbits.One
 conf.ParityBit = True
 conf.Timeout = 2
 
