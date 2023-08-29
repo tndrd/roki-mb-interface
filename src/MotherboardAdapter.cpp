@@ -60,44 +60,6 @@ void MotherboardAdapter::ResetIMUCounter() {
     throw ForwardException(FooName);
 }
 
-std::vector<uint8_t>
-MotherboardAdapter::BodySendSync(const std::vector<uint8_t> &txData,
-                                 int responceSize) {
-  static const char *FooName = "BodySendSync";
-
-  if (responceSize < 0 || responceSize > std::numeric_limits<uint16_t>::max())
-    throw MotherboardException(FooName, "Wrong responce size: " +
-                                            std::to_string(responceSize));
-
-  if (txData.empty())
-    throw MotherboardException(FooName, "Wrong request size" +
-                                            std::to_string(txData.size()));
-
-  std::vector<uint8_t> rxData(responceSize, 0);
-
-  if (!Motherboard::BodySendSync(txData.data(), txData.size(), rxData.data(),
-                                 responceSize))
-    throw ForwardException(FooName);
-
-  return rxData;
-}
-
-void MotherboardAdapter::BodySendAsync(const std::vector<uint8_t> &txData,
-                                       int responceSize) {
-  static const char *FooName = "BodySendAsync";
-
-  if (responceSize < 0 || responceSize > std::numeric_limits<uint16_t>::max())
-    throw MotherboardException(FooName, "Wrong responce size: " +
-                                            std::to_string(responceSize));
-
-  if (txData.empty())
-    throw MotherboardException(FooName, "Wrong request size" +
-                                            std::to_string(txData.size()));
-
-  if (!Motherboard::BodySendAsync(txData.data(), txData.size(), responceSize))
-    throw ForwardException(FooName);
-}
-
 QueueInfo MotherboardAdapter::GetQueueInfo() {
   static const char *FooName = "GetQueueInfo";
 

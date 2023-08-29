@@ -26,10 +26,6 @@ public:
   IMUFrame GetCurrentOrientation();
   IMUInfo GetIMUInfo();
   void ResetIMUCounter();
-
-  std::vector<uint8_t> BodySendSync(const std::vector<uint8_t> &txData,
-                                    int responceSize);
-  void BodySendAsync(const std::vector<uint8_t> &txData, int responceSize);
   QueueInfo GetQueueInfo();
 };
 } // namespace Roki
