@@ -32,4 +32,5 @@ target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
 
 # Tests
 
+include(bindings/bindings.cmake)
 include(tests/tests.cmake)
