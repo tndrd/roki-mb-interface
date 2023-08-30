@@ -27,6 +27,6 @@ private:
   bool SendAsync(byte *txData);
 
 public:
-  bool SetServoPosAsync(ServoData servoDatas[], byte servoCount, byte frame);
+  bool setServoPosAsync(ServoData servoDatas[], byte servoCount, byte frame);
 };
 } // namespace Roki

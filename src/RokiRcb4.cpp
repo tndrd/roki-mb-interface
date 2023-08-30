@@ -33,7 +33,7 @@ bool RokiRcb4::SendAsync(byte *txData) {
   return true;
 }
 
-bool RokiRcb4::SetServoPosAsync(ServoData servoDatas[], byte servoCount,
+bool RokiRcb4::setServoPosAsync(ServoData servoDatas[], byte servoCount,
                                 byte frame) {
   if (runConstFrameServoCmd(servoDatas, servoCount, frame) == -1)
     return MakeError("Failed to set servo pos: ill command");
