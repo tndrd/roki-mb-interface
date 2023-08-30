@@ -68,12 +68,13 @@ PYBIND11_MODULE(Roki, m)
 
   py::class_<Rcb4> rcb4(m, "Rcb4");
 
-  py::class_<Rcb4::ServoData>(m, "ServoData")
+  py::class_<Rcb4::ServoData>(rcb4, "ServoData")
       .def(py::init<>())
       .def_readwrite("Id", &Rcb4::ServoData::Id)
       .def_readwrite("Sio", &Rcb4::ServoData::Sio)
       .def_readwrite("Data", &Rcb4::ServoData::Data);
 
+  rcb4.def(py::init<MotherboardAdapter&>());
   rcb4.def("checkAcknowledge", &Rcb4::checkAcknowledge);
   rcb4.def("getPio", &Rcb4::getPio);
   rcb4.def("setPio", &Rcb4::setPio);
@@ -90,5 +91,6 @@ PYBIND11_MODULE(Roki, m)
   rcb4.def("setServoSpeed", &Rcb4::setServoSpeed);
   rcb4.def("setServoStretch", &Rcb4::setServoStretch);
 
-  // rcb4.
+  rcb4.def("getError", &Rcb4::GetError);
+  rcb4.def("isOk", &Rcb4::IsOk);
 }
