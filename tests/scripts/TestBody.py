@@ -1,5 +1,4 @@
 import sys
-sys.path.append('/home/pi/Tndrd/roki-mb-interface/build')
 import time
 
 import Roki
