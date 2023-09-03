@@ -91,6 +91,7 @@ PYBIND11_MODULE(Roki, m)
   rcb4.def("setServoSpeed", &Rcb4::setServoSpeed);
   rcb4.def("setServoStretch", &Rcb4::setServoStretch);
   rcb4.def("moveRamToComCmdSynchronize", &Rcb4::moveRamToComCmdSynchronize);
+  rcb4.def("motionPlay", &Rcb4::motionPlay);
 
   rcb4.def("getError", &Rcb4::GetError);
   rcb4.def("isOk", &Rcb4::IsOk);
