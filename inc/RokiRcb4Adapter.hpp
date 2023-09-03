@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RokiRcb4.hpp"
+#include <tuple>
 
 namespace Roki
 {
@@ -17,5 +18,6 @@ namespace Roki
     bool setHoldPos(std::vector<ServoData> &servoDatas);
     bool setServoSpeed(std::vector<ServoData> &servoDatas);
     bool setServoStretch(std::vector<ServoData> &servoDatas);
+    std::tuple<bool, std::vector<byte>> moveRamToComCmdSynchronize(int scrAddr, byte srcDataSize);
   };
 } // namespace Roki
