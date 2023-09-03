@@ -28,5 +28,8 @@ private:
 
 public:
   bool setServoPosAsync(ServoData servoDatas[], byte servoCount, byte frame);
+  
+  // overrides default motionPlay implementation
+  bool motionPlay(int motionNum);
 };
 } // namespace Roki
