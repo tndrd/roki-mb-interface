@@ -37,4 +37,4 @@ target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 # Tests
 
 include(bindings/bindings.cmake)
-include(tests/tests.cmake)
+include(examples/examples.cmake)
