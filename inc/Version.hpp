@@ -1,0 +1,4 @@
+#pragma once
+
+#define INTERFACE_VERSION_MAJOR 0
+#define INTERFACE_VERSION_MINOR 1

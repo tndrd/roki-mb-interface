@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "Helpers.hpp"
+#include "Version.hpp"
 
 namespace Roki {
 
@@ -41,6 +42,7 @@ public:
     using Type = uint8_t;
     static constexpr Type Body = 0;
     static constexpr Type Imu = 1;
+    static constexpr Type Ack = 2;
   };
 
   struct OutPackage {
@@ -74,12 +76,10 @@ private:
 private:
   bool MakeError(const std::string &msg);
   bool MakeTTYError(const TTYConfig &tty, const std::string &msg);
-
   void SerializePackageToBuf(const OutPackage &package, size_t *size);
   bool Read(uint8_t *buf, size_t size);
   bool Write(const uint8_t *buf, size_t size);
   bool ReadToBuf(size_t size);
-  bool EnsureSOM1(size_t windowSize);
 
 public:
   SerialInterface() = default;
@@ -94,6 +94,8 @@ public:
   std::string GetError() const;
 
   bool Configure(const TTYConfig &ttyConfig);
+  bool CheckVersion();
+  
   bool Send(const OutPackage &package);
   bool Receive(size_t responceSize, InPackage &package);
 };

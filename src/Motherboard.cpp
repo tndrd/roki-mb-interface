@@ -20,6 +20,9 @@ bool Motherboard::Configure(const SerialInterface::TTYConfig &ServiceConfig) {
   if (!Service.Configure(ServiceConfig))
     return ServiceError();
 
+  if (!Service.CheckVersion())
+    return ServiceError();
+
   return true;
 }
 

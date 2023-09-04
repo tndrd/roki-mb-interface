@@ -17,7 +17,7 @@ namespace Roki
   }
 
   void SerialInterface::SerializePackageToBuf(const OutPackage &package,
-                                          size_t *size)
+                                              size_t *size)
   {
     assert(package.Data);
     assert(size);
@@ -130,6 +130,30 @@ namespace Roki
     return true;
   }
 
+  bool SerialInterface::CheckVersion()
+  {
+    std::array<uint8_t, 1> data{0};
+    OutPackage out{
+        Periphery::Ack, 2,
+        0, data.data(), data.size()};
+
+    if (!Send(out))
+      return false;
+
+    InPackage in;
+
+    if (!Receive(2, in))
+      return false;
+
+    uint8_t VersionMajor = in.Data[0];
+    uint8_t VersionMinor = in.Data[1];
+    
+    if (VersionMajor != INTERFACE_VERSION_MAJOR || VersionMinor != INTERFACE_VERSION_MINOR)
+      return MakeError("Library v" + std::to_string(INTERFACE_VERSION_MAJOR) + "." + std::to_string(INTERFACE_VERSION_MINOR) + " conflicts with firmware v" + std::to_string(VersionMajor) + "." + std::to_string(VersionMinor));
+  
+    return true;
+  }
+
   bool SerialInterface::Send(const OutPackage &package)
   {
     if (!Fd.IsValid())
@@ -235,7 +259,8 @@ namespace Roki
 
 #ifdef DBGMB
     std::cout << "OK" << std::endl;
-    std::cout << "Package OK\n" << std::endl;
+    std::cout << "Package OK\n"
+              << std::endl;
 #endif
 
     return true;

@@ -1,0 +1,2 @@
+add_executable(SerialInterfaceTest tests/SerialInterfaceTest.cpp)
+target_link_libraries(SerialInterfaceTest GTest::gtest_main)
