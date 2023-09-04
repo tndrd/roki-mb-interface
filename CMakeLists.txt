@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(deps/pybind11)
 add_subdirectory(deps/rcb4-base-class)
-add_subdirectory(deps/googletest)
 
 #ADD_DEFINITIONS(-DDBGMB=1)
 
@@ -34,7 +33,6 @@ target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
 add_library(RokiRcb4Adapter src/RokiRcb4Adapter.cpp)
 target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 
-# Tests
-
+#include(tests/tests.cmake)
 include(bindings/bindings.cmake)
 include(examples/examples.cmake)
