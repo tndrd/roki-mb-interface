@@ -1,185 +1,174 @@
 #include "IMURPC.hpp"
-namespace Roki
-{
+namespace Roki {
 
-  void IMURPC::SerializeToBuf(IMUFrameRequest request)
-  {
-    *reinterpret_cast<uint16_t *>(RequestBuffer.data()) = request.seq;
+void IMURPC::SerializeToBuf(IMUFrameRequest request) {
+  *reinterpret_cast<uint16_t *>(RequestBuffer.data()) = request.seq;
+}
+
+void IMURPC::SerializeToBuf(IMUInfoRequest request) { RequestBuffer[0] = 0; }
+
+void IMURPC::SerializeToBuf(IMULatestRequest request) { RequestBuffer[0] = 0; }
+
+void IMURPC::SerializeToBuf(IMUResetRequest request) { RequestBuffer[0] = 0; }
+
+template <typename T>
+SerialInterface::OutPackage IMURPC::CreatePackage(T Request) {
+  SerializeToBuf(Request);
+  SerialInterface::OutPackage outPackage{
+      SerialInterface::Periphery::Imu, T::ResponceType::Size,
+      RequestMode::Serialize(T::Mode), RequestBuffer.data(), T::Size};
+  return outPackage;
+}
+
+template <>
+IMURPC::IMUFrame
+IMURPC::DeserializeResponce(const SerialInterface::InPackage &package) {
+  assert(package.ResponceSize == IMUFrame::Size);
+
+  const uint8_t *ptr = package.Data;
+
+  return IMUFrame::DeserializeFrom(&ptr);
+}
+
+template <>
+IMURPC::IMUInfo
+IMURPC::DeserializeResponce(const SerialInterface::InPackage &package) {
+  assert(package.ResponceSize == IMUInfo::Size);
+  const uint8_t *ptr = package.Data;
+  return IMUInfo::DeserializeFrom(&ptr);
+}
+
+template <>
+IMURPC::Empty
+IMURPC::DeserializeResponce(const SerialInterface::InPackage &package) {
+  assert(package.ResponceSize == Empty::Size);
+  return Empty{};
+}
+
+template <typename T, typename ResponceT>
+bool IMURPC::PerformRPC(SerialInterface &si, T request, ResponceT &responce) {
+  static_assert(std::is_same_v<ResponceT, typename T::ResponceType>,
+                "Bad instantiation");
+
+  SerialInterface::OutPackage outPackage = CreatePackage(request);
+
+  if (!si.Send(outPackage)) {
+    HasError = true;
+    Error = si.GetError();
+    return false;
   }
 
-  void IMURPC::SerializeToBuf(IMUInfoRequest request)
-  {
-    RequestBuffer[0] = 0;
+  SerialInterface::InPackage inPackage;
+  if (!si.Receive(T::ResponceType::Size, inPackage)) {
+    HasError = true;
+    Error = si.GetError();
+    return false;
   }
 
-  void IMURPC::SerializeToBuf(IMULatestRequest request)
-  {
-    RequestBuffer[0] = 0;
+  if (inPackage.Error != 0) {
+    HasError = true;
+    Error = GetErrorDescription(inPackage.Error);
+    return false;
   }
 
-  void IMURPC::SerializeToBuf(IMUResetRequest request)
-  {
-    RequestBuffer[0] = 0;
+  responce = DeserializeResponce<typename T::ResponceType>(inPackage);
+  return true;
+}
+
+bool IMURPC::IsOk() const { return !HasError; }
+std::string IMURPC::GetError() const { return Error; }
+
+IMURPC::ErrorCodes::Type IMURPC::ErrorCodes::Deserialize(uint8_t error) {
+  return error;
+}
+
+const char *IMURPC::GetErrorDescription(ErrorCodes::Type errCode) {
+  switch (errCode) {
+  case ErrorCodes::Success:
+    return "Success";
+  case ErrorCodes::QueueEmpty:
+    return "Queue is empty";
+  case ErrorCodes::BadSeq:
+    return "Bad seq number";
+  case ErrorCodes::UnknownMode:
+    return "Unknown Mode";
+  case ErrorCodes::BadRequest:
+    return "Bad Request";
+  default:
+    return "Unknown error";
   }
+}
 
-  template <typename T>
-  SerialInterface::OutPackage IMURPC::CreatePackage(T Request)
-  {
-    SerializeToBuf(Request);
-    SerialInterface::OutPackage outPackage{SerialInterface::Periphery::Imu, T::ResponceType::Size,
-                                           RequestMode::Serialize(T::Mode), RequestBuffer.data(), T::Size};
-    return outPackage;
-  }
+IMURPC::IMUInfo IMURPC::IMUInfo::DeserializeFrom(uint8_t const **data) {
+  assert(data);
+  assert(*data);
 
-  template <>
-  IMURPC::IMUFrame
-  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
-  {
-    assert(package.ResponceSize == IMUFrame::Size);
+  const uint8_t *ptr = *data;
 
-    const uint8_t *ptr = package.Data;
+  IMUInfo info;
+  info.First = *reinterpret_cast<const uint16_t *>(ptr);
+  ptr += sizeof(uint16_t);
 
-    return IMUFrame::DeserializeFrom(&ptr);
-  }
+  info.NumAv = *reinterpret_cast<const uint16_t *>(ptr);
+  ptr += sizeof(uint16_t);
 
-  template <>
-  IMURPC::IMUInfo
-  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
-  {
-    assert(package.ResponceSize == IMUInfo::Size);
-    const uint8_t *ptr = package.Data;
-    return IMUInfo::DeserializeFrom(&ptr);
-  }
+  info.MaxFrames = *reinterpret_cast<const uint16_t *>(ptr);
+  ptr += sizeof(uint16_t);
 
-  template <>
-  IMURPC::Empty
-  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
-  {
-    assert(package.ResponceSize == Empty::Size);
-    return Empty{};
-  }
+  return info;
+}
 
-  template <typename T, typename ResponceT>
-  bool IMURPC::PerformRPC(SerialInterface &si, T request, ResponceT &responce)
-  {
-    static_assert(std::is_same_v<ResponceT, typename T::ResponceType>, "Bad instantiation");
+IMURPC::IMUFrame IMURPC::IMUFrame::DeserializeFrom(uint8_t const **data) {
+  assert(data);
+  assert(*data);
 
-    SerialInterface::OutPackage outPackage = CreatePackage(request);
+  const uint8_t *ptr = *data;
 
-    if (!si.Send(outPackage))
-    {
-      HasError = true;
-      Error = si.GetError();
-      return false;
-    }
+  IMUFrame fr;
+  // cppcheck-suppress uninitStructMember
+  auto &qt = fr.Orientation;
 
-    SerialInterface::InPackage inPackage;
-    if (!si.Receive(T::ResponceType::Size, inPackage))
-    {
-      HasError = true;
-      Error = si.GetError();
-      return false;
-    }
+  // cppcheck-suppress uninitStructMember
+  auto &ts = fr.Timestamp;
 
-    if (inPackage.Error != 0)
-    {
-      HasError = true;
-      Error = GetErrorDescription(inPackage.Error);
-      return false;
-    }
+  const float norm = 16384; // 2**14
 
-    responce = DeserializeResponce<typename T::ResponceType>(inPackage);
-    return true;
-  }
+  qt.X = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+  ptr += sizeof(int16_t);
 
-  bool IMURPC::IsOk() const { return !HasError; }
-  std::string IMURPC::GetError() const { return Error; }
+  qt.Y = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+  ptr += sizeof(int16_t);
 
-  const char *IMURPC::GetErrorDescription(ErrorCodes::Type errCode)
-  {
-    switch (errCode)
-    {
-    case ErrorCodes::Success:
-      return "Success";
-    case ErrorCodes::FrameUnavailable:
-      return "Frame unavailable";
-    case ErrorCodes::UnknownMode:
-      return "Unknown Mode";
-    case ErrorCodes::BadRequest:
-      return "Bad Request";
-    default:
-      return "Unknown error";
-    }
-  }
+  qt.Z = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+  ptr += sizeof(int16_t);
 
-  IMURPC::IMUInfo IMURPC::IMUInfo::DeserializeFrom(uint8_t const **data)
-  {
-    assert(data);
-    assert(*data);
+  qt.W = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
+  ptr += sizeof(int16_t);
 
-    const uint8_t *ptr = *data;
+  /*
+  qt.Accuracy = *reinterpret_cast<const float *>(ptr);
+  ptr += sizeof(float);
+  */
 
-    IMUInfo info;
-    info.First = *reinterpret_cast<const uint16_t *>(ptr);
-    ptr += sizeof(uint16_t);
+  ts.TimeS = *reinterpret_cast<const uint32_t *>(ptr);
+  ptr += sizeof(uint32_t);
 
-    info.NumAv = *reinterpret_cast<const uint16_t *>(ptr);
-    ptr += sizeof(uint16_t);
+  ts.TimeNS = *reinterpret_cast<const uint32_t *>(ptr);
+  ptr += sizeof(uint32_t);
 
-    info.MaxFrames = *reinterpret_cast<const uint16_t *>(ptr);
-    ptr += sizeof(uint16_t);
+  fr.SensorID = *reinterpret_cast<const uint8_t *>(ptr);
+  ptr += sizeof(uint8_t);
 
-    return info;
-  }
+  return fr;
+}
 
-  IMURPC::IMUFrame IMURPC::IMUFrame::DeserializeFrom(uint8_t const **data)
-  {
-    assert(data);
-    assert(*data);
-
-    const uint8_t *ptr = *data;
-
-    IMUFrame fr;
-    // cppcheck-suppress uninitStructMember
-    auto &qt = fr.Orientation;
-
-    // cppcheck-suppress uninitStructMember
-    auto &ts = fr.Timestamp;
-
-    const float norm = 16384; // 2**14
-
-    qt.X = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    qt.Y = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    qt.Z = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    qt.W = float(*reinterpret_cast<const int16_t *>(ptr)) / norm;
-    ptr += sizeof(int16_t);
-
-    /*
-    qt.Accuracy = *reinterpret_cast<const float *>(ptr);
-    ptr += sizeof(float);
-    */
-
-    ts.TimeS = *reinterpret_cast<const uint32_t *>(ptr);
-    ptr += sizeof(uint32_t);
-
-    ts.TimeNS = *reinterpret_cast<const uint32_t *>(ptr);
-    ptr += sizeof(uint32_t);
-
-    fr.SensorID = *reinterpret_cast<const uint8_t *>(ptr);
-    ptr += sizeof(uint8_t);
-
-    return fr;
-  }
-
-  template bool IMURPC::PerformRPC(SerialInterface &, IMUFrameRequest, IMUFrameRequest::ResponceType &);
-  template bool IMURPC::PerformRPC(SerialInterface &, IMUInfoRequest, IMUInfoRequest::ResponceType &);
-  template bool IMURPC::PerformRPC(SerialInterface &, IMULatestRequest, IMULatestRequest::ResponceType &);
-  template bool IMURPC::PerformRPC(SerialInterface &, IMUResetRequest, IMUResetRequest::ResponceType &);
+template bool IMURPC::PerformRPC(SerialInterface &, IMUFrameRequest,
+                                 IMUFrameRequest::ResponceType &);
+template bool IMURPC::PerformRPC(SerialInterface &, IMUInfoRequest,
+                                 IMUInfoRequest::ResponceType &);
+template bool IMURPC::PerformRPC(SerialInterface &, IMULatestRequest,
+                                 IMULatestRequest::ResponceType &);
+template bool IMURPC::PerformRPC(SerialInterface &, IMUResetRequest,
+                                 IMUResetRequest::ResponceType &);
 
 } // namespace Roki
