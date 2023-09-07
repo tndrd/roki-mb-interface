@@ -27,7 +27,7 @@ print("Ok")
 #mb.ResetIMUCounter()
 
 sd = Roki.Rcb4.ServoData()
-sd.Id = 8
+sd.Id = 4
 sd.Sio = 1
 
 x = 0
