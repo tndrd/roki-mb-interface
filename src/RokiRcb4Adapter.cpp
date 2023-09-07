@@ -35,13 +35,13 @@ namespace Roki
     return RokiRcb4::setServoStretch(servoDatas.data(), servoDatas.size());
   }
 
-  std::tuple<bool, std::vector<byte>> RokiRcb4Adapter::moveRamToComCmdSynchronize(int scrAddr, byte srcDataSize)
+  std::tuple<bool, std::vector<byte>> RokiRcb4Adapter::moveRamToComCmdSynchronize(int addr, byte size)
   {
-    std::vector<byte> rxData(srcDataSize, 0);
-    if (RokiRcb4::moveRamToComCmdSynchronize(scrAddr, srcDataSize, rxData.data()) != srcDataSize)
-      return {false, rxData};
-    else
+    std::vector<byte> rxData(size, 0);
+    if (RokiRcb4::moveRamToComCmdSynchronize(addr, size, rxData.data()))
       return {true, rxData};
+    else
+      return {false, rxData};
   }
 
 } // namespace Roki

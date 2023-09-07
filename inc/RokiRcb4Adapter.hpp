@@ -18,6 +18,6 @@ namespace Roki
     bool setHoldPos(std::vector<ServoData> &servoDatas);
     bool setServoSpeed(std::vector<ServoData> &servoDatas);
     bool setServoStretch(std::vector<ServoData> &servoDatas);
-    std::tuple<bool, std::vector<byte>> moveRamToComCmdSynchronize(int scrAddr, byte srcDataSize);
+    std::tuple<bool, std::vector<byte>> moveRamToComCmdSynchronize(int addr, byte size);
   };
 } // namespace Roki

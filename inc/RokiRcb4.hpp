@@ -31,5 +31,7 @@ public:
   
   // overrides default motionPlay implementation
   bool motionPlay(int motionNum);
+
+  bool	moveRamToComCmdSynchronize(int addr, byte size, uint8_t* rxBuf);
 };
 } // namespace Roki
