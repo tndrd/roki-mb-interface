@@ -32,6 +32,12 @@ namespace Roki
     RequestBuffer[0] = 0;
   }
 
+  void IMURPC::SerializeToBuf(ConfigureFilterRequest request)
+  {
+    RequestBuffer[0] = request.TargetDuration;
+    RequestBuffer[1] = request.DurationThreshold;
+  }
+
   template <typename T>
   SerialInterface::OutPackage IMURPC::CreatePackage(T Request)
   {
@@ -203,5 +209,6 @@ namespace Roki
   template bool IMURPC::PerformRPC(SerialInterface &, IMUResetRequest, IMUResetRequest::ResponceType &);
   template bool IMURPC::PerformRPC(SerialInterface &, SetStrobeOffsetRequest, SetStrobeOffsetRequest::ResponceType &);
   template bool IMURPC::PerformRPC(SerialInterface &, StrobeWidthRequest, StrobeWidthRequest::ResponceType &);
+  template bool IMURPC::PerformRPC(SerialInterface &, ConfigureFilterRequest, ConfigureFilterRequest::ResponceType &);
 
 } // namespace Roki

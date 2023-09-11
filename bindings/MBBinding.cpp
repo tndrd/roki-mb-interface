@@ -62,7 +62,8 @@ PYBIND11_MODULE(Roki, m)
       .def("ResetIMUCounter", &MotherboardAdapter::ResetIMUCounter)
       .def("GetQueueInfo", &MotherboardAdapter::GetQueueInfo)
       .def("SetStrobeOffset", &MotherboardAdapter::SetStrobeOffset)
-      .def("GetStrobeWidth", &MotherboardAdapter::GetStrobeWidth);
+      .def("GetStrobeWidth", &MotherboardAdapter::GetStrobeWidth)
+      .def("ConfigureStrobeFilter", &MotherboardAdapter::ConfigureStrobeFilter);
 
   /* Rcb4 */
 

@@ -15,8 +15,9 @@ namespace Roki
       static constexpr Type Info = 1;
       static constexpr Type LatestFrame = 2;
       static constexpr Type Reset = 3;
-      static constexpr Type SetOffset = 4; 
+      static constexpr Type SetOffset = 4;
       static constexpr Type StrobeWidth = 5;
+      static constexpr Type ConfigureFilter = 6;
 
       static uint8_t Serialize(Type mode) { return mode; }
       static Type Deserialize(uint8_t meta) { return meta; }
@@ -58,7 +59,7 @@ namespace Roki
       static constexpr size_t Size = 4 * sizeof(int16_t) + /* sizeof(float) + */
                                      2 * sizeof(uint32_t) +
                                      sizeof(uint8_t);
-      static IMUFrame DeserializeFrom(uint8_t const**ptr);
+      static IMUFrame DeserializeFrom(uint8_t const **ptr);
     };
 
     struct IMUInfo
@@ -69,7 +70,7 @@ namespace Roki
 
       static constexpr size_t Size = 3 * sizeof(uint16_t);
 
-      static IMUInfo DeserializeFrom(uint8_t const**ptr);
+      static IMUInfo DeserializeFrom(uint8_t const **ptr);
     };
 
     struct Empty
@@ -129,6 +130,16 @@ namespace Roki
       static constexpr RequestMode::Type Mode = RequestMode::StrobeWidth;
     };
 
+    struct ConfigureFilterRequest
+    {
+      static constexpr size_t Size = 2;
+      using ResponceType = Empty;
+      static constexpr RequestMode::Type Mode = RequestMode::ConfigureFilter;
+
+      uint8_t TargetDuration;
+      uint8_t DurationThreshold;
+    };
+
   private:
     static constexpr size_t BufferSize = 32;
     std::array<uint8_t, BufferSize> RequestBuffer;
@@ -142,6 +153,7 @@ namespace Roki
     void SerializeToBuf(IMUResetRequest request);
     void SerializeToBuf(SetStrobeOffsetRequest request);
     void SerializeToBuf(StrobeWidthRequest request);
+    void SerializeToBuf(ConfigureFilterRequest request);
 
     template <typename T>
     SerialInterface::OutPackage CreatePackage(T Request);

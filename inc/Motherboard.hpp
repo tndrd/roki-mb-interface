@@ -31,6 +31,7 @@ public:
   bool ResetIMUCounter();
   bool SetStrobeOffset(uint8_t offset);
   bool GetStrobeWidth(uint8_t& width);
+  bool ConfigureStrobeFilter(uint8_t targetDuration, uint8_t durationThreshold);
 
   bool BodySendSync(const uint8_t *requestData, uint8_t requestSize,
                     uint8_t *responceData, uint8_t responceSize);

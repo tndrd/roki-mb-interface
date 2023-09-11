@@ -88,6 +88,15 @@ bool Motherboard::GetStrobeWidth(uint8_t& width) {
   return true;
 }
 
+bool Motherboard::ConfigureStrobeFilter(uint8_t targetDuration, uint8_t durationThreshold) {
+  IMURPC::ConfigureFilterRequest request {targetDuration, durationThreshold};
+  IMURPC::Empty responce;
+
+  if (!IMU.PerformRPC(Service, request, responce))
+    return IMUError();
+  return true;
+}
+
 bool Motherboard::BodySendSync(const uint8_t *requestData, uint8_t requestSize,
                                uint8_t *responceData, uint8_t responceSize) {
   BodyRPC::Request request;

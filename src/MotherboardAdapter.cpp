@@ -1,94 +1,124 @@
 #include "MotherboardAdapter.hpp"
 
-namespace Roki {
-MotherboardException::MotherboardException(const std::string &source,
-                                           const std::string &msg)
-    : std::runtime_error("Motherboard::" + source + ": " + msg) {}
+namespace Roki
+{
+  MotherboardException::MotherboardException(const std::string &source,
+                                             const std::string &msg)
+      : std::runtime_error("Motherboard::" + source + ": " + msg) {}
 
-void MotherboardAdapter::Configure(
-    const SerialInterface::TTYConfig &serviceConfig) {
-  static const char *FooName = "Configure";
+  void MotherboardAdapter::Configure(
+      const SerialInterface::TTYConfig &serviceConfig)
+  {
+    static const char *fooName = "Configure";
 
-  if (!Motherboard::Configure(serviceConfig))
-    throw ForwardException(FooName);
-}
+    if (!Motherboard::Configure(serviceConfig))
+      throw ForwardException(fooName);
+  }
 
-MotherboardException MotherboardAdapter::ForwardException(const std::string &source) const {
-  return MotherboardException(source, Motherboard::GetError());
-}
+  MotherboardException MotherboardAdapter::ForwardException(const std::string &source) const
+  {
+    return MotherboardException(source, Motherboard::GetError());
+  }
 
-IMUFrame MotherboardAdapter::GetOrientationBySeq(int seq) {
-  static const char *FooName = "GetOrientationBySeq";
+  template<typename T>
+  void MotherboardAdapter::CheckIntBoundaries(int value, const char* fooName) const {
+    static const char* msg = "Inappropriate argument value";
 
-  if (seq < 0 || seq > std::numeric_limits<uint16_t>::max())
-    throw MotherboardException(FooName, "Wrong argument value");
+    if (value < std::numeric_limits<T>::min())
+      throw MotherboardException(fooName, msg);
 
-  IMUFrame result;
+    if (value > std::numeric_limits<T>::max())
+      throw MotherboardException(fooName, msg);
+  }
 
-  if (!Motherboard::GetOrientation(static_cast<uint16_t>(seq), result))
-    throw ForwardException(FooName);
+  IMUFrame MotherboardAdapter::GetOrientationBySeq(int seq)
+  {
+    static const char *fooName = "GetOrientationBySeq";
 
-  return result;
-}
+    CheckIntBoundaries<uint16_t>(seq, fooName);
 
-IMUFrame MotherboardAdapter::GetCurrentOrientation() {
-  static const char *FooName = "GetCurrentOrientation";
+    IMUFrame result;
 
-  IMUFrame result;
+    if (!Motherboard::GetOrientation(static_cast<uint16_t>(seq), result))
+      throw ForwardException(fooName);
 
-  if (!Motherboard::GetOrientation(result))
-    throw ForwardException(FooName);
+    return result;
+  }
 
-  return result;
-}
+  IMUFrame MotherboardAdapter::GetCurrentOrientation()
+  {
+    static const char *fooName = "GetCurrentOrientation";
 
-IMUInfo MotherboardAdapter::GetIMUInfo() {
-  static const char *FooName = "GetIMUInfo";
+    IMUFrame result;
 
-  IMUInfo result;
+    if (!Motherboard::GetOrientation(result))
+      throw ForwardException(fooName);
 
-  if (!Motherboard::GetIMUInfo(result))
-    throw ForwardException(FooName);
+    return result;
+  }
 
-  return result;
-}
+  IMUInfo MotherboardAdapter::GetIMUInfo()
+  {
+    static const char *fooName = "GetIMUInfo";
 
-void MotherboardAdapter::ResetIMUCounter() {
-  static const char *FooName = "ResetIMUCounter";
+    IMUInfo result;
 
-  if (!Motherboard::ResetIMUCounter())
-    throw ForwardException(FooName);
-}
+    if (!Motherboard::GetIMUInfo(result))
+      throw ForwardException(fooName);
 
-void MotherboardAdapter::SetStrobeOffset(int offset) {
-  static const char *FooName = "SetStrobeOffset";
+    return result;
+  }
 
-  if (offset < 0 || offset > std::numeric_limits<uint8_t>::max())
-    throw MotherboardException(FooName, "Wrong argument value");
+  void MotherboardAdapter::ResetIMUCounter()
+  {
+    static const char *fooName = "ResetIMUCounter";
 
-  if (!Motherboard::SetStrobeOffset(offset))
-    throw ForwardException(FooName);
-}
+    if (!Motherboard::ResetIMUCounter())
+      throw ForwardException(fooName);
+  }
 
-int MotherboardAdapter::GetStrobeWidth() {
-  static const char *FooName = "GetStrobeWidth";
+  void MotherboardAdapter::SetStrobeOffset(int offset)
+  {
+    static const char *fooName = "SetStrobeOffset";
 
-  uint8_t width;
+    CheckIntBoundaries<uint8_t>(offset, fooName);
 
-  if (!Motherboard::GetStrobeWidth(width))
-    throw ForwardException(FooName);
+    if (!Motherboard::SetStrobeOffset(offset))
+      throw ForwardException(fooName);
+  }
 
-  return width;
-}
+  int MotherboardAdapter::GetStrobeWidth()
+  {
+    static const char *fooName = "GetStrobeWidth";
 
-QueueInfo MotherboardAdapter::GetQueueInfo() {
-  static const char *FooName = "GetQueueInfo";
+    uint8_t width;
 
-  QueueInfo result;
+    if (!Motherboard::GetStrobeWidth(width))
+      throw ForwardException(fooName);
 
-  if (!Motherboard::GetQueueInfo(result))
-    throw ForwardException(FooName);
+    return width;
+  }
 
-  return result;
-}
+  void MotherboardAdapter::ConfigureStrobeFilter(int targetDuration, int durationThreshold)
+  {
+    static const char *fooName = "ConfigureStrobeFilter";
+
+    CheckIntBoundaries<uint8_t>(targetDuration, fooName);
+    CheckIntBoundaries<uint8_t>(durationThreshold, fooName);
+
+    if (!Motherboard::ConfigureStrobeFilter(targetDuration, durationThreshold))
+      throw ForwardException(fooName);
+  }
+
+  QueueInfo MotherboardAdapter::GetQueueInfo()
+  {
+    static const char *fooName = "GetQueueInfo";
+
+    QueueInfo result;
+
+    if (!Motherboard::GetQueueInfo(result))
+      throw ForwardException(fooName);
+
+    return result;
+  }
 } // namespace Roki
