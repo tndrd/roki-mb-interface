@@ -70,8 +70,8 @@ int main()
     std::cout << " Responces: " << qi.NumResponces << std::endl;
     std::cout << std::endl;
 
-    if (qi.NumRequests == 0)
-      break;
+    //if (qi.NumRequests == 0)
+    //  break;
 
     // std::this_thread::sleep_for(std::chrono::seconds(1));
   }

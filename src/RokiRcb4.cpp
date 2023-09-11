@@ -52,4 +52,8 @@ namespace Roki
     return resume();
   }
 
+  bool	RokiRcb4::moveRamToComCmdSynchronize(int addr, byte size, uint8_t* rxBuf) {
+    return Rcb4BaseClass::moveRamToComCmdSynchronize(addr, size, rxBuf) == size;
+  }
+
 } // namespace Roki

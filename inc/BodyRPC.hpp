@@ -24,7 +24,8 @@ namespace Roki
       using Type = uint8_t;
       static constexpr Type Success = 0;
       static constexpr Type Timeout = 1;
-      static constexpr Type Unknown = 2;
+      static constexpr Type NACK = 2;
+      static constexpr Type Unknown = 3;
 
       static uint8_t Serialize(Type mode);
       static Type Deserialize(uint8_t val);

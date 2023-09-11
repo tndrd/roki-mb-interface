@@ -49,6 +49,7 @@ print("Ok")
 sd = Roki.Rcb4.ServoData()
 sd.Id = 4
 sd.Sio = 1
+sd.Data = 7500
 
 doAsync = 0
 
@@ -67,9 +68,9 @@ while True:
             print(rcb.getError())
             quit()
 
-        if (quat_bytes[-1] != 42):
-            print("Sequence Error")
-            quit()
+        #if (quat_bytes[-1] != 42):
+        #    print("Sequence Error")
+        #    quit()
 
         try:
             quat = struct.unpack('<hhhh', bytes(quat_bytes))

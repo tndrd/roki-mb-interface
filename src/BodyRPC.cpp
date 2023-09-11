@@ -31,6 +31,8 @@ namespace Roki
       return "Success";
     case Timeout:
       return "Body timeout";
+    case NACK:
+      return "Command refused by body";
     case Unknown:
       return "Unknow body error";
     default:
