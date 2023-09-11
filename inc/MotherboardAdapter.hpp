@@ -26,6 +26,8 @@ public:
   IMUFrame GetCurrentOrientation();
   IMUInfo GetIMUInfo();
   void ResetIMUCounter();
+  void SetStrobeOffset(int offset);
+  int GetStrobeWidth();
   QueueInfo GetQueueInfo();
 };
 } // namespace Roki

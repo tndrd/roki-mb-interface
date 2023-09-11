@@ -60,6 +60,27 @@ void MotherboardAdapter::ResetIMUCounter() {
     throw ForwardException(FooName);
 }
 
+void MotherboardAdapter::SetStrobeOffset(int offset) {
+  static const char *FooName = "SetStrobeOffset";
+
+  if (offset < 0 || offset > std::numeric_limits<uint8_t>::max())
+    throw MotherboardException(FooName, "Wrong argument value");
+
+  if (!Motherboard::SetStrobeOffset(offset))
+    throw ForwardException(FooName);
+}
+
+int MotherboardAdapter::GetStrobeWidth() {
+  static const char *FooName = "GetStrobeWidth";
+
+  uint8_t width;
+
+  if (!Motherboard::GetStrobeWidth(width))
+    throw ForwardException(FooName);
+
+  return width;
+}
+
 QueueInfo MotherboardAdapter::GetQueueInfo() {
   static const char *FooName = "GetQueueInfo";
 

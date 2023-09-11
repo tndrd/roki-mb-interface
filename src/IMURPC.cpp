@@ -22,6 +22,16 @@ namespace Roki
     RequestBuffer[0] = 0;
   }
 
+  void IMURPC::SerializeToBuf(SetStrobeOffsetRequest request)
+  {
+    RequestBuffer[0] = request.offset;
+  }
+
+  void IMURPC::SerializeToBuf(StrobeWidthRequest request)
+  {
+    RequestBuffer[0] = 0;
+  }
+
   template <typename T>
   SerialInterface::OutPackage IMURPC::CreatePackage(T Request)
   {
@@ -92,6 +102,14 @@ namespace Roki
     return true;
   }
 
+  template <>
+  IMURPC::Byte
+  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
+  {
+    assert(package.ResponceSize == Byte::Size);
+    return {package.Data[0]};
+  }
+
   bool IMURPC::IsOk() const { return !HasError; }
   std::string IMURPC::GetError() const { return Error; }
 
@@ -107,6 +125,8 @@ namespace Roki
       return "Unknown Mode";
     case ErrorCodes::BadRequest:
       return "Bad Request";
+    case ErrorCodes::BadOffset:
+      return "Bad offset";
     default:
       return "Unknown error";
     }
@@ -181,5 +201,7 @@ namespace Roki
   template bool IMURPC::PerformRPC(SerialInterface &, IMUInfoRequest, IMUInfoRequest::ResponceType &);
   template bool IMURPC::PerformRPC(SerialInterface &, IMULatestRequest, IMULatestRequest::ResponceType &);
   template bool IMURPC::PerformRPC(SerialInterface &, IMUResetRequest, IMUResetRequest::ResponceType &);
+  template bool IMURPC::PerformRPC(SerialInterface &, SetStrobeOffsetRequest, SetStrobeOffsetRequest::ResponceType &);
+  template bool IMURPC::PerformRPC(SerialInterface &, StrobeWidthRequest, StrobeWidthRequest::ResponceType &);
 
 } // namespace Roki

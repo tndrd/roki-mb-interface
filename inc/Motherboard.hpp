@@ -29,6 +29,8 @@ public:
   bool GetOrientation(IMURPC::IMUFrame &result);
   bool GetIMUInfo(IMURPC::IMUInfo &result);
   bool ResetIMUCounter();
+  bool SetStrobeOffset(uint8_t offset);
+  bool GetStrobeWidth(uint8_t& width);
 
   bool BodySendSync(const uint8_t *requestData, uint8_t requestSize,
                     uint8_t *responceData, uint8_t responceSize);

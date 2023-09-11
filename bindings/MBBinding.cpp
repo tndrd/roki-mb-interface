@@ -60,7 +60,9 @@ PYBIND11_MODULE(Roki, m)
       .def("GetCurrentOrientation", &MotherboardAdapter::GetCurrentOrientation)
       .def("GetIMUInfo", &MotherboardAdapter::GetIMUInfo)
       .def("ResetIMUCounter", &MotherboardAdapter::ResetIMUCounter)
-      .def("GetQueueInfo", &MotherboardAdapter::GetQueueInfo);
+      .def("GetQueueInfo", &MotherboardAdapter::GetQueueInfo)
+      .def("SetStrobeOffset", &MotherboardAdapter::SetStrobeOffset)
+      .def("GetStrobeWidth", &MotherboardAdapter::GetStrobeWidth);
 
   /* Rcb4 */
 

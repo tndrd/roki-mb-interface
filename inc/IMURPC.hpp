@@ -15,6 +15,8 @@ namespace Roki
       static constexpr Type Info = 1;
       static constexpr Type LatestFrame = 2;
       static constexpr Type Reset = 3;
+      static constexpr Type SetOffset = 4; 
+      static constexpr Type StrobeWidth = 5;
 
       static uint8_t Serialize(Type mode) { return mode; }
       static Type Deserialize(uint8_t meta) { return meta; }
@@ -27,6 +29,7 @@ namespace Roki
       static constexpr Type FrameUnavailable = 1;
       static constexpr Type UnknownMode = 2;
       static constexpr Type BadRequest = 3;
+      static constexpr Type BadOffset = 4;
     };
 
     struct TimestampT
@@ -74,6 +77,12 @@ namespace Roki
       static constexpr size_t Size = 1;
     };
 
+    struct Byte
+    {
+      static constexpr size_t Size = 1;
+      uint8_t Value;
+    };
+
     struct IMUFrameRequest
     {
       static constexpr size_t Size = 2;
@@ -104,6 +113,22 @@ namespace Roki
       static constexpr RequestMode::Type Mode = RequestMode::Reset;
     };
 
+    struct SetStrobeOffsetRequest
+    {
+      static constexpr size_t Size = 1;
+      using ResponceType = Empty;
+      static constexpr RequestMode::Type Mode = RequestMode::SetOffset;
+
+      uint8_t offset;
+    };
+
+    struct StrobeWidthRequest
+    {
+      static constexpr size_t Size = 1;
+      using ResponceType = Byte;
+      static constexpr RequestMode::Type Mode = RequestMode::StrobeWidth;
+    };
+
   private:
     static constexpr size_t BufferSize = 32;
     std::array<uint8_t, BufferSize> RequestBuffer;
@@ -115,6 +140,8 @@ namespace Roki
     void SerializeToBuf(IMUInfoRequest request);
     void SerializeToBuf(IMULatestRequest request);
     void SerializeToBuf(IMUResetRequest request);
+    void SerializeToBuf(SetStrobeOffsetRequest request);
+    void SerializeToBuf(StrobeWidthRequest request);
 
     template <typename T>
     SerialInterface::OutPackage CreatePackage(T Request);

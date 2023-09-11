@@ -68,6 +68,26 @@ bool Motherboard::ResetIMUCounter() {
   return true;
 }
 
+bool Motherboard::SetStrobeOffset(uint8_t offset) {
+  IMURPC::SetStrobeOffsetRequest request{offset};
+  IMURPC::Empty responce;
+
+  if (!IMU.PerformRPC(Service, request, responce))
+    return IMUError();
+  return true;
+}
+
+bool Motherboard::GetStrobeWidth(uint8_t& width) {
+  IMURPC::StrobeWidthRequest request {};
+  IMURPC::Byte responce;
+
+  if (!IMU.PerformRPC(Service, request, responce))
+    return IMUError();
+
+  width = responce.Value;
+  return true;
+}
+
 bool Motherboard::BodySendSync(const uint8_t *requestData, uint8_t requestSize,
                                uint8_t *responceData, uint8_t responceSize) {
   BodyRPC::Request request;
