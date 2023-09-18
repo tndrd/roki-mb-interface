@@ -15,6 +15,7 @@ conf.ParityBit = True
 conf.Timeout = 2
 
 mb.Configure(conf)
+mb.SetQueuePeriod(5)
 
 rcb = Roki.Rcb4(mb)
 
@@ -29,19 +30,21 @@ print("Ok")
 sd = Roki.Rcb4.ServoData()
 sd.Id = 4
 sd.Sio = 1
+while True:
+    x = 0
+    req = 0
+    while x < 2000:
+        sd.Data = 7500 + int(500 * sin(0.1 * x))
+        if not rcb.setServoPosAsync([sd], int(5)):
+            print(rcb.getError())
+            quit()
+        req = mb.GetQueueInfo().NumRequests
+        print(req)
+        x = x + 1
 
-x = 0
-req = 0
-while x < 500:
-    sd.Data = 7500 + int(500 * sin(0.1 * x))
-    rcb.setServoPosAsync([sd], int(5))
-    req = mb.GetQueueInfo().NumRequests
-    print(req)
-    x = x + 1
-
-while req > 0:
-    print(rcb.checkAcknowledge())
-    req = mb.GetQueueInfo().NumRequests
-    print(req)
+    while req > 0:
+        print(rcb.checkAcknowledge())
+        req = mb.GetQueueInfo().NumRequests
+        print(req)
     
 
