@@ -34,5 +34,6 @@ public:
   void ConfigureStrobeFilter(int targetDuration, int durationThreshold);
 
   QueueInfo GetQueueInfo();
+  void SetQueuePeriod(int periodMs);
 };
 } // namespace Roki

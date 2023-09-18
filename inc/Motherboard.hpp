@@ -39,6 +39,7 @@ public:
                      uint8_t responceSize);
 
   bool GetQueueInfo(BodyRPC::Info& result);
+  bool SetQueuePeriod(uint8_t periodMs);
   
   bool IsOk() const;
   std::string GetError() const;

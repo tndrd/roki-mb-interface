@@ -121,4 +121,13 @@ namespace Roki
 
     return result;
   }
+
+  void MotherboardAdapter::SetQueuePeriod(int periodMs) {
+    static const char* fooName = "SetQueuePeriod";
+
+    CheckIntBoundaries<uint8_t>(periodMs, fooName);
+
+    if (!Motherboard::SetQueuePeriod(periodMs))
+      throw ForwardException(fooName);
+  }
 } // namespace Roki

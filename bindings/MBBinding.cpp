@@ -63,7 +63,8 @@ PYBIND11_MODULE(Roki, m)
       .def("GetQueueInfo", &MotherboardAdapter::GetQueueInfo)
       .def("SetStrobeOffset", &MotherboardAdapter::SetStrobeOffset)
       .def("GetStrobeWidth", &MotherboardAdapter::GetStrobeWidth)
-      .def("ConfigureStrobeFilter", &MotherboardAdapter::ConfigureStrobeFilter);
+      .def("ConfigureStrobeFilter", &MotherboardAdapter::ConfigureStrobeFilter)
+      .def("SetQueuePeriod", &MotherboardAdapter::SetQueuePeriod);
 
   /* Rcb4 */
 

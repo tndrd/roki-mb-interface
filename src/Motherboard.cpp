@@ -137,6 +137,13 @@ bool Motherboard::GetQueueInfo(BodyRPC::Info& result) {
   return true;
 }
 
+bool Motherboard::SetQueuePeriod(uint8_t periodMs) {
+  if (!Body.SetPeriod(Service, periodMs))
+    return BodyError();
+
+  return true;
+}
+
 bool Motherboard::IsOk() const { return HasError; }
 std::string Motherboard::GetError() const { return Error; }
 
