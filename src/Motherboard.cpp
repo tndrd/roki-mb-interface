@@ -127,6 +127,10 @@ bool Motherboard::BodySendAsync(const uint8_t *requestData, uint8_t requestSize,
   if (!Body.Send(Service, request))
     return BodyError();
 
+  BodyRPC::Responce responce;
+  if (!Body.Recieve(Service, responce, 1))
+    return BodyError();
+
   return true;
 }
 

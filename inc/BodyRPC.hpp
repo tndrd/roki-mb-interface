@@ -28,6 +28,7 @@ namespace Roki
       static constexpr Type NACK = 2;
       static constexpr Type Unknown = 3;
       static constexpr Type BadPeriod = 4;
+      static constexpr Type QueueFull = 5;
 
       static uint8_t Serialize(Type mode);
       static Type Deserialize(uint8_t val);

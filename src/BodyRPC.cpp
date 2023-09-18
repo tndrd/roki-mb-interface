@@ -37,6 +37,8 @@ namespace Roki
       return "Unknow body error";
     case BadPeriod:
       return "Bad queue period";
+    case QueueFull:
+      return "Body queue is full";
     default:
       return "Unknown error value";
     }
