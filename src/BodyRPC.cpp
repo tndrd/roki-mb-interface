@@ -35,6 +35,8 @@ namespace Roki
       return "Command refused by body";
     case Unknown:
       return "Unknow body error";
+    case BadPeriod:
+      return "Bad queue period";
     default:
       return "Unknown error value";
     }
@@ -92,8 +94,9 @@ namespace Roki
     return info;
   }
 
-  bool BodyRPC::GetInfo(SerialInterface& si, Info& result) {
-    std::array<uint8_t, 1> buf {0};
+  bool BodyRPC::GetInfo(SerialInterface &si, Info &result)
+  {
+    std::array<uint8_t, 1> buf{0};
     SerialInterface::OutPackage out{
         SerialInterface::Periphery::Body, Info::Size,
         MessageMode::Serialize(MessageMode::Info), buf.data(), buf.size()};
@@ -106,8 +109,28 @@ namespace Roki
     if (!si.Receive(Info::Size, package))
       return MakeError(si.GetError());
 
-    const uint8_t* ptr = package.Data;
+    const uint8_t *ptr = package.Data;
     result = Info::DeserializeFrom(&ptr);
+    return true;
+  }
+
+  bool BodyRPC::SetPeriod(SerialInterface &si, uint8_t periodMs)
+  {
+    if (periodMs == 0)
+      return MakeError("Period value should be greater than zero");
+
+    SerialInterface::OutPackage out{
+        SerialInterface::Periphery::Body, 1,
+        MessageMode::Serialize(MessageMode::SetPeriod), &periodMs, 1};
+
+    if (!si.Send(out))
+      return MakeError(si.GetError());
+
+    SerialInterface::InPackage package;
+
+    if (!si.Receive(1, package))
+      return MakeError(si.GetError());
+
     return true;
   }
 
