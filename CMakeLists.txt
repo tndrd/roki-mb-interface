@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(deps/pybind11)
 add_subdirectory(deps/rcb4-base-class)
 
-#ADD_DEFINITIONS(-DDBGMB=1)
+ADD_DEFINITIONS(-DDBGMB=1)
 
 include_directories(inc/)
 

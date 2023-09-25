@@ -25,7 +25,7 @@ public:
   Motherboard() = default;
 
   bool Configure(const SerialInterface::TTYConfig &serviceConfig);
-  bool GetOrientation(uint16_t seq, IMURPC::IMUFrame &result);
+  bool GetStrobeFrame(uint16_t seq, IMURPC::StrobeFrame &result);
   bool GetOrientation(IMURPC::IMUFrame &result);
   bool GetIMUInfo(IMURPC::IMUInfo &result);
   bool ResetIMUCounter();

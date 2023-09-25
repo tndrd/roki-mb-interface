@@ -28,6 +28,11 @@ PYBIND11_MODULE(Roki, m)
       .def_readwrite("Timestamp", &IMUFrame::Timestamp)
       .def_readwrite("SensorID", &IMUFrame::SensorID);
 
+    py::class_<StrobeFrame>(m, "StrobeFrame")
+      .def(py::init<>())
+      .def_readwrite("Orientation", &StrobeFrame::Orientation)
+      .def_readwrite("ServoPos", &StrobeFrame::ServoPos);
+
   py::class_<IMUInfo>(m, "IMUInfo")
       .def(py::init<>())
       .def_readwrite("First", &IMUInfo::First)
@@ -56,8 +61,8 @@ PYBIND11_MODULE(Roki, m)
   py::class_<MotherboardAdapter>(m, "Motherboard")
       .def(py::init<>())
       .def("Configure", &MotherboardAdapter::Configure)
-      .def("GetOrientationBySeq", &MotherboardAdapter::GetOrientationBySeq)
-      .def("GetCurrentOrientation", &MotherboardAdapter::GetCurrentOrientation)
+      .def("GetStrobeFrame", &MotherboardAdapter::GetStrobeFrame)
+      .def("GetOrientation", &MotherboardAdapter::GetOrientation)
       .def("GetIMUInfo", &MotherboardAdapter::GetIMUInfo)
       .def("ResetIMUCounter", &MotherboardAdapter::ResetIMUCounter)
       .def("GetQueueInfo", &MotherboardAdapter::GetQueueInfo)

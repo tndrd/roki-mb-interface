@@ -31,23 +31,23 @@ namespace Roki
       throw MotherboardException(fooName, msg);
   }
 
-  IMUFrame MotherboardAdapter::GetOrientationBySeq(int seq)
+  StrobeFrame MotherboardAdapter::GetStrobeFrame(int seq)
   {
-    static const char *fooName = "GetOrientationBySeq";
+    static const char *fooName = "GetStrobeFrame";
 
     CheckIntBoundaries<uint16_t>(seq, fooName);
 
-    IMUFrame result;
+    StrobeFrame result;
 
-    if (!Motherboard::GetOrientation(static_cast<uint16_t>(seq), result))
+    if (!Motherboard::GetStrobeFrame(static_cast<uint16_t>(seq), result))
       throw ForwardException(fooName);
 
     return result;
   }
 
-  IMUFrame MotherboardAdapter::GetCurrentOrientation()
+  IMUFrame MotherboardAdapter::GetOrientation()
   {
-    static const char *fooName = "GetCurrentOrientation";
+    static const char *fooName = "GetOrientation";
 
     IMUFrame result;
 

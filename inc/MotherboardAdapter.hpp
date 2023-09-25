@@ -25,8 +25,8 @@ public:
 
   void Configure(const SerialInterface::TTYConfig &serviceConfig);
 
-  IMUFrame GetOrientationBySeq(int seq);
-  IMUFrame GetCurrentOrientation();
+  StrobeFrame GetStrobeFrame(int seq);
+  IMUFrame GetOrientation();
   IMUInfo GetIMUInfo();
   void ResetIMUCounter();
   void SetStrobeOffset(int offset);

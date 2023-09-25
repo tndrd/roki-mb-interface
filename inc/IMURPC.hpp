@@ -5,22 +5,32 @@
 
 namespace Roki
 {
-  class IMURPC
+  class MotherboardRPC
   {
   public:
-    struct RequestMode
+    struct ProcedureID
     {
       using Type = uint8_t;
-      static constexpr Type FrameBySeq = 0;
-      static constexpr Type Info = 1;
-      static constexpr Type LatestFrame = 2;
-      static constexpr Type Reset = 3;
-      static constexpr Type SetOffset = 4;
-      static constexpr Type StrobeWidth = 5;
-      static constexpr Type ConfigureFilter = 6;
+      static constexpr Type IMUFrame = 0;
+      static constexpr Type BodyFrame = 1;
+      static constexpr Type IMUInfo = 2;
+      static constexpr Type BodyInfo = 3;
+      static constexpr Type IMULatest = 4;
+      static constexpr Type ResetContainers = 5;
+      static constexpr Type IMUStrobeOffset = 6;
+      static constexpr Type BodyStrobeOffset = 7;
+      static constexpr Type GetStrobeWidth = 8;
+      static constexpr Type ConfigureStrobeFilter = 9;
+      static constexpr Type GetVersion = 10;
 
-      static uint8_t Serialize(Type mode) { return mode; }
-      static Type Deserialize(uint8_t meta) { return meta; }
+      static uint8_t Serialize(Type mode)
+      {
+        return mode;
+      }
+      static Type Deserialize(uint8_t meta)
+      {
+        return meta;
+      }
     };
 
     struct ErrorCodes
@@ -31,117 +41,177 @@ namespace Roki
       static constexpr Type UnknownMode = 2;
       static constexpr Type BadRequest = 3;
       static constexpr Type BadOffset = 4;
+      static constexpr Type TargetError = 5;
     };
 
-    struct TimestampT
+    struct Messages
     {
-      size_t TimeS;
-      size_t TimeNS;
+      struct IMUFrame
+      {
+        struct TimestampT
+        {
+          uint32_t TimeS;
+          uint32_t TimeNS;
+        };
+
+        struct Quaternion
+        {
+          float X;
+          float Y;
+          float Z;
+          float W;
+        };
+
+        Quaternion Orientation;
+        TimestampT Timestamp;
+
+        uint8_t SensorID;
+
+        static constexpr size_t Size = 4 * sizeof(int16_t) + /* sizeof(float) + */
+                                       2 * sizeof(uint32_t) +
+                                       sizeof(uint8_t);
+
+        static IMUFrame Deserialize(uint8_t const **ptr);
+      };
+
+      struct BodyFrame
+      {
+        std::vector<uint8_t> ServoData;
+
+        static constexpr size_t Size = 33;
+        static BodyFrame Deserialize(uint8_t const **ptr);
+      };
+
+      struct FrameContainerInfo
+      {
+        uint16_t First;
+        uint16_t NumAv;
+        uint16_t MaxFrames;
+
+        static constexpr size_t Size = 3 * sizeof(uint16_t);
+        static FrameContainerInfo Deserialize(uint8_t const **ptr);
+      };
+
+      struct Empty
+      {
+        static constexpr size_t Size = 1;
+
+        void Serialize(uint8_t **ptr);
+        static Empty Deserialize(uint8_t const **ptr);
+      };
+
+      struct Byte
+      {
+        static constexpr size_t Size = 1;
+        uint8_t Value;
+
+        void Serialize(uint8_t **ptr);
+        static Empty Deserialize(uint8_t const **ptr);
+      };
+
+      struct FrameNumber
+      {
+        static constexpr size_t Size = 2;
+        uint16_t Seq;
+
+        void Serialize(uint8_t **ptr);
+      };
+
+      struct StrobeFilterConfig
+      {
+        static constexpr size_t Size = 2;
+
+        void Serialize(uint8_t **ptr);
+      };
     };
 
-    struct Quaternion
+    struct Procedures
     {
-      float X;
-      float Y;
-      float Z;
-      float W;
+      struct GetIMUFrame
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::IMUFrame;
 
-      // float Accuracy;
-    };
+        using Request = Messages::FrameNumber;
+        using Responce = Messages::IMUFrame;
+      };
 
-    struct IMUFrame
-    {
-      Quaternion Orientation;
-      TimestampT Timestamp;
+      struct GetBodyFrame
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::BodyFrame;
 
-      uint8_t SensorID;
+        using Request = Messages::FrameNumber;
+        using Responce = Messages::BodyFrame;
+      };
 
-      static constexpr size_t Size = 4 * sizeof(int16_t) + /* sizeof(float) + */
-                                     2 * sizeof(uint32_t) +
-                                     sizeof(uint8_t);
-      static IMUFrame DeserializeFrom(uint8_t const **ptr);
-    };
+      struct IMUInfo
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::IMUInfo;
 
-    struct IMUInfo
-    {
-      uint16_t First;
-      uint16_t NumAv;
-      uint16_t MaxFrames;
+        using Request = Messages::Empty;
+        using Responce = Messages::FrameContainerInfo;
+      };
 
-      static constexpr size_t Size = 3 * sizeof(uint16_t);
+      struct BodyInfo
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::BodyInfo;
 
-      static IMUInfo DeserializeFrom(uint8_t const **ptr);
-    };
+        using Request = Messages::Empty;
+        using Responce = Messages::FrameContainerInfo;
+      };
 
-    struct Empty
-    {
-      static constexpr size_t Size = 1;
-    };
+      struct IMULatest
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::IMULatest;
 
-    struct Byte
-    {
-      static constexpr size_t Size = 1;
-      uint8_t Value;
-    };
+        using Request = Messages::Empty;
+        using Responce = Messages::IMUFrame;
+      };
 
-    struct IMUFrameRequest
-    {
-      static constexpr size_t Size = 2;
-      static constexpr RequestMode::Type Mode = RequestMode::FrameBySeq;
-      using ResponceType = IMUFrame;
+      struct ResetContainers
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::ResetContainers;
 
-      uint16_t seq;
-    };
+        using Request = Messages::Empty;
+        using Responce = Messages::Empty;
+      };
 
-    struct IMUInfoRequest
-    {
-      static constexpr size_t Size = 1;
-      using ResponceType = IMUInfo;
-      static constexpr RequestMode::Type Mode = RequestMode::Info;
-    };
+      struct IMUStrobeOffset
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::IMUStrobeOffset;
 
-    struct IMULatestRequest
-    {
-      static constexpr size_t Size = 1;
-      using ResponceType = IMUFrame;
-      static constexpr RequestMode::Type Mode = RequestMode::LatestFrame;
-    };
+        using RequestType = Messages::Byte;
+        using ResponceType = Messages::Empty;
+      };
 
-    struct IMUResetRequest
-    {
-      static constexpr size_t Size = 1;
-      using ResponceType = Empty;
-      static constexpr RequestMode::Type Mode = RequestMode::Reset;
-    };
+      struct BodyStrobeOffset
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::BodyStrobeOffset;
 
-    struct SetStrobeOffsetRequest
-    {
-      static constexpr size_t Size = 1;
-      using ResponceType = Empty;
-      static constexpr RequestMode::Type Mode = RequestMode::SetOffset;
+        using RequestType = Messages::Byte;
+        using ResponceType = Messages::Empty;
+      };
 
-      uint8_t offset;
-    };
+      struct StrobeWidth
+      {
+        static constexpr ProcedureID::Type ID = ProcedureID::GetStrobeWidth;
 
-    struct StrobeWidthRequest
-    {
-      static constexpr size_t Size = 1;
-      using ResponceType = Byte;
-      static constexpr RequestMode::Type Mode = RequestMode::StrobeWidth;
-    };
+        using RequestType = Messages::Empty;
+        using ResponceType = Messages::Byte;
+      };
 
-    struct ConfigureFilterRequest
-    {
-      static constexpr size_t Size = 2;
-      using ResponceType = Empty;
-      static constexpr RequestMode::Type Mode = RequestMode::ConfigureFilter;
+      struct ConfigureFilter
+      {
+        static constexpr size_t Size = 2;
+        using RequestType = Messages::StrobeFilterConfig;
+        using ResponceType = Messages::Empty;
+        static constexpr ProcedureID::Type Mode = ProcedureID::ConfigureFilter;
 
-      uint8_t TargetDuration;
-      uint8_t DurationThreshold;
-    };
+        uint8_t TargetDuration;
+        uint8_t DurationThreshold;
+      };
+    }
 
-  private:
-    static constexpr size_t BufferSize = 32;
+    private : static constexpr size_t BufferSize = 32;
     std::array<uint8_t, BufferSize> RequestBuffer;
 
     bool HasError = false;
@@ -162,6 +232,7 @@ namespace Roki
     T DeserializeResponce(const SerialInterface::InPackage &package);
 
     static const char *GetErrorDescription(ErrorCodes::Type errCode);
+    static bool ErrorIsFatal(ErrorCodes::Type errCode);
 
   public:
     template <typename T, typename ResponceT>

@@ -59,6 +59,17 @@ namespace Roki
   }
 
   template <>
+  IMURPC::StrobeFrame
+  IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
+  {
+    assert(package.ResponceSize == StrobeFrame::Size);
+
+    const uint8_t *ptr = package.Data;
+
+    return StrobeFrame::DeserializeFrom(&ptr);
+  }
+
+  template <>
   IMURPC::IMUInfo
   IMURPC::DeserializeResponce(const SerialInterface::InPackage &package)
   {
@@ -133,6 +144,8 @@ namespace Roki
       return "Bad Request";
     case ErrorCodes::BadOffset:
       return "Bad offset";
+    case ErrorCodes::ServoDataUnavailable:
+      return "Servo data is unavailable for requested frame";
     default:
       return "Unknown error";
     }
@@ -201,6 +214,17 @@ namespace Roki
     ptr += sizeof(uint8_t);
 
     return fr;
+  }
+
+  IMURPC::StrobeFrame IMURPC::StrobeFrame::DeserializeFrom(uint8_t const **ptr)
+  {
+    IMURPC::StrobeFrame frame;
+    frame.Orientation = IMUFrame::DeserializeFrom(ptr);
+
+    memcpy(frame.ServoPos.data(), *ptr, StrobeFrame::ServoPosSize);
+    *ptr += ServoPosSize;
+
+    return frame;
   }
 
   template bool IMURPC::PerformRPC(SerialInterface &, IMUFrameRequest, IMUFrameRequest::ResponceType &);

@@ -23,8 +23,8 @@ int main()
 
   mb.GetQueueInfo();
   mb.GetIMUInfo();
-  mb.GetCurrentOrientation();
+  mb.GetOrientation();
   mb.ResetIMUCounter();
 
-  mb.GetOrientationBySeq(0);
+  mb.GetStrobeFrame(0);
 }

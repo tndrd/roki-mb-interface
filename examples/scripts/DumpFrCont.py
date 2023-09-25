@@ -19,7 +19,7 @@ info = mb.GetIMUInfo()
 print(f"Found {info.NumAv} frames, starting from {info.First}: ")
 
 for i in range(info.First, info.First + info.NumAv):
-    fr = mb.GetOrientationBySeq(i)
+    fr = mb.GetStrobeFrame(i).Orientation
 
     print(f"Quaternion: seq #{i}")
     print("  X:  " + str(fr.Orientation.X))

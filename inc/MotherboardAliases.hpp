@@ -9,4 +9,5 @@ namespace Roki {
     using IMUInfo = IMURPC::IMUInfo;
     using TTYConfig = SerialInterface::TTYConfig;
     using QueueInfo = BodyRPC::Info;
+    using StrobeFrame = IMURPC::StrobeFrame;
 }
