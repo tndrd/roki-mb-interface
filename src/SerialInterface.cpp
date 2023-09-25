@@ -147,10 +147,10 @@ namespace Roki
 
     uint8_t VersionMajor = in.Data[0];
     uint8_t VersionMinor = in.Data[1];
-    
+
     if (VersionMajor != INTERFACE_VERSION_MAJOR || VersionMinor != INTERFACE_VERSION_MINOR)
       return MakeError("Library v" + std::to_string(INTERFACE_VERSION_MAJOR) + "." + std::to_string(INTERFACE_VERSION_MINOR) + " conflicts with firmware v" + std::to_string(VersionMajor) + "." + std::to_string(VersionMinor));
-  
+
     return true;
   }
 
@@ -167,6 +167,13 @@ namespace Roki
     for (int i = 0; i < size; ++i)
     {
       std::cout << std::hex << +Buffer[i] << " ";
+    }
+    std::cout << std::dec << std::endl;
+
+    std::cout << std::dec << "Data [" << +package.RequestSize << "]: " << std::flush;
+    for (int i = 0; i < package.RequestSize; ++i)
+    {
+      std::cout << std::hex << +package.Data[i] << " ";
     }
     std::cout << std::dec << std::endl;
 #endif
@@ -231,7 +238,7 @@ namespace Roki
 
 #ifdef DBGMB
     std::cout << +package.Error << std::endl;
-    std::cout << "Data: " << std::flush;
+    std::cout << std::dec << "Data [" << responceSize << "]: " << std::flush;
 #endif
 
     if (!ReadToBuf(responceSize))
