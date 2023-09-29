@@ -12,27 +12,29 @@ include_directories(inc/)
 
 add_library(Helpers src/Helpers.cpp)
 
-add_library(SerialInterface src/SerialInterface.cpp)
-target_link_libraries(SerialInterface Helpers)
+add_library(MbSerial src/MbSerial.cpp)
+target_link_libraries(MbSerial PUBLIC Helpers)
 
-add_library(IMURPC src/IMURPC.cpp)
-target_link_libraries(IMURPC PUBLIC SerialInterface)
+add_library(MbClient src/MbClient.cpp)
+target_link_libraries(MbClient PUBLIC MbSerial)
 
-add_library(BodyRPC src/BodyRPC.cpp)
-target_link_libraries(BodyRPC PUBLIC SerialInterface)
+add_library(MbMessages src/MbMessages.cpp)
+
+add_library(MbService src/MbService.cpp)
+target_link_libraries(MbService PUBLIC MbMessages)
 
 add_library(Motherboard src/Motherboard.cpp)
-target_link_libraries(Motherboard PUBLIC IMURPC BodyRPC)
+target_link_libraries(Motherboard PUBLIC MbService MbClient)
 
-add_library(RokiRcb4 src/RokiRcb4.cpp)
-target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
-
-add_library(MotherboardAdapter src/MotherboardAdapter.cpp)
-target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
-
-add_library(RokiRcb4Adapter src/RokiRcb4Adapter.cpp)
-target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
-
-#include(tests/tests.cmake)
-include(bindings/bindings.cmake)
-include(examples/examples.cmake)
+#add_library(RokiRcb4 src/RokiRcb4.cpp)
+#target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
+#
+#add_library(MotherboardAdapter src/MotherboardAdapter.cpp)
+#target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
+#
+#add_library(RokiRcb4Adapter src/RokiRcb4Adapter.cpp)
+#target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
+#
+##include(tests/tests.cmake)
+#include(bindings/bindings.cmake)
+#include(examples/examples.cmake)

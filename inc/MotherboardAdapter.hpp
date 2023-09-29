@@ -1,10 +1,8 @@
 #pragma once
 
 #include "Motherboard.hpp"
-#include "MotherboardAliases.hpp"
-
-#include <stdexcept>
 #include <limits>
+#include <tuple>
 
 namespace Roki {
 
@@ -16,24 +14,29 @@ public:
 class MotherboardAdapter : public Motherboard {
 private:
   MotherboardException ForwardException(const std::string &source) const;
-  
-  template<typename T>
-  void CheckIntBoundaries(int value, const char* fooName) const;
+
+  template <typename T>
+  void CheckIntBoundaries(int value, const char *fooName) const;
+
+  template <typename T> using Ret = typename std::tuple<bool, T>;
 
 public:
   MotherboardAdapter() = default;
 
-  void Configure(const SerialInterface::TTYConfig &serviceConfig);
+  bool Configure(const TTYConfig &serviceConfig);
 
-  StrobeFrame GetStrobeFrame(int seq);
-  IMUFrame GetOrientation();
-  IMUInfo GetIMUInfo();
-  void ResetIMUCounter();
-  void SetStrobeOffset(int offset);
-  int GetStrobeWidth();
-  void ConfigureStrobeFilter(int targetDuration, int durationThreshold);
-
-  QueueInfo GetQueueInfo();
-  void SetQueuePeriod(int periodMs);
+  Ret<IMUFrame> GetIMUFrame(int seq);
+  Ret<std::vector<int>> GetBodyFrame(int seq);
+  Ret<FrameContainerInfo> GetIMUContainerInfo();
+  Ret<FrameContainerInfo> GetBodyContainerInfo();
+  bool ResetStrobeContainers();
+  bool SetIMUStrobeOffset(int offset);
+  bool SetBodyStrobeOffset(int offset);
+  Ret<IMUFrame> GetIMULatest();
+  Ret<uint8_t> GetStrobeWidth();
+  bool ConfigureStrobeFilter(int targetDuration, int durationThreshold);
+  Ret<BodyQueueInfo> GetBodyQueueInfo();
+  bool SetBodyQueuePeriod(int periodMs);
+  Ret<Version> GetVersion();
 };
 } // namespace Roki

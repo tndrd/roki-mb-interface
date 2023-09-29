@@ -1,10 +1,10 @@
 #pragma once
 
+#include <asm/termbits.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <asm/termbits.h>
 #include <unistd.h>
 
 #include <array>
@@ -18,13 +18,13 @@
 
 namespace Roki {
 
-class SerialInterface final {
+class MbSerial final {
 public:
   struct TTYConfig final {
     std::string Port;
     size_t Baudrate;
 
-    enum class StopbitsCount { One, Two }; 
+    enum class StopbitsCount { One, Two };
     StopbitsCount Stopbits;
 
     bool ParityBit;
@@ -38,29 +38,18 @@ public:
     static constexpr Type SOM3 = 0xAF;
   };
 
-  struct Periphery {
-    using Type = uint8_t;
-    static constexpr Type Body = 0;
-    static constexpr Type Imu = 1;
-    static constexpr Type Ack = 2;
-  };
-
   struct OutPackage {
-    Periphery::Type PeripheryId;
-    uint8_t ResponceSize;
-    uint8_t MetaInfo;
-
+    uint8_t ProcedureID;
+    
     const uint8_t *Data;
-    uint8_t RequestSize;
+    uint8_t Size;
   };
 
   struct InPackage {
-    uint8_t PeripheryId;
-    uint8_t MetaInfo;
+    uint8_t Size;
     uint8_t Error;
 
     const uint8_t *Data;
-    uint8_t ResponceSize;
   };
 
 private:
@@ -82,22 +71,21 @@ private:
   bool ReadToBuf(size_t size);
 
 public:
-  SerialInterface() = default;
+  MbSerial() = default;
 
-  SerialInterface(const SerialInterface &) = delete;
-  SerialInterface &operator=(const SerialInterface &) = delete;
+  MbSerial(const MbSerial &) = delete;
+  MbSerial &operator=(const MbSerial &) = delete;
 
-  SerialInterface(SerialInterface &&) = default;
-  SerialInterface &operator=(SerialInterface &&) = default;
+  MbSerial(MbSerial &&) = default;
+  MbSerial &operator=(MbSerial &&) = default;
 
   bool IsOk() const;
   std::string GetError() const;
 
   bool Configure(const TTYConfig &ttyConfig);
-  bool CheckVersion();
-  
+
   bool Send(const OutPackage &package);
-  bool Receive(size_t responceSize, InPackage &package);
+  bool Receive(InPackage &package);
 };
 
 } // namespace Roki

@@ -1,7 +1,8 @@
 #pragma once
-#include "BodyRPC.hpp"
-#include "IMURPC.hpp"
-#include "SerialInterface.hpp"
+#include "MbAliases.hpp"
+#include "MbClient.hpp"
+#include "MbService.hpp"
+#include "Version.hpp"
 
 namespace Roki {
 
@@ -10,37 +11,42 @@ private:
   bool HasError = false;
   std::string Error;
 
-  SerialInterface Service;
-
-  IMURPC IMU;
-  BodyRPC Body;
+  MbSerial Serial;
+  MbClient Client;
+private:
+  using Proc = MbService::Procedures;
 
 private:
   bool MakeError(const std::string &msg);
-  bool ServiceError();
-  bool IMUError();
-  bool BodyError();
-
+  bool MakeFooError(const std::string& fooName, const std::string& msg);
+  
 public:
   Motherboard() = default;
+  bool Configure(const TTYConfig &serviceConfig);
 
-  bool Configure(const SerialInterface::TTYConfig &serviceConfig);
-  bool GetStrobeFrame(uint16_t seq, IMURPC::StrobeFrame &result);
-  bool GetOrientation(IMURPC::IMUFrame &result);
-  bool GetIMUInfo(IMURPC::IMUInfo &result);
-  bool ResetIMUCounter();
-  bool SetStrobeOffset(uint8_t offset);
-  bool GetStrobeWidth(uint8_t& width);
+  bool GetIMUFrame(uint16_t seq, IMUFrame &result);
+  bool GetBodyFrame(uint16_t seq, BodyResponce &result);
+
+  bool GetIMUContainerInfo(FrameContainerInfo &result);
+  bool GetBodyContainerInfo(FrameContainerInfo &result);
+
+  bool ResetStrobeContainers();
+
+  bool SetIMUStrobeOffset(uint8_t offset);
+  bool SetBodyStrobeOffset(uint8_t offset);
+
+  bool GetIMULatest(IMUFrame &result);
+
+  bool GetStrobeWidth(uint8_t &result);
   bool ConfigureStrobeFilter(uint8_t targetDuration, uint8_t durationThreshold);
 
-  bool BodySendSync(const uint8_t *requestData, uint8_t requestSize,
-                    uint8_t *responceData, uint8_t responceSize);
-  bool BodySendAsync(const uint8_t *requestData, uint8_t requestSize,
-                     uint8_t responceSize);
+  bool BodySendForward(const uint8_t* requestData, uint8_t requestSize, uint8_t* responceData, uint8_t responceSize);
+  bool BodySendQueue(const uint8_t* requestData, uint8_t requestSize, uint8_t responceSize);
+  bool GetBodyQueueInfo(BodyQueueInfo& result);
+  bool SetBodyQueuePeriod(uint8_t periodMs);
 
-  bool GetQueueInfo(BodyRPC::Info& result);
-  bool SetQueuePeriod(uint8_t periodMs);
-  
+  bool GetVersion(Version& result);
+
   bool IsOk() const;
   std::string GetError() const;
 };

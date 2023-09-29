@@ -1,169 +1,192 @@
 #include "Motherboard.hpp"
 
-namespace Roki
-{
+namespace Roki {
 
-  bool Motherboard::MakeError(const std::string &msg)
-  {
-    HasError = true;
-    Error = msg;
-    return false;
-  }
+bool Motherboard::MakeError(const std::string &msg) {
+  HasError = true;
+  Error = msg;
+  return false;
+}
 
-  bool Motherboard::ServiceError()
-  {
-    return MakeError("Service: " + Service.GetError());
-  }
+bool Motherboard::MakeFooError(const std::string &fooName,
+                               const std::string &msg) {
+  return MakeError(fooName + ": " + msg);
+}
 
-  bool Motherboard::IMUError() { return MakeError("IMU: " + IMU.GetError()); }
+std::string VersionToString(Version version) {
+  return "v" + std::to_string(version.Major) + "." +
+         std::to_string(version.Minor);
+}
 
-  bool Motherboard::BodyError() { return MakeError("Body: " + Body.GetError()); }
+std::string LibraryVersionToString() {
+  Version version;
+  version.Major = INTERFACE_VERSION_MAJOR;
+  version.Minor = INTERFACE_VERSION_MINOR;
 
-  bool Motherboard::Configure(const SerialInterface::TTYConfig &ServiceConfig)
-  {
-    if (!Service.Configure(ServiceConfig))
-      return ServiceError();
+  return VersionToString(version);
+}
 
-    if (!Service.CheckVersion())
-      return ServiceError();
-
+bool CheckVersion(Version version) {
+  if (version.Major == INTERFACE_VERSION_MAJOR &&
+      version.Minor == INTERFACE_VERSION_MINOR)
     return true;
+  return false;
+}
+
+#define FOO_ERROR(msg) MakeFooError(__func__, msg)
+#define CHECK_CLIENT_ERROR ok ? true : FOO_ERROR(Client.GetError())
+
+bool Motherboard::Configure(const TTYConfig &config) {
+  Version version;
+
+  if (!Serial.Configure(config))
+    return FOO_ERROR(Serial.GetError());
+
+  if (!GetVersion(version))
+    return FOO_ERROR(GetError());
+
+  if (!CheckVersion(version))
+    return FOO_ERROR("Version conflict: library " + LibraryVersionToString() +
+                     " firmware " + VersionToString(version));
+
+  return true;
+}
+
+bool Motherboard::GetIMUFrame(uint16_t seq, IMUFrame &result) {
+  Messages::FrameNumber request;
+  request.Seq = seq;
+
+  bool ok = Client.PerformRPC<Proc::GetIMUFrame>(Serial, request, result);
+  return ok ? true : FOO_ERROR(Client.GetError());
+}
+
+bool Motherboard::GetBodyFrame(uint16_t seq, BodyResponce &result) {
+  Messages::FrameNumber request;
+  request.Seq = seq;
+
+  bool ok = Client.PerformRPC<Proc::GetBodyFrame>(Serial, request, result);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::GetIMUContainerInfo(FrameContainerInfo &result) {
+  bool ok = Client.PerformRPC<Proc::GetIMUContainerInfo>(Serial, {}, result);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::GetBodyContainerInfo(FrameContainerInfo &result) {
+  bool ok = Client.PerformRPC<Proc::GetBodyContainerInfo>(Serial, {}, result);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::ResetStrobeContainers() {
+  Messages::Empty responce;
+  bool ok =
+      Client.PerformRPC<Proc::ResetStrobeContainers>(Serial, {}, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::SetIMUStrobeOffset(uint8_t offset) {
+  Messages::Byte request;
+  Messages::Empty responce;
+
+  request.Value = offset;
+
+  bool ok =
+      Client.PerformRPC<Proc::SetIMUStrobeOffset>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::SetBodyStrobeOffset(uint8_t offset) {
+  Messages::Byte request;
+  Messages::Empty responce;
+
+  request.Value = offset;
+
+  bool ok =
+      Client.PerformRPC<Proc::SetBodyStrobeOffset>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::GetIMULatest(IMUFrame &result) {
+  bool ok = Client.PerformRPC<Proc::GetIMULatest>(Serial, {}, result);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::GetStrobeWidth(uint8_t &result) {
+  Messages::Byte responce;
+  bool ok = Client.PerformRPC<Proc::GetStrobeWidth>(Serial, {}, responce);
+  if (ok)
+    result = responce.Value;
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::ConfigureStrobeFilter(uint8_t targetDuration,
+                                        uint8_t durationThreshold) {
+  Messages::StrobeFilterConfig request;
+  Messages::Empty responce;
+  request.TargetDuration = targetDuration;
+  request.DurationThreshold = durationThreshold;
+
+  bool ok =
+      Client.PerformRPC<Proc::ConfigureStrobeFilter>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::BodySendForward(const uint8_t *requestData,
+                                  uint8_t requestSize, uint8_t *responceData,
+                                  uint8_t responceSize) {
+  Messages::BodyRequest request;
+  Messages::BodyResponce responce;
+  request.Data = requestData;
+  request.Size = requestSize;
+  request.ResponceSize = responceSize;
+
+  bool ok = Client.PerformRPC<Proc::BodySendForward>(Serial, request, responce);
+
+  if (ok) {
+    assert(responceSize == responce.Size);
+    memcpy(responceData, responce.Data, responce.Size);
   }
 
-  bool Motherboard::GetStrobeFrame(uint16_t seq, IMURPC::StrobeFrame &result)
-  {
-    IMURPC::IMUFrameRequest request{seq};
-    IMURPC::StrobeFrame responce;
+  return CHECK_CLIENT_ERROR;
+}
 
-    if (!IMU.PerformRPC(Service, request, responce))
-      return IMUError();
+bool Motherboard::BodySendQueue(const uint8_t *requestData, uint8_t requestSize,
+                                uint8_t responceSize) {
+  Messages::BodyRequest request;
+  Messages::Empty responce;
+  request.Data = requestData;
+  request.Size = requestSize;
+  request.ResponceSize = responceSize;
 
-    result = responce;
-    return true;
-  }
+  bool ok = Client.PerformRPC<Proc::BodySendQueue>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
 
-  bool Motherboard::GetOrientation(IMURPC::IMUFrame &result)
-  {
-    IMURPC::IMULatestRequest request{};
-    IMURPC::IMUFrame responce;
+bool Motherboard::GetBodyQueueInfo(BodyQueueInfo &result) {
+  bool ok = Client.PerformRPC<Proc::GetBodyQueueInfo>(Serial, {}, result);
+  return CHECK_CLIENT_ERROR;
+}
 
-    if (!IMU.PerformRPC(Service, request, responce))
-      return IMUError();
+bool Motherboard::SetBodyQueuePeriod(uint8_t periodMs) {
+  Messages::PeriodMs request;
+  Messages::Empty responce;
+  request.Ms = periodMs;
 
-    result = responce;
-    return true;
-  }
+  bool ok =
+      Client.PerformRPC<Proc::SetBodyQueuePeriod>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
 
-  bool Motherboard::GetIMUInfo(IMURPC::IMUInfo &result)
-  {
-    IMURPC::IMUInfoRequest request{};
-    IMURPC::IMUInfo responce;
+bool Motherboard::GetVersion(Version &result) {
+  bool ok = Client.PerformRPC<Proc::GetVersion>(Serial, {}, result);
+  return CHECK_CLIENT_ERROR;
+}
 
-    if (!IMU.PerformRPC(Service, request, responce))
-      return IMUError();
+#undef CHECK_CLIENT_ERROR
+#undef FOO_ERROR
 
-    result = responce;
-    return true;
-  }
-
-  bool Motherboard::ResetIMUCounter()
-  {
-    IMURPC::IMUResetRequest request{};
-    IMURPC::Empty responce;
-
-    if (!IMU.PerformRPC(Service, request, responce))
-      return IMUError();
-    return true;
-  }
-
-  bool Motherboard::SetStrobeOffset(uint8_t offset)
-  {
-    IMURPC::SetStrobeOffsetRequest request{offset};
-    IMURPC::Empty responce;
-
-    if (!IMU.PerformRPC(Service, request, responce))
-      return IMUError();
-    return true;
-  }
-
-  bool Motherboard::GetStrobeWidth(uint8_t &width)
-  {
-    IMURPC::StrobeWidthRequest request{};
-    IMURPC::Byte responce;
-
-    if (!IMU.PerformRPC(Service, request, responce))
-      return IMUError();
-
-    width = responce.Value;
-    return true;
-  }
-
-  bool Motherboard::ConfigureStrobeFilter(uint8_t targetDuration, uint8_t durationThreshold)
-  {
-    IMURPC::ConfigureFilterRequest request{targetDuration, durationThreshold};
-    IMURPC::Empty responce;
-
-    if (!IMU.PerformRPC(Service, request, responce))
-      return IMUError();
-    return true;
-  }
-
-  bool Motherboard::BodySendSync(const uint8_t *requestData, uint8_t requestSize,
-                                 uint8_t *responceData, uint8_t responceSize)
-  {
-    BodyRPC::Request request;
-    request.Data = requestData;
-    request.RequestSize = requestSize;
-    request.ResponceSize = responceSize;
-    request.Mode = BodyRPC::MessageMode::Sync;
-
-    if (!Body.Send(Service, request))
-      return BodyError();
-
-    BodyRPC::Responce responce;
-    if (!Body.Recieve(Service, responce, responceSize))
-      return BodyError();
-
-    memcpy(responceData, responce.Data, responceSize);
-    return true;
-  }
-
-  bool Motherboard::BodySendAsync(const uint8_t *requestData, uint8_t requestSize,
-                                  uint8_t responceSize)
-  {
-    BodyRPC::Request request;
-    request.Data = requestData;
-    request.RequestSize = requestSize;
-    request.ResponceSize = responceSize;
-    request.Mode = BodyRPC::MessageMode::Async;
-
-    if (!Body.Send(Service, request))
-      return BodyError();
-
-    BodyRPC::Responce responce;
-    if (!Body.Recieve(Service, responce, 1))
-      return BodyError();
-
-    return true;
-  }
-
-  bool Motherboard::GetQueueInfo(BodyRPC::Info &result)
-  {
-    if (!Body.GetInfo(Service, result))
-      return BodyError();
-
-    return true;
-  }
-
-  bool Motherboard::SetQueuePeriod(uint8_t periodMs)
-  {
-    if (!Body.SetPeriod(Service, periodMs))
-      return BodyError();
-
-    return true;
-  }
-
-  bool Motherboard::IsOk() const { return HasError; }
-  std::string Motherboard::GetError() const { return Error; }
+bool Motherboard::IsOk() const { return HasError; }
+std::string Motherboard::GetError() const { return Error; }
 
 } // namespace Roki
