@@ -19,7 +19,7 @@ void MbSerial::SerializePackageToBuf(const OutPackage &package,
   assert(package.Data);
   assert(size);
 
-  *size = package.Size + 4;
+  *size = package.Size + 5;
   assert(*size < BufferSize);
 
   uint8_t *ptr = Buffer.data();
@@ -27,6 +27,7 @@ void MbSerial::SerializePackageToBuf(const OutPackage &package,
   *(ptr++) = SOM::SOM1;
   *(ptr++) = SOM::SOM2;
   *(ptr++) = package.ProcedureID;
+  *(ptr++) = package.Size;
 
   memcpy(ptr, package.Data, package.Size);
   ptr += package.Size;
