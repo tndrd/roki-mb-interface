@@ -61,7 +61,7 @@ public:
       static constexpr ProcedureID::Type ID = ProcedureID::GetIMUFrame;
 
       using RequestType = Messages::FrameNumber;
-      using ResponceType = Messages::IMUFrame;
+      using ResponceType = Messages::IMUFrameMsg;
     };
 
     struct GetBodyFrame : public Procedure {
@@ -89,7 +89,7 @@ public:
       static constexpr ProcedureID::Type ID = ProcedureID::GetIMULatest;
 
       using RequestType = Messages::Empty;
-      using ResponceType = Messages::IMUFrame;
+      using ResponceType = Messages::IMUFrameMsg;
     };
 
     struct ResetStrobeContainers : public Procedure {
