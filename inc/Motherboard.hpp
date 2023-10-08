@@ -1,4 +1,5 @@
 #pragma once
+
 #include "MbAliases.hpp"
 #include "MbClient.hpp"
 #include "MbService.hpp"
@@ -7,10 +8,10 @@
 namespace Roki {
 
 class Motherboard {
-private:
+protected:
   bool HasError = false;
   std::string Error;
-
+private:
   MbSerial Serial;
   MbClient Client;
 private:
