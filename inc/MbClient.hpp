@@ -40,7 +40,7 @@ public:
 
     outPackage.ProcedureID = Proc::ID;
     outPackage.Data = RequestBuffer.data();
-    outPackage.Size = request.Size;
+    outPackage.Size = request.GetPackedSize();
 
     request.Serialize(RequestBuffer.data());
 
@@ -56,7 +56,7 @@ public:
     if (error != ok)
       return MakeError(ErrorCodes<Proc>::GetDescription(error));
 
-    responce = Responce<Proc>::Deserialize(inPackage.Data, inPackage.Size);
+    responce = Responce<Proc>::Deserialize(inPackage.Data);
     return true;
   }
 };
