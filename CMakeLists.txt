@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "-Werror")
 
 add_subdirectory(deps/pybind11)
 add_subdirectory(deps/rcb4-base-class)
+add_subdirectory(deps/roki-mb-service)
 
 ADD_DEFINITIONS(-DDBGMB=1)
 
@@ -19,12 +20,8 @@ target_link_libraries(MbSerial PUBLIC DescriptorWrapper)
 add_library(MbClient src/MbClient.cpp)
 target_link_libraries(MbClient PUBLIC MbSerial)
 
-add_library(MbMessages src/MbMessages.cpp)
-
-add_library(MbService src/MbService.cpp)
-target_link_libraries(MbService PUBLIC MbMessages)
-
 add_library(IMUFrame src/Helpers/IMUFrame.cpp)
+target_link_libraries(IMUFrame PUBLIC MbService)
 
 add_library(Motherboard src/Motherboard.cpp)
 target_link_libraries(Motherboard PUBLIC MbService MbClient IMUFrame)
