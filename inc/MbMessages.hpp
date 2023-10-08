@@ -7,28 +7,27 @@
 namespace Roki {
 namespace Messages {
 
-struct IMUFrame {
+struct IMUFrameMsg {
   struct TimestampT {
     uint32_t TimeS;
     uint32_t TimeNS;
   };
 
-  struct Quaternion {
-    float X;
-    float Y;
-    float Z;
-    float W;
+  struct QuaternionMsg {
+    int16_t X;
+    int16_t Y;
+    int16_t Z;
+    int16_t W;
   };
 
-  Quaternion Orientation;
+  QuaternionMsg Orientation;
   TimestampT Timestamp;
 
   uint8_t SensorID;
 
-  static constexpr size_t Size = 4 * sizeof(int16_t) + /* sizeof(float) + */
-                                 2 * sizeof(uint32_t) + sizeof(uint8_t);
-
-  static IMUFrame Deserialize(const uint8_t *ptr, size_t size);
+  void Serialize(uint8_t *ptr) const;
+  static IMUFrameMsg Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct FrameContainerInfo {
@@ -36,79 +35,86 @@ struct FrameContainerInfo {
   uint16_t NumAv;
   uint16_t MaxFrames;
 
-  static constexpr size_t Size = 3 * sizeof(uint16_t);
-  static FrameContainerInfo Deserialize(const uint8_t *ptr, size_t size);
+  void Serialize(uint8_t *ptr) const;
+  static FrameContainerInfo Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct Empty {
-  static constexpr size_t Size = 1;
-
   void Serialize(uint8_t *ptr) const;
-  static Empty Deserialize(const uint8_t *ptr, size_t size);
+  static Empty Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct Byte {
-  static constexpr size_t Size = 1;
   uint8_t Value;
 
   void Serialize(uint8_t *ptr) const;
-  static Byte Deserialize(const uint8_t *ptr, size_t size);
+  static Byte Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct FrameNumber {
-  static constexpr size_t Size = 2;
   uint16_t Seq;
 
   void Serialize(uint8_t *ptr) const;
+  static FrameNumber Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct StrobeFilterConfig {
-  static constexpr size_t Size = 2;
   uint8_t TargetDuration;
   uint8_t DurationThreshold;
 
   void Serialize(uint8_t *ptr) const;
+  static StrobeFilterConfig Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct Version {
-  static constexpr size_t Size = 2;
   uint8_t Major;
   uint8_t Minor;
 
-  static Version Deserialize(const uint8_t *ptr, size_t size);
+  void Serialize(uint8_t *ptr) const;
+  static Version Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct BodyQueueInfo {
-  static constexpr size_t Size = 2 * sizeof(uint16_t);
-
   uint16_t NumRequests;
   uint16_t NumResponces;
 
-  static BodyQueueInfo Deserialize(const uint8_t *ptr, size_t size);
+  void Serialize(uint8_t *ptr) const;
+  static BodyQueueInfo Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct PeriodMs {
-  static constexpr size_t Size = 1;
-
   uint8_t Ms;
 
   void Serialize(uint8_t *ptr) const;
+  static PeriodMs Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct BodyRequest {
   const uint8_t *Data;
-  uint8_t Size;
 
+  uint8_t RequestSize;
   uint8_t ResponceSize;
 
   void Serialize(uint8_t *ptr) const;
+  static BodyRequest Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 struct BodyResponce {
   const uint8_t *Data;
-  uint8_t Size;
+  uint8_t ResponceSize;
 
-  static BodyResponce Deserialize(const uint8_t *ptr, size_t size);
+  void Serialize(uint8_t *ptr) const;
+  static BodyResponce Deserialize(const uint8_t *ptr);
+  size_t GetPackedSize() const;
 };
 
 } // namespace Messages
