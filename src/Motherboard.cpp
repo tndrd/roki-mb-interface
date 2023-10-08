@@ -54,10 +54,14 @@ bool Motherboard::Configure(const TTYConfig &config) {
 
 bool Motherboard::GetIMUFrame(uint16_t seq, IMUFrame &result) {
   Messages::FrameNumber request;
+  Messages::IMUFrameMsg responce;
   request.Seq = seq;
 
-  bool ok = Client.PerformRPC<Proc::GetIMUFrame>(Serial, request, result);
-  return ok ? true : FOO_ERROR(Client.GetError());
+  bool ok = Client.PerformRPC<Proc::GetIMUFrame>(Serial, request, responce);
+
+  if (ok)
+    result = IMUFrame::ConvertFrom(responce);
+  return CHECK_CLIENT_ERROR;
 }
 
 bool Motherboard::GetBodyFrame(uint16_t seq, BodyResponce &result) {
@@ -108,7 +112,11 @@ bool Motherboard::SetBodyStrobeOffset(uint8_t offset) {
 }
 
 bool Motherboard::GetIMULatest(IMUFrame &result) {
-  bool ok = Client.PerformRPC<Proc::GetIMULatest>(Serial, {}, result);
+  Messages::IMUFrameMsg responce;
+
+  bool ok = Client.PerformRPC<Proc::GetIMULatest>(Serial, {}, responce);
+  if (ok)
+    result = IMUFrame::ConvertFrom(responce);
   return CHECK_CLIENT_ERROR;
 }
 
@@ -138,14 +146,14 @@ bool Motherboard::BodySendForward(const uint8_t *requestData,
   Messages::BodyRequest request;
   Messages::BodyResponce responce;
   request.Data = requestData;
-  request.Size = requestSize;
+  request.RequestSize = requestSize;
   request.ResponceSize = responceSize;
 
   bool ok = Client.PerformRPC<Proc::BodySendForward>(Serial, request, responce);
 
   if (ok) {
-    assert(responceSize == responce.Size);
-    memcpy(responceData, responce.Data, responce.Size);
+    assert(responceSize == responce.ResponceSize);
+    memcpy(responceData, responce.Data, responce.ResponceSize);
   }
 
   return CHECK_CLIENT_ERROR;
@@ -156,7 +164,7 @@ bool Motherboard::BodySendQueue(const uint8_t *requestData, uint8_t requestSize,
   Messages::BodyRequest request;
   Messages::Empty responce;
   request.Data = requestData;
-  request.Size = requestSize;
+  request.RequestSize = requestSize;
   request.ResponceSize = responceSize;
 
   bool ok = Client.PerformRPC<Proc::BodySendQueue>(Serial, request, responce);
