@@ -11,10 +11,10 @@ ADD_DEFINITIONS(-DDBGMB=1)
 
 include_directories(inc/)
 
-add_library(Helpers src/Helpers.cpp)
+add_library(DescriptorWrapper src/Helpers/DescriptorWrapper.cpp)
 
 add_library(MbSerial src/MbSerial.cpp)
-target_link_libraries(MbSerial PUBLIC Helpers)
+target_link_libraries(MbSerial PUBLIC DescriptorWrapper)
 
 add_library(MbClient src/MbClient.cpp)
 target_link_libraries(MbClient PUBLIC MbSerial)
@@ -24,8 +24,10 @@ add_library(MbMessages src/MbMessages.cpp)
 add_library(MbService src/MbService.cpp)
 target_link_libraries(MbService PUBLIC MbMessages)
 
+add_library(IMUFrame src/Helpers/IMUFrame.cpp)
+
 add_library(Motherboard src/Motherboard.cpp)
-target_link_libraries(Motherboard PUBLIC MbService MbClient)
+target_link_libraries(Motherboard PUBLIC MbService MbClient IMUFrame)
 
 add_library(RokiRcb4 src/RokiRcb4.cpp)
 target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
