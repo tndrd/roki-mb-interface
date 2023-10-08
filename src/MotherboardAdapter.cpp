@@ -47,9 +47,10 @@ MA::Ret<std::vector<uint8_t>> MA::GetBodyFrame(int seq) {
     return ERR_RET;
 
   std::vector<uint8_t> data;
-  data.resize(bodyResponce.Size);
+  size_t size = bodyResponce.ResponceSize;
+  data.resize(size);
 
-  memcpy(data.data(), bodyResponce.Data, bodyResponce.Size);
+  memcpy(data.data(), bodyResponce.Data, size);
 
   return {result, data};
 }
