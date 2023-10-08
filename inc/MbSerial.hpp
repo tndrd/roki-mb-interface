@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "Helpers.hpp"
+#include "Helpers/DescriptorWrapper.hpp"
 #include "Version.hpp"
 
 namespace Roki {
