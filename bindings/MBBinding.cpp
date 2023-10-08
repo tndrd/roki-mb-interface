@@ -1,11 +1,10 @@
-#include "PyBinding.hpp"
 #include "MotherboardAdapter.hpp"
+#include "PyBinding.hpp"
 #include "RokiRcb4Adapter.hpp"
 
 using namespace Roki;
 
-PYBIND11_MODULE(Roki, m)
-{
+PYBIND11_MODULE(Roki, m) {
   m.doc() = "Roki motherboard interface";
 
   /* Motherboard */
@@ -28,48 +27,46 @@ PYBIND11_MODULE(Roki, m)
       .def_readwrite("Timestamp", &IMUFrame::Timestamp)
       .def_readwrite("SensorID", &IMUFrame::SensorID);
 
-    py::class_<StrobeFrame>(m, "StrobeFrame")
+  py::class_<FrameContainerInfo>(m, "FrameContainerInfo")
       .def(py::init<>())
-      .def_readwrite("Orientation", &StrobeFrame::Orientation)
-      .def_readwrite("ServoPos", &StrobeFrame::ServoPos);
+      .def_readwrite("First", &FrameContainerInfo::First)
+      .def_readwrite("NumAv", &FrameContainerInfo::NumAv)
+      .def_readwrite("MaxFrames", &FrameContainerInfo::MaxFrames);
 
-  py::class_<IMUInfo>(m, "IMUInfo")
+  py::class_<BodyQueueInfo>(m, "BodyQueueInfo")
       .def(py::init<>())
-      .def_readwrite("First", &IMUInfo::First)
-      .def_readwrite("NumAv", &IMUInfo::NumAv)
-      .def_readwrite("MaxFrames", &IMUInfo::MaxFrames);
+      .def_readwrite("NumRequests", &BodyQueueInfo::NumRequests)
+      .def_readwrite("NumResponces", &BodyQueueInfo::NumResponces);
 
-  py::class_<QueueInfo>(m, "QueueInfo")
+  py::enum_<MbSerial::TTYConfig::StopbitsCount>(m, "Stopbits", py::arithmetic())
+      .value("One", MbSerial::TTYConfig::StopbitsCount::One)
+      .value("Two", MbSerial::TTYConfig::StopbitsCount::Two);
+
+  py::class_<MbSerial::TTYConfig>(m, "TTYConfig")
       .def(py::init<>())
-      .def_readwrite("NumRequests", &QueueInfo::NumRequests)
-      .def_readwrite("NumResponces", &QueueInfo::NumResponces);
+      .def_readwrite("Port", &MbSerial::TTYConfig::Port)
+      .def_readwrite("Baudrate", &MbSerial::TTYConfig::Baudrate)
+      .def_readwrite("Stopbits", &MbSerial::TTYConfig::Stopbits)
+      .def_readwrite("ParityBit", &MbSerial::TTYConfig::ParityBit)
+      .def_readwrite("Timeout", &MbSerial::TTYConfig::Timeout);
 
-  py::enum_<SerialInterface::TTYConfig::StopbitsCount>(m, "Stopbits", py::arithmetic())
-      .value("One", SerialInterface::TTYConfig::StopbitsCount::One)
-      .value("Two", SerialInterface::TTYConfig::StopbitsCount::Two);
+  using MA = MotherboardAdapter;
 
-  py::class_<SerialInterface::TTYConfig>(m, "TTYConfig")
+  py::class_<MA>(m, "Motherboard")
       .def(py::init<>())
-      .def_readwrite("Port", &SerialInterface::TTYConfig::Port)
-      .def_readwrite("Baudrate", &SerialInterface::TTYConfig::Baudrate)
-      .def_readwrite("Stopbits", &SerialInterface::TTYConfig::Stopbits)
-      .def_readwrite("ParityBit", &SerialInterface::TTYConfig::ParityBit)
-      .def_readwrite("Timeout", &SerialInterface::TTYConfig::Timeout);
-
-  py::register_exception<MotherboardException>(m, "MotherboardException");
-
-  py::class_<MotherboardAdapter>(m, "Motherboard")
-      .def(py::init<>())
-      .def("Configure", &MotherboardAdapter::Configure)
-      .def("GetStrobeFrame", &MotherboardAdapter::GetStrobeFrame)
-      .def("GetOrientation", &MotherboardAdapter::GetOrientation)
-      .def("GetIMUInfo", &MotherboardAdapter::GetIMUInfo)
-      .def("ResetIMUCounter", &MotherboardAdapter::ResetIMUCounter)
-      .def("GetQueueInfo", &MotherboardAdapter::GetQueueInfo)
-      .def("SetStrobeOffset", &MotherboardAdapter::SetStrobeOffset)
-      .def("GetStrobeWidth", &MotherboardAdapter::GetStrobeWidth)
-      .def("ConfigureStrobeFilter", &MotherboardAdapter::ConfigureStrobeFilter)
-      .def("SetQueuePeriod", &MotherboardAdapter::SetQueuePeriod);
+      .def("GetIMUFrame", &MA::GetIMUFrame)
+      .def("GetBodyFrame", &MA::GetBodyFrame)
+      .def("GetIMUContainerInfo", &MA::GetIMUContainerInfo)
+      .def("GetBodyContainerInfo", &MA::GetBodyContainerInfo)
+      .def("ResetStrobeContainers", &MA::ResetStrobeContainers)
+      .def("SetIMUStrobeOffset", &MA::SetIMUStrobeOffset)
+      .def("SetBodyStrobeOffset", &MA::SetBodyStrobeOffset)
+      .def("GetIMULatest", &MA::GetIMULatest)
+      .def("GetStrobeWidth", &MA::GetStrobeWidth)
+      .def("ConfigureStrobeFilter", &MA::ConfigureStrobeFilter)
+      .def("GetBodyQueueInfo", &MA::GetBodyQueueInfo)
+      .def("SetBodyQueuePeriod", &MA::SetBodyQueuePeriod)
+      .def("GetVersion", &MA::GetVersion);
 
   /* Rcb4 */
 
@@ -83,13 +80,15 @@ PYBIND11_MODULE(Roki, m)
       .def_readwrite("Sio", &Rcb4::ServoData::Sio)
       .def_readwrite("Data", &Rcb4::ServoData::Data);
 
-  rcb4.def(py::init<MotherboardAdapter&>());
+  rcb4.def(py::init<MotherboardAdapter &>());
   rcb4.def("checkAcknowledge", &Rcb4::checkAcknowledge);
   rcb4.def("getPio", &Rcb4::getPio);
   rcb4.def("setPio", &Rcb4::setPio);
   rcb4.def("getPioMode", &Rcb4::getPioMode);
   rcb4.def("setPioMode", &Rcb4::setPioMode);
-  rcb4.def("setSingleServo", static_cast<bool (Rcb4::*)(Rcb4::ServoData, uint8_t)>(&Rcb4::setSingleServo));
+  rcb4.def("setSingleServo",
+           static_cast<bool (Rcb4::*)(Rcb4::ServoData, uint8_t)>(
+               &Rcb4::setSingleServo));
   rcb4.def("setFreeSingleServo", &Rcb4::setFreeSingleServo);
   rcb4.def("setHoldSingleServo", &Rcb4::setHoldSingleServo);
   rcb4.def("setServoPos", &Rcb4::setServoPos);
