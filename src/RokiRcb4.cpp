@@ -20,7 +20,7 @@ namespace Roki
 
   bool RokiRcb4::synchronize(byte txBuf[], byte txLen, byte rxBuf[], byte rxLen)
   {
-    if (!Mboard->BodySendSync(txBuf, txLen, rxBuf, rxLen))
+    if (!Mboard->BodySendForward(txBuf, txLen, rxBuf, rxLen))
       return MakeError("Failed to synchronize: " + Mboard->GetError());
 
     HasError = false;
@@ -31,7 +31,7 @@ namespace Roki
   {
     uint8_t txSize = *txData;
 
-    if (!Mboard->BodySendAsync(txData, txSize, 4))
+    if (!Mboard->BodySendQueue(txData, txSize, 4))
       return MakeError("Failed to send async: " + Mboard->GetError());
 
     HasError = false;
