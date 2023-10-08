@@ -2,11 +2,12 @@
 
 #include "MbMessages.hpp"
 #include "MbSerial.hpp"
+#include "Helpers/IMUFrame.hpp"
 
 namespace Roki {
-    using Quaternion = Messages::IMUFrame::Quaternion;
-    using Timestamp =  Messages::IMUFrame::TimestampT;
-    using IMUFrame =  Messages::IMUFrame;
+    using IMUFrame = Helpers::IMUFrame;
+    using Quaternion = IMUFrame::Quaternion;
+    using Timestamp =  IMUFrame::TimestampT;
     using FrameContainerInfo = Messages::FrameContainerInfo;
     using TTYConfig = MbSerial::TTYConfig;
     using BodyQueueInfo = Messages::BodyQueueInfo;
