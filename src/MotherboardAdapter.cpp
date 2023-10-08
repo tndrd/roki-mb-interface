@@ -1,133 +1,128 @@
 #include "MotherboardAdapter.hpp"
 
-namespace Roki
-{
-  MotherboardException::MotherboardException(const std::string &source,
-                                             const std::string &msg)
-      : std::runtime_error("Motherboard::" + source + ": " + msg) {}
+namespace Roki {
 
-  void MotherboardAdapter::Configure(
-      const SerialInterface::TTYConfig &serviceConfig)
-  {
-    static const char *fooName = "Configure";
-
-    if (!Motherboard::Configure(serviceConfig))
-      throw ForwardException(fooName);
+using MA = MotherboardAdapter;
+#define ERR_RET                                                                \
+  {                                                                            \
+    false, {}                                                                  \
   }
 
-  MotherboardException MotherboardAdapter::ForwardException(const std::string &source) const
-  {
-    return MotherboardException(source, Motherboard::GetError());
-  }
+bool MA::MakeError(const std::string &msg) {
+  HasError = true;
+  Error = msg;
+  return false;
+}
 
-  template<typename T>
-  void MotherboardAdapter::CheckIntBoundaries(int value, const char* fooName) const {
-    static const char* msg = "Inappropriate argument value";
+template <typename T> bool MA::CheckIntBoundaries(int value) {
+  static const char *msg = "Inappropriate argument value";
 
-    if (value < std::numeric_limits<T>::min())
-      throw MotherboardException(fooName, msg);
+  if (value < std::numeric_limits<T>::min())
+    return MakeError(msg);
 
-    if (value > std::numeric_limits<T>::max())
-      throw MotherboardException(fooName, msg);
-  }
+  if (value > std::numeric_limits<T>::max())
+    return MakeError(msg);
 
-  StrobeFrame MotherboardAdapter::GetStrobeFrame(int seq)
-  {
-    static const char *fooName = "GetStrobeFrame";
+  return true;
+}
 
-    CheckIntBoundaries<uint16_t>(seq, fooName);
+MA::Ret<IMUFrame> MA::GetIMUFrame(int seq) {
+  if (!CheckIntBoundaries<uint16_t>(seq))
+    return ERR_RET;
 
-    StrobeFrame result;
+  IMUFrame frame;
+  bool result = Motherboard::GetIMUFrame(seq, frame);
 
-    if (!Motherboard::GetStrobeFrame(static_cast<uint16_t>(seq), result))
-      throw ForwardException(fooName);
+  return {result, frame};
+}
 
-    return result;
-  }
+MA::Ret<std::vector<uint8_t>> MA::GetBodyFrame(int seq) {
+  if (!CheckIntBoundaries<uint16_t>(seq))
+    return ERR_RET;
 
-  IMUFrame MotherboardAdapter::GetOrientation()
-  {
-    static const char *fooName = "GetOrientation";
+  BodyResponce bodyResponce;
+  bool result = Motherboard::GetBodyFrame(seq, bodyResponce);
 
-    IMUFrame result;
+  if (!result)
+    return ERR_RET;
 
-    if (!Motherboard::GetOrientation(result))
-      throw ForwardException(fooName);
+  std::vector<uint8_t> data;
+  data.resize(bodyResponce.Size);
 
-    return result;
-  }
+  memcpy(data.data(), bodyResponce.Data, bodyResponce.Size);
 
-  IMUInfo MotherboardAdapter::GetIMUInfo()
-  {
-    static const char *fooName = "GetIMUInfo";
+  return {result, data};
+}
 
-    IMUInfo result;
+MA::Ret<FrameContainerInfo> MA::GetIMUContainerInfo() {
+  FrameContainerInfo info;
+  bool result = Motherboard::GetIMUContainerInfo(info);
 
-    if (!Motherboard::GetIMUInfo(result))
-      throw ForwardException(fooName);
+  return {result, info};
+}
 
-    return result;
-  }
+MA::Ret<FrameContainerInfo> MA::GetBodyContainerInfo() {
+  FrameContainerInfo info;
+  bool result = Motherboard::GetBodyContainerInfo(info);
 
-  void MotherboardAdapter::ResetIMUCounter()
-  {
-    static const char *fooName = "ResetIMUCounter";
+  return {result, info};
+}
 
-    if (!Motherboard::ResetIMUCounter())
-      throw ForwardException(fooName);
-  }
+bool MA::ResetStrobeContainers() {
+  return Motherboard::ResetStrobeContainers();
+}
 
-  void MotherboardAdapter::SetStrobeOffset(int offset)
-  {
-    static const char *fooName = "SetStrobeOffset";
+bool MA::SetIMUStrobeOffset(int offset) {
+  if (!CheckIntBoundaries<uint8_t>(offset))
+    return false;
 
-    CheckIntBoundaries<uint8_t>(offset, fooName);
+  return Motherboard::SetIMUStrobeOffset(offset);
+}
+bool MA::SetBodyStrobeOffset(int offset) {
+  if (!CheckIntBoundaries<uint8_t>(offset))
+    return false;
 
-    if (!Motherboard::SetStrobeOffset(offset))
-      throw ForwardException(fooName);
-  }
+  return Motherboard::SetBodyStrobeOffset(offset);
+}
 
-  int MotherboardAdapter::GetStrobeWidth()
-  {
-    static const char *fooName = "GetStrobeWidth";
+MA::Ret<IMUFrame> MA::GetIMULatest() {
+  IMUFrame frame;
+  bool result = Motherboard::GetIMULatest(frame);
+  return {result, frame};
+}
 
-    uint8_t width;
+MA::Ret<int> MA::GetStrobeWidth() {
+  uint8_t width;
+  bool result = Motherboard::GetStrobeWidth(width);
+  return {result, width};
+}
 
-    if (!Motherboard::GetStrobeWidth(width))
-      throw ForwardException(fooName);
+bool MA::ConfigureStrobeFilter(int targetDuration, int durationThreshold) {
+  if (!CheckIntBoundaries<uint8_t>(targetDuration))
+    return false;
+  if (!CheckIntBoundaries<uint8_t>(durationThreshold))
+    return false;
 
-    return width;
-  }
+  return Motherboard::ConfigureStrobeFilter(targetDuration, durationThreshold);
+}
 
-  void MotherboardAdapter::ConfigureStrobeFilter(int targetDuration, int durationThreshold)
-  {
-    static const char *fooName = "ConfigureStrobeFilter";
+MA::Ret<BodyQueueInfo> MA::GetBodyQueueInfo() {
+  BodyQueueInfo info;
+  bool result = Motherboard::GetBodyQueueInfo(info);
+  return {result, info};
+}
 
-    CheckIntBoundaries<uint8_t>(targetDuration, fooName);
-    CheckIntBoundaries<uint8_t>(durationThreshold, fooName);
+bool MA::SetBodyQueuePeriod(int periodMs) {
+  if (!CheckIntBoundaries<uint8_t>(periodMs))
+    return false;
+  
+  return Motherboard::SetBodyQueuePeriod(periodMs);
+}
 
-    if (!Motherboard::ConfigureStrobeFilter(targetDuration, durationThreshold))
-      throw ForwardException(fooName);
-  }
+MA::Ret<Version> MA::GetVersion() {
+  Version version;
+  bool result = Motherboard::GetVersion(version);
+  return {result, version};
+}
 
-  QueueInfo MotherboardAdapter::GetQueueInfo()
-  {
-    static const char *fooName = "GetQueueInfo";
-
-    QueueInfo result;
-
-    if (!Motherboard::GetQueueInfo(result))
-      throw ForwardException(fooName);
-
-    return result;
-  }
-
-  void MotherboardAdapter::SetQueuePeriod(int periodMs) {
-    static const char* fooName = "SetQueuePeriod";
-
-    CheckIntBoundaries<uint8_t>(periodMs, fooName);
-
-    if (!Motherboard::SetQueuePeriod(periodMs))
-      throw ForwardException(fooName);
-  }
 } // namespace Roki
