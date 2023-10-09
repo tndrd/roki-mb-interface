@@ -30,21 +30,27 @@ print("Ok")
 sd = Roki.Rcb4.ServoData()
 sd.Id = 4
 sd.Sio = 1
-while True:
+
+active = True
+
+while active:
     x = 0
     req = 0
     while x < 2000:
         sd.Data = 7500 + int(500 * sin(0.1 * x))
-        if not rcb.setServoPosAsync([sd], int(5)):
+        # Last argument is pause after command execution
+        # Pause is measured in QueueTimer ticks
+        # Pause = 0 means "Execute the command each tick"
+        # 0 <= pause <= 255
+        pause = 10
+        if not rcb.setServoPosAsync([sd], int(5), pause):
             print(rcb.getError())
-            quit()
+            active = False
+            break
         req = mb.GetQueueInfo().NumRequests
         print(req)
         x = x + 1
 
-    while req > 0:
-        print(rcb.checkAcknowledge())
-        req = mb.GetQueueInfo().NumRequests
-        print(req)
-    
+input("Press any key to stop...")
 
+mb.ResetQueue()
