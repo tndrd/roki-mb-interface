@@ -37,7 +37,7 @@ public:
   bool BodySendSync(const uint8_t *requestData, uint8_t requestSize,
                     uint8_t *responceData, uint8_t responceSize);
   bool BodySendAsync(const uint8_t *requestData, uint8_t requestSize,
-                     uint8_t responceSize);
+                     uint8_t responceSize, uint8_t nPause);
 
   bool GetQueueInfo(BodyRPC::Info& result);
   bool SetQueuePeriod(uint8_t periodMs);

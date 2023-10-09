@@ -117,10 +117,14 @@ bool Motherboard::BodySendSync(const uint8_t *requestData, uint8_t requestSize,
 }
 
 bool Motherboard::BodySendAsync(const uint8_t *requestData, uint8_t requestSize,
-                                uint8_t responceSize) {
+                                uint8_t responceSize, uint8_t nPause) {
   BodyRPC::Request request;
-  request.Data = requestData;
-  request.RequestSize = requestSize;
+  static std::array<uint8_t, 300> dataBuf;
+  dataBuf[0] = nPause;
+  memcpy(dataBuf.data() + 1, requestData, requestSize);
+
+  request.Data = dataBuf.data();
+  request.RequestSize = requestSize + 1;
   request.ResponceSize = responceSize;
   request.Mode = BodyRPC::MessageMode::Async;
 

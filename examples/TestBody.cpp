@@ -43,7 +43,7 @@ int main()
     if (x < 500)
     {
       sd.Data = 7500 + int(500 * sin(0.1 * x));
-      if(!rcb4.setServoPosAsync(&sd, 1, 5)) {
+      if(!rcb4.setServoPosAsync(&sd, 1, 5, 0)) {
         std::cout << rcb4.GetError() << std::endl;
         exit(1);
       }

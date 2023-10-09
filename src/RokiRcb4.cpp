@@ -27,11 +27,11 @@ namespace Roki
     return true;
   }
 
-  bool RokiRcb4::SendAsync(byte *txData)
+  bool RokiRcb4::SendAsync(byte *txData, uint8_t nPause)
   {
     uint8_t txSize = *txData;
 
-    if (!Mboard->BodySendAsync(txData, txSize, 4))
+    if (!Mboard->BodySendAsync(txData, txSize, 4, nPause))
       return MakeError("Failed to send async: " + Mboard->GetError());
 
     HasError = false;
@@ -39,11 +39,11 @@ namespace Roki
   }
 
   bool RokiRcb4::setServoPosAsync(ServoData servoDatas[], byte servoCount,
-                                  byte frame)
+                                  byte frame, uint8_t nPause)
   {
     if (runConstFrameServoCmd(servoDatas, servoCount, frame) == -1)
       return MakeError("Failed to set servo pos: ill command");
-    return SendAsync(txBuf);
+    return SendAsync(txBuf, nPause);
   }
 
   bool RokiRcb4::motionPlay(int motionNum)

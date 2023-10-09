@@ -10,9 +10,9 @@ namespace Roki
     return RokiRcb4::setServoPos(servoDatas.data(), servoDatas.size(), frame);
   }
 
-  bool RokiRcb4Adapter::setServoPosAsync(std::vector<ServoData> &servoDatas, byte frame)
+  bool RokiRcb4Adapter::setServoPosAsync(std::vector<ServoData> &servoDatas, byte frame, uint8_t nPause)
   {
-    return RokiRcb4::setServoPosAsync(servoDatas.data(), servoDatas.size(), frame);
+    return RokiRcb4::setServoPosAsync(servoDatas.data(), servoDatas.size(), frame, nPause);
   }
 
   bool RokiRcb4Adapter::setFreePos(std::vector<ServoData> &servoDatas)
