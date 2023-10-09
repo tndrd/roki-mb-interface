@@ -148,6 +148,13 @@ bool Motherboard::SetQueuePeriod(uint8_t periodMs) {
   return true;
 }
 
+bool Motherboard::ResetQueue() {
+  if (!Body.ResetQueue(Service))
+    return BodyError();
+  
+  return true;
+}
+
 bool Motherboard::IsOk() const { return HasError; }
 std::string Motherboard::GetError() const { return Error; }
 

@@ -1,139 +1,143 @@
 #include "BodyRPC.hpp"
 
-namespace Roki
-{
+namespace Roki {
 
-  auto BodyRPC::MessageMode::Serialize(MessageMode::Type mode) -> uint8_t
-  {
-    return mode;
+auto BodyRPC::MessageMode::Serialize(MessageMode::Type mode) -> uint8_t {
+  return mode;
+}
+
+auto BodyRPC::MessageMode::Deserialize(uint8_t data) -> Type { return data; }
+
+bool BodyRPC::MakeError(const std::string &msg) {
+  HasError = true;
+  Error = msg;
+  return false;
+}
+
+auto BodyRPC::ErrorCode::Serialize(Type mode) -> uint8_t { return mode; }
+auto BodyRPC::ErrorCode::Deserialize(uint8_t val) -> Type { return val; }
+
+std::string BodyRPC::ErrorCode::GetDescription(Type error) {
+  switch (error) {
+  case Success:
+    return "Success";
+  case Timeout:
+    return "Body timeout";
+  case NACK:
+    return "Command refused by body";
+  case Unknown:
+    return "Unknow body error";
+  case BadPeriod:
+    return "Bad queue period";
+  case QueueFull:
+    return "Body queue is full";
+  default:
+    return "Unknown error value";
   }
+}
 
-  auto BodyRPC::MessageMode::Deserialize(uint8_t data) -> Type
-  {
-    return data;
-  }
+bool BodyRPC::IsOk() const { return !HasError; }
+std::string BodyRPC::GetError() const { return Error; }
 
-  bool BodyRPC::MakeError(const std::string &msg)
-  {
-    HasError = true;
-    Error = msg;
-    return false;
-  }
+bool BodyRPC::Send(SerialInterface &si, Request request) {
+  SerialInterface::OutPackage out{
+      SerialInterface::Periphery::Body, request.ResponceSize,
+      MessageMode::Serialize(request.Mode), request.Data, request.RequestSize};
 
-  auto BodyRPC::ErrorCode::Serialize(Type mode) -> uint8_t { return mode; }
-  auto BodyRPC::ErrorCode::Deserialize(uint8_t val) -> Type { return val; }
+  if (!si.Send(out))
+    return MakeError(si.GetError());
 
-  std::string BodyRPC::ErrorCode::GetDescription(Type error)
-  {
-    switch (error)
-    {
-    case Success:
-      return "Success";
-    case Timeout:
-      return "Body timeout";
-    case NACK:
-      return "Command refused by body";
-    case Unknown:
-      return "Unknow body error";
-    case BadPeriod:
-      return "Bad queue period";
-    case QueueFull:
-      return "Body queue is full";
-    default:
-      return "Unknown error value";
-    }
-  }
+  return true;
+}
 
-  bool BodyRPC::IsOk() const { return !HasError; }
-  std::string BodyRPC::GetError() const { return Error; }
+bool BodyRPC::Recieve(SerialInterface &si, Responce &responce,
+                      uint8_t responceSize) {
+  SerialInterface::InPackage package;
 
-  bool BodyRPC::Send(SerialInterface &si, Request request)
-  {
-    SerialInterface::OutPackage out{
-        SerialInterface::Periphery::Body, request.ResponceSize,
-        MessageMode::Serialize(request.Mode), request.Data, request.RequestSize};
+  if (!si.Receive(responceSize, package))
+    return MakeError(si.GetError());
 
-    if (!si.Send(out))
-      return MakeError(si.GetError());
+  ErrorCode::Type error = ErrorCode::Deserialize(package.Error);
 
-    return true;
-  }
+  if (error != ErrorCode::Success)
+    return MakeError(ErrorCode::GetDescription(error));
 
-  bool BodyRPC::Recieve(SerialInterface &si, Responce &responce,
-                        uint8_t responceSize)
-  {
-    SerialInterface::InPackage package;
+  responce.Data = package.Data;
+  responce.ResponceSize = package.ResponceSize;
+  responce.Error = error;
+  responce.Mode = MessageMode::Deserialize(package.MetaInfo);
 
-    if (!si.Receive(responceSize, package))
-      return MakeError(si.GetError());
+  return true;
+}
 
-    ErrorCode::Type error = ErrorCode::Deserialize(package.Error);
+BodyRPC::Info BodyRPC::Info::DeserializeFrom(uint8_t const **ptr) {
+  Info info;
 
-    if (error != ErrorCode::Success)
-      return MakeError(ErrorCode::GetDescription(error));
+  assert(ptr);
+  assert(*ptr);
 
-    responce.Data = package.Data;
-    responce.ResponceSize = package.ResponceSize;
-    responce.Error = error;
-    responce.Mode = MessageMode::Deserialize(package.MetaInfo);
+  info.NumRequests = *reinterpret_cast<const uint16_t *>(*ptr);
+  *ptr += sizeof(uint16_t);
 
-    return true;
-  }
+  info.NumResponces = *reinterpret_cast<const uint16_t *>(*ptr);
+  *ptr += sizeof(uint16_t);
 
-  BodyRPC::Info BodyRPC::Info::DeserializeFrom(uint8_t const **ptr)
-  {
-    Info info;
+  return info;
+}
 
-    assert(ptr);
-    assert(*ptr);
+bool BodyRPC::GetInfo(SerialInterface &si, Info &result) {
+  std::array<uint8_t, 1> buf{0};
+  SerialInterface::OutPackage out{SerialInterface::Periphery::Body, Info::Size,
+                                  MessageMode::Serialize(MessageMode::Info),
+                                  buf.data(), buf.size()};
 
-    info.NumRequests = *reinterpret_cast<const uint16_t *>(*ptr);
-    *ptr += sizeof(uint16_t);
+  if (!si.Send(out))
+    return MakeError(si.GetError());
 
-    info.NumResponces = *reinterpret_cast<const uint16_t *>(*ptr);
-    *ptr += sizeof(uint16_t);
+  SerialInterface::InPackage package;
 
-    return info;
-  }
+  if (!si.Receive(Info::Size, package))
+    return MakeError(si.GetError());
 
-  bool BodyRPC::GetInfo(SerialInterface &si, Info &result)
-  {
-    std::array<uint8_t, 1> buf{0};
-    SerialInterface::OutPackage out{
-        SerialInterface::Periphery::Body, Info::Size,
-        MessageMode::Serialize(MessageMode::Info), buf.data(), buf.size()};
+  const uint8_t *ptr = package.Data;
+  result = Info::DeserializeFrom(&ptr);
+  return true;
+}
 
-    if (!si.Send(out))
-      return MakeError(si.GetError());
+bool BodyRPC::ResetQueue(SerialInterface &si) {
+  std::array<uint8_t, 1> buf{0};
+  SerialInterface::OutPackage out{
+      SerialInterface::Periphery::Body, 1,
+      MessageMode::Serialize(MessageMode::ResetQueue), buf.data(), 1};
 
-    SerialInterface::InPackage package;
+  if (!si.Send(out))
+    return MakeError(si.GetError());
 
-    if (!si.Receive(Info::Size, package))
-      return MakeError(si.GetError());
+  SerialInterface::InPackage package;
 
-    const uint8_t *ptr = package.Data;
-    result = Info::DeserializeFrom(&ptr);
-    return true;
-  }
+  if (!si.Receive(1, package))
+    return MakeError(si.GetError());
 
-  bool BodyRPC::SetPeriod(SerialInterface &si, uint8_t periodMs)
-  {
-    if (periodMs == 0)
-      return MakeError("Period value should be greater than zero");
+  return true;
+}
 
-    SerialInterface::OutPackage out{
-        SerialInterface::Periphery::Body, 1,
-        MessageMode::Serialize(MessageMode::SetPeriod), &periodMs, 1};
+bool BodyRPC::SetPeriod(SerialInterface &si, uint8_t periodMs) {
+  if (periodMs == 0)
+    return MakeError("Period value should be greater than zero");
 
-    if (!si.Send(out))
-      return MakeError(si.GetError());
+  SerialInterface::OutPackage out{
+      SerialInterface::Periphery::Body, 1,
+      MessageMode::Serialize(MessageMode::SetPeriod), &periodMs, 1};
 
-    SerialInterface::InPackage package;
+  if (!si.Send(out))
+    return MakeError(si.GetError());
 
-    if (!si.Receive(1, package))
-      return MakeError(si.GetError());
+  SerialInterface::InPackage package;
 
-    return true;
-  }
+  if (!si.Receive(1, package))
+    return MakeError(si.GetError());
+
+  return true;
+}
 
 } // namespace Roki

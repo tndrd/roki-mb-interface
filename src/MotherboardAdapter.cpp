@@ -130,4 +130,11 @@ namespace Roki
     if (!Motherboard::SetQueuePeriod(periodMs))
       throw ForwardException(fooName);
   }
+
+  void MotherboardAdapter::ResetQueue() {
+    static const char* fooName = "ResetQueue";
+
+    if(!Motherboard::ResetQueue())
+      throw ForwardException(fooName);
+  }
 } // namespace Roki

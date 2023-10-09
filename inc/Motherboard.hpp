@@ -29,6 +29,7 @@ public:
   bool GetOrientation(IMURPC::IMUFrame &result);
   bool GetIMUInfo(IMURPC::IMUInfo &result);
   bool ResetIMUCounter();
+  bool ResetQueue();
   bool SetStrobeOffset(uint8_t offset);
   bool GetStrobeWidth(uint8_t& width);
   bool ConfigureStrobeFilter(uint8_t targetDuration, uint8_t durationThreshold);

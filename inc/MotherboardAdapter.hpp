@@ -29,6 +29,7 @@ public:
   IMUFrame GetCurrentOrientation();
   IMUInfo GetIMUInfo();
   void ResetIMUCounter();
+  void ResetQueue();
   void SetStrobeOffset(int offset);
   int GetStrobeWidth();
   void ConfigureStrobeFilter(int targetDuration, int durationThreshold);

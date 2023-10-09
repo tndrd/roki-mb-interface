@@ -15,6 +15,7 @@ namespace Roki
       static constexpr Type Async = 1;
       static constexpr Type Info = 2;
       static constexpr Type SetPeriod = 3;
+      static constexpr Type ResetQueue = 4;
 
       static uint8_t Serialize(MessageMode::Type mode);
       static Type Deserialize(uint8_t data);
@@ -82,6 +83,7 @@ namespace Roki
     bool Recieve(SerialInterface &si, Responce &responce, uint8_t responceSize);
     bool GetInfo(SerialInterface& si, Info& result);
     bool SetPeriod(SerialInterface& si, uint8_t periodMs);
+    bool ResetQueue(SerialInterface& si);
   };
 
 } // namespace Roki
