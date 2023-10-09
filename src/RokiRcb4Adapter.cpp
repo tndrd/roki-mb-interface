@@ -12,6 +12,13 @@ namespace Roki
 
   bool RokiRcb4Adapter::setServoPosAsync(std::vector<ServoData> &servoDatas, byte frame, uint8_t nPause)
   {
+    #ifdef DBGSPA
+    std::cerr << "SetServoPosAsync {sio, id, data}:" << std::endl;
+    for (ServoData& sd: servoDatas)
+      std::cerr << "  {" << +sd.Sio << ", " << +sd.Id << ", " << +sd.Data << "}" << std::endl;
+    std::cerr << std::endl;
+    #endif
+
     return RokiRcb4::setServoPosAsync(servoDatas.data(), servoDatas.size(), frame, nPause);
   }
 
