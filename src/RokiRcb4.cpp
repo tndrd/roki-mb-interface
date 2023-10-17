@@ -48,8 +48,8 @@ namespace Roki
 
   bool RokiRcb4::motionPlay(int motionNum)
   {
-    setMotionNum(motionNum);
-    return resume();
+    return setMotionNum(motionNum);
+    //return resume();
   }
 
   bool	RokiRcb4::moveRamToComCmdSynchronize(int addr, byte size, uint8_t* rxBuf) {
