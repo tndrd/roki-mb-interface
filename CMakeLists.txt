@@ -9,7 +9,7 @@ add_subdirectory(deps/rcb4-base-class)
 add_subdirectory(deps/roki-mb-service)
 add_subdirectory(deps/googletest)
 
-add_definitions(-DDBGMB=1)
+#add_definitions(-DDBGMB=1)
 
 include_directories(inc/)
 
