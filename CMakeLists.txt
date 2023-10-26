@@ -9,7 +9,7 @@ add_subdirectory(deps/rcb4-base-class)
 add_subdirectory(deps/roki-mb-service)
 add_subdirectory(deps/googletest)
 
-ADD_DEFINITIONS(-DDBGMB=1)
+add_definitions(-DDBGMB=1)
 
 include_directories(inc/)
 
@@ -39,6 +39,6 @@ target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 add_library(MbDefaultConfig src/MbDefaultConfig.cpp)
 target_link_libraries(MbDefaultConfig PUBLIC Motherboard)
 
-##include(tests/tests.cmake)
+include(tests/tests.cmake)
 include(bindings/bindings.cmake)
-#include(examples/examples.cmake)
+# include(examples/examples.cmake)
