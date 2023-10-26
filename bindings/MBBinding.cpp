@@ -1,4 +1,5 @@
 #include "MotherboardAdapter.hpp"
+#include "MbDefaultConfig.hpp"
 #include "PyBinding.hpp"
 #include "RokiRcb4Adapter.hpp"
 
@@ -66,8 +67,12 @@ PYBIND11_MODULE(Roki, m) {
       .def("ConfigureStrobeFilter", &MA::ConfigureStrobeFilter)
       .def("GetBodyQueueInfo", &MA::GetBodyQueueInfo)
       .def("SetBodyQueuePeriod", &MA::SetBodyQueuePeriod)
-      .def("GetVersion", &MA::GetVersion);
+      .def("GetVersion", &MA::GetVersion)
+      .def("IsOk", &MA::IsOk)
+      .def("GetError", &MA::GetError);
 
+  m.def("MbDefaultConfig", &MbAdapterDefaultConfig);
+  
   /* Rcb4 */
 
   using Rcb4 = RokiRcb4Adapter;
