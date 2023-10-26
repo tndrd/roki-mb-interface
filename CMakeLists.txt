@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "-Werror")
 add_subdirectory(deps/pybind11)
 add_subdirectory(deps/rcb4-base-class)
 add_subdirectory(deps/roki-mb-service)
+add_subdirectory(deps/googletest)
 
 ADD_DEFINITIONS(-DDBGMB=1)
 
