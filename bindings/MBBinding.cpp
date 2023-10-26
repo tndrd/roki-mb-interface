@@ -35,8 +35,8 @@ PYBIND11_MODULE(Roki, m) {
 
   py::class_<BodyQueueInfo>(m, "BodyQueueInfo")
       .def(py::init<>())
-      .def_readwrite("NumRequests", &BodyQueueInfo::NumRequests)
-      .def_readwrite("NumResponces", &BodyQueueInfo::NumResponces);
+      .def_readwrite("Size", &BodyQueueInfo::Size)
+      .def_readwrite("Capacity", &BodyQueueInfo::Capacity);
 
   py::enum_<MbSerial::TTYConfig::StopbitsCount>(m, "Stopbits", py::arithmetic())
       .value("One", MbSerial::TTYConfig::StopbitsCount::One)
