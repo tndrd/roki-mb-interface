@@ -7,3 +7,6 @@
 [submodule "deps/roki-mb-service"]
 	path = deps/roki-mb-service
 	url = https://github.com/tndrd/roki-mb-service.git
+[submodule "deps/googletest"]
+	path = deps/googletest
+	url = https://github.com/google/googletest.git

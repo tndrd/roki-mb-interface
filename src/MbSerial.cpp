@@ -8,14 +8,12 @@ bool MbSerial::MakeError(const std::string &msg) {
   return false;
 }
 
-bool MbSerial::MakeTTYError(const TTYConfig &tty,
-                                   const std::string &msg) {
+bool MbSerial::MakeTTYError(const TTYConfig &tty, const std::string &msg) {
   return MakeError("Port " + tty.Port + ": " + msg + ": " +
                    std::string{strerror(errno)});
 }
 
-void MbSerial::SerializePackageToBuf(const OutPackage &package,
-                                            size_t *size) {
+void MbSerial::SerializePackageToBuf(const OutPackage &package, size_t *size) {
   assert(package.Data);
   assert(size);
 
@@ -37,34 +35,31 @@ void MbSerial::SerializePackageToBuf(const OutPackage &package,
 
 bool MbSerial::Read(uint8_t *buf, size_t size) {
   size_t total = 0;
-  do {
+  while (total < size) {
     int ret = read(Fd.Get(), buf + total, size - total);
     if (ret < 0)
       return MakeTTYError(TTY, "Failed to read");
     else if (ret == 0)
       return MakeError("Port " + TTY.Port + ": Read timeout");
     total += ret;
-  } while (total < size);
+  }
   return true;
 }
 
 bool MbSerial::Write(const uint8_t *buf, size_t size) {
   size_t total = 0;
-  do {
+  while (total < size) {
     int ret = write(Fd.Get(), buf + total, size - total);
     if (ret < 0)
       return MakeTTYError(TTY, "Failed to write");
     else if (ret == 0)
       return MakeError("Port " + TTY.Port + ": Write timeout");
     total += ret;
-
-  } while (total < size);
+  }
   return true;
 }
 
-bool MbSerial::ReadToBuf(size_t size) {
-  return Read(Buffer.data(), size);
-}
+bool MbSerial::ReadToBuf(size_t size) { return Read(Buffer.data(), size); }
 bool MbSerial::IsOk() const { return !HasError; }
 std::string MbSerial::GetError() const { return Error; }
 
@@ -139,8 +134,7 @@ bool MbSerial::Send(const OutPackage &package) {
   }
   std::cout << std::dec << std::endl;
 
-  std::cout << std::dec << "Data [" << +package.Size
-            << "]: " << std::flush;
+  std::cout << std::dec << "Data [" << +package.Size << "]: " << std::flush;
   for (int i = 0; i < package.Size; ++i) {
     std::cout << std::hex << +package.Data[i] << " ";
   }
