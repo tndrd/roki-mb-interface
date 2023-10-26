@@ -174,3 +174,6 @@ TEST(Motherboard, BodySendQueue) {
         << "Failed to overflow body queue" << std::endl;
   }
 }
+
+#undef MB_CALL
+#undef INIT_MB
