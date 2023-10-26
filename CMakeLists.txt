@@ -36,6 +36,9 @@ target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
 add_library(RokiRcb4Adapter src/RokiRcb4Adapter.cpp)
 target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 
+add_library(MbDefaultConfig src/MbDefaultConfig.cpp)
+target_link_libraries(MbDefaultConfig PUBLIC Motherboard)
+
 ##include(tests/tests.cmake)
 include(bindings/bindings.cmake)
 #include(examples/examples.cmake)
