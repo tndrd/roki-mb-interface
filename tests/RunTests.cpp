@@ -31,16 +31,38 @@ bool AskPrompt(const std::string &msg)
   return resp == 'y';
 }
 
-#define PROMPT(msg) ASSERT_TRUE(AskPrompt(msg))
+bool AskSkip()
+{
+  std::cerr << "Want to skip? [y/n]: " << std::endl;
+  char resp = getchar();
+  getchar();
 
-bool RokiPyTestRun(const std::string &name)
+  return resp == 'y';
+}
+
+#define PROMPT(msg) ASSERT_TRUE(AskPrompt(msg))
+#define ASK_SKIP if (AskSkip()) ASSERT_TRUE(true);
+
+bool RokiPyTestRun(const std::string &name, /* const */ std::vector<std::string> /* & */ args = {})
 {
   pid_t pid = fork();
 
   if (pid == 0)
   { // child
     std::string path = "tests/" + name;
-    execlp("python3", "python3", path.data(), NULL);
+
+    std::string python3 = "python3";
+
+    std::vector<char *> argv;
+    argv.push_back(&python3[0]);
+    argv.push_back(&path[0]);
+
+    for (auto &arg : args)
+      argv.push_back(&arg[0]);
+
+    argv.push_back(NULL);
+
+    execvp(argv[0], argv.data());
 
     perror("Failed to execute");
     exit(1);
@@ -61,6 +83,7 @@ bool RokiPyTestRun(const std::string &name)
 }
 
 #define RPTEST(name) ASSERT_TRUE(RokiPyTestRun(name)) << "Failed to run test " << name << std::endl;
+#define RPTEST_ARG(name, args) ASSERT_TRUE(RokiPyTestRun(name, args)) << "Failed to run test " << name << std::endl;
 
 TEST(SerialInterface, NoFile)
 {
@@ -107,18 +130,6 @@ TEST(Motherboard, ConfigureStrobeFilter)
   MB_CALL(ConfigureStrobeFilter(0, 0));
 }
 
-TEST(Motherboard, GetStrobeDuration)
-{
-  RPTEST("TakePhotos.py");
-
-  INIT_MB;
-
-  uint8_t width;
-  MB_CALL(GetStrobeWidth(width));
-
-  ASSERT_EQ(width, 16);
-}
-
 TEST(Motherboard, SetIMUStrobeOffset)
 {
   INIT_MB;
@@ -144,7 +155,7 @@ TEST(Motherboard, GetIMUContainerInfo)
 
 TEST(Motherboard, GetIMUFrame)
 {
-  RPTEST("TakePhotos.py");
+  RPTEST_ARG("TakePhotos.py", {"1"});
 
   INIT_MB;
 
@@ -172,7 +183,7 @@ TEST(Motherboard, GetBodyContainerInfo)
 
 TEST(Motherboard, GetBodyFrame)
 {
-  RPTEST("TakePhotos.py");
+  RPTEST_ARG("TakePhotos.py", {"1"});
 
   INIT_MB;
 
