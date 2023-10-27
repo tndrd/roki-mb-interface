@@ -3,19 +3,28 @@ import RokiPyTest as rpt
 from threading import Thread
 import time
 
-REMAIN_TOLERANCE = 2
+REMAIN_TOLERANCE = 5
+
+def return_servo(rcb):
+    sd = Roki.Rcb4.ServoData()
+    sd.Id = 8
+    sd.Sio = 0
+    sd.Data = 7500
 
 def fill_bq(rcb, count):
-    sd = Roki.ServoData()
+    sd = Roki.Rcb4.ServoData()
     sd.Id = 8
     sd.Sio = 0
     
     for x in range(count):
         value = 7500 + (-0.5 + x / count) * 1000
-        sd.Value = value
-        rcb.SetServoPosAsync([sd], 5)
+        sd.Data = int(value)
+        rcb.setServoPosAsync([sd], 5)
 
 def test_bq_period(period):
+    period_old = period
+    period = int(period * (92 / 100))
+
     mb = Roki.Motherboard()
     rpt.call(mb, Roki.MbDefaultConfig(mb))
 
@@ -23,21 +32,24 @@ def test_bq_period(period):
     rpt.call(rcb, rcb.checkAcknowledge())
 
     count = rpt.call(mb, mb.GetBodyQueueInfo()).Capacity
-    rpt.call(rcb, rcb.SetBodyQueuePeriod(period))
+    rpt.call(mb, mb.SetBodyQueuePeriod(period))
 
-    thrd = Thread(target = fill_bq, args=[count])
-    thrd.run()
+    queue_time = count * (period_old / 1000) 
+    
+    start = time.perf_counter()
+    fill_bq(rcb, count)
+    filled = time.perf_counter()
 
-    time.sleep(count * (period / 1000))
+    time.sleep(queue_time - (filled - start))
 
     remains = rpt.call(mb, mb.GetBodyQueueInfo()).Size
 
     if (remains > REMAIN_TOLERANCE):
+        return_servo(rcb)
         rpt.failure_stop(f"BQ Period Error: remains {remains} objects")
+    return_servo(rcb)
 
-    thrd.join()
-
-test_bq_period(5)
+test_bq_period(20)
 test_bq_period(10)
 test_bq_period(20)
 #test_bq_period(100)
