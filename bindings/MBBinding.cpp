@@ -106,6 +106,6 @@ PYBIND11_MODULE(Roki, m) {
   rcb4.def("moveRamToComCmdSynchronize", &Rcb4::moveRamToComCmdSynchronize);
   rcb4.def("motionPlay", &Rcb4::motionPlay);
 
-  rcb4.def("getError", &Rcb4::GetError);
-  rcb4.def("isOk", &Rcb4::IsOk);
+  rcb4.def("GetError", &Rcb4::GetError);
+  rcb4.def("IsOk", &Rcb4::IsOk);
 }
