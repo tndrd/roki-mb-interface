@@ -3,6 +3,7 @@ import RokiPyTest as rpt
 import Roki
 import cv2
 import time
+rpt.mute_picamera()
 
 TEST_TIME_S = 1
 FRAME_DURATION_US = 16700
@@ -21,6 +22,7 @@ picam2.start()
 rpt.eprint(f"Running for {TEST_TIME_S}s...")
 time.sleep(1)
 picam2.set_controls({"FrameDurationLimits": (FRAME_DURATION_US, FRAME_DURATION_US)})
+time.sleep(TEST_TIME_S)
 picam2.stop()
 
 imu = rpt.call(mb, mb.GetIMUContainerInfo())
