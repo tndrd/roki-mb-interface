@@ -1,20 +1,25 @@
 import sys
+import os
+from picamera2 import Picamera2
 
-def eprint(msg):
-    print(msg, file=sys.stderr)
+def mute_picamera():
+    Picamera2.set_logging(Picamera2.ERROR)
+    os.environ["LIBCAMERA_LOG_LEVELS"] = "4"
+
+def eprint(msg, **kwargs):
+    print(msg, **kwargs, file=sys.stderr)
 
 def failure_stop(msg):
     eprint(msg)
     sys.exit(1)
 
 def end_test():
-    eprint("OK")
     sys.exit(0)
 
 def call(mb, val):
-    ret = 0
-    
-    if type(val) == type(tuple):
+    ret = None
+
+    if type(val) is tuple:
         ret = val[1]
         val = val[0]
     
