@@ -41,7 +41,9 @@ bool AskSkip()
 }
 
 #define PROMPT(msg) ASSERT_TRUE(AskPrompt(msg))
-#define ASK_SKIP if (AskSkip()) ASSERT_TRUE(true);
+#define ASK_SKIP \
+  if (AskSkip()) \
+    ASSERT_TRUE(true);
 
 bool RokiPyTestRun(const std::string &name, /* const */ std::vector<std::string> /* & */ args = {})
 {
@@ -84,6 +86,39 @@ bool RokiPyTestRun(const std::string &name, /* const */ std::vector<std::string>
 
 #define RPTEST(name) ASSERT_TRUE(RokiPyTestRun(name)) << "Failed to run test " << name << std::endl;
 #define RPTEST_ARG(name, args) ASSERT_TRUE(RokiPyTestRun(name, args)) << "Failed to run test " << name << std::endl;
+
+void PrintFrame(const IMUFrame& frame)
+{
+  std::cerr << "Orientation:" << std::endl;
+  std::cerr << "  X: " << frame.Orientation.X << std::endl;
+  std::cerr << "  Y: " << frame.Orientation.Y << std::endl;
+  std::cerr << "  Z: " << frame.Orientation.Z << std::endl;
+  std::cerr << "  W: " << frame.Orientation.W << std::endl;
+  std::cerr << "Timestamp:" << std::endl;
+  std::cerr << "  S: " << frame.Timestamp.TimeS << std::endl;
+  std::cerr << " nS: " << frame.Timestamp.TimeNS << std::endl;
+  std::cerr << "SensorId: " << +frame.SensorID << std::endl;
+}
+
+void PrintServoData(const uint8_t* data, size_t size) {
+  std::cerr << "TODO" << std::endl;
+}
+
+float QuatVal(const uint8_t* data) {
+  const int16_t* ptr = reinterpret_cast<const int16_t*>(data);
+  int16_t val = *ptr;
+  float result = float(val) / 16384.0f;
+  return result;
+}
+
+void PrintBodyIMU(const uint8_t* data, size_t size) {
+  assert(size == 8);
+  std::cerr << "Orientation:" << std::endl;
+  std::cerr << "  X: " << QuatVal(data + 0) << std::endl;
+  std::cerr << "  Y: " << QuatVal(data + 2) << std::endl;
+  std::cerr << "  Z: " << QuatVal(data + 4) << std::endl;
+  std::cerr << "  W: " << QuatVal(data + 6) << std::endl;
+}
 
 TEST(SerialInterface, NoFile)
 {
@@ -273,13 +308,13 @@ TEST(Rcb4, SetServoPosSync)
 
   sd.Id = 8;
   sd.Sio = 0;
-  sd.Data = 9000;
+  sd.Data = 8000;
 
-  RCB_CALL(setServoPos(&sd, 1, 5));
+  RCB_CALL(setServoPos(&sd, 1, 10));
   PROMPT("Servo has moved");
 
   sd.Data = 7500;
-  RCB_CALL(setServoPos(&sd, 1, 5));
+  RCB_CALL(setServoPos(&sd, 1, 10));
 }
 
 TEST(Rcb4, SetServoPosAsync)
@@ -290,13 +325,13 @@ TEST(Rcb4, SetServoPosAsync)
 
   sd.Id = 8;
   sd.Sio = 0;
-  sd.Data = 9000;
+  sd.Data = 7000;
 
-  RCB_CALL(setServoPosAsync(&sd, 1, 5));
+  RCB_CALL(setServoPosAsync(&sd, 1, 10));
   PROMPT("Servo has moved");
 
   sd.Data = 7500;
-  RCB_CALL(setServoPosAsync(&sd, 1, 5));
+  RCB_CALL(setServoPosAsync(&sd, 1, 10));
 }
 
 TEST(Motherboard, TestBodyQueue)
@@ -319,6 +354,57 @@ TEST(Rcb4, ReadRam)
 TEST(Motherboard, TestStrobeFilter)
 {
   RPTEST("TestSF.py");
+}
+
+TEST(ValidateData, CurrentHeadImu)
+{
+  INIT_MB;
+
+  IMUFrame frame;
+  MB_CALL(GetIMULatest(frame));
+
+  PrintFrame(frame);
+  PROMPT("IMU frame valid");
+}
+
+
+TEST(ValidateData, ImuBySeq)
+{
+  INIT_MB;
+
+  IMUFrame frame;
+  FrameContainerInfo info;
+
+  RPTEST_ARG("TakePhotos.py", {"1"})
+
+  MB_CALL(GetIMUContainerInfo(info));
+  MB_CALL(GetIMUFrame(info.First, frame));
+
+  PrintFrame(frame);
+  PROMPT("IMU frame valid");
+}
+
+TEST(ValidateData, BodyBySeq)
+{
+  INIT_MB;
+
+  BodyResponce responce;
+  FrameContainerInfo info;
+
+  RPTEST_ARG("TakePhotos.py", {"1"})
+
+  MB_CALL(GetBodyContainerInfo(info));
+  MB_CALL(GetBodyFrame(info.First, responce));
+
+  std::cerr << "Body responce: size "<< +responce.ResponceSize << std::endl;
+  
+  for (int i = 0; i < responce.ResponceSize; ++i) {
+    std::cerr << std::hex << +responce.Data[i] << " ";
+  }
+  
+  std::cout << std::dec << std::endl;
+
+  PROMPT("Body Responce valid");
 }
 
 #undef MB_CALL
