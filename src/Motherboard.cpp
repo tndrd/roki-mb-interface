@@ -196,6 +196,12 @@ bool Motherboard::GetVersion(Version &result) {
   return CHECK_CLIENT_ERROR;
 }
 
+bool Motherboard::ResetBodyQueue() {
+  Messages::Empty responce;
+  bool ok = Client.PerformRPC<Proc::ResetBodyQueue>(Serial, {}, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
 #undef CHECK_CLIENT_ERROR
 #undef FOO_ERROR
 

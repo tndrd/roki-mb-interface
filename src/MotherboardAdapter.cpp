@@ -82,6 +82,10 @@ namespace Roki
     return Motherboard::ResetStrobeContainers();
   }
 
+  bool MA::ResetBodyQueue() {
+    return Motherboard::ResetBodyQueue();
+  }
+
   bool MA::SetIMUStrobeOffset(int offset)
   {
     if (!CheckIntBoundaries<uint8_t>(offset))

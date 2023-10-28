@@ -45,6 +45,7 @@ public:
   bool BodySendQueue(const uint8_t* requestData, uint8_t requestSize, uint8_t responceSize, uint8_t pause = 0);
   bool GetBodyQueueInfo(BodyQueueInfo& result);
   bool SetBodyQueuePeriod(uint8_t periodMs);
+  bool ResetBodyQueue();
 
   bool GetVersion(Version& result);
 

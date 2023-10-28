@@ -36,6 +36,7 @@ public:
 
   Ret<BodyQueueInfo> GetBodyQueueInfo();
   bool SetBodyQueuePeriod(int periodMs);
+  bool ResetBodyQueue();
 
   Ret<Version> GetVersion();
 };

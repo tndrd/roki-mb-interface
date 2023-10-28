@@ -69,7 +69,8 @@ PYBIND11_MODULE(Roki, m) {
       .def("SetBodyQueuePeriod", &MA::SetBodyQueuePeriod)
       .def("GetVersion", &MA::GetVersion)
       .def("IsOk", &MA::IsOk)
-      .def("GetError", &MA::GetError);
+      .def("GetError", &MA::GetError)
+      .def("ResetBodyQueue", &MA::ResetBodyQueue);
 
   m.def("MbDefaultConfig", &MbAdapterDefaultConfig);
   
