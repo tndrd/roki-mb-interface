@@ -19,7 +19,7 @@ def fill_bq(rcb, count):
     for x in range(count):
         value = 7500 + (-0.5 + x / count) * 1000
         sd.Data = int(value)
-        rcb.setServoPosAsync([sd], 5)
+        rcb.setServoPosAsync([sd], 5, 0)
 
 def test_bq_period(period):
     period_old = period
