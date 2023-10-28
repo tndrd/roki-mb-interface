@@ -24,10 +24,10 @@ private:
   virtual bool synchronize(byte txBuf[], byte txLen, byte rxBuf[],
                            byte rxLen) override;
 
-  bool SendAsync(byte *txData);
+  bool SendAsync(byte *txData, uint8_t pause);
 
 public:
-  bool setServoPosAsync(ServoData servoDatas[], byte servoCount, byte frame);
+  bool setServoPosAsync(ServoData servoDatas[], byte servoCount, byte frame, uint8_t pause = 0);
   
   // overrides default motionPlay implementation
   bool motionPlay(int motionNum);

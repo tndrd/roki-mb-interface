@@ -42,7 +42,7 @@ public:
   bool ConfigureStrobeFilter(uint8_t targetDuration, uint8_t durationThreshold);
 
   bool BodySendForward(const uint8_t* requestData, uint8_t requestSize, uint8_t* responceData, uint8_t responceSize);
-  bool BodySendQueue(const uint8_t* requestData, uint8_t requestSize, uint8_t responceSize);
+  bool BodySendQueue(const uint8_t* requestData, uint8_t requestSize, uint8_t responceSize, uint8_t pause = 0);
   bool GetBodyQueueInfo(BodyQueueInfo& result);
   bool SetBodyQueuePeriod(uint8_t periodMs);
 

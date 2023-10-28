@@ -160,14 +160,19 @@ bool Motherboard::BodySendForward(const uint8_t *requestData,
 }
 
 bool Motherboard::BodySendQueue(const uint8_t *requestData, uint8_t requestSize,
-                                uint8_t responceSize) {
+                                uint8_t responceSize, uint8_t pause) {
+  
   Messages::BodyRequest request;
   Messages::Empty responce;
   request.Data = requestData;
   request.RequestSize = requestSize;
   request.ResponceSize = responceSize;
 
-  bool ok = Client.PerformRPC<Proc::BodySendQueue>(Serial, request, responce);
+  Messages::BodyQueueRequest msg;
+  msg.Request = request;
+  msg.Pause = pause;
+
+  bool ok = Client.PerformRPC<Proc::BodySendQueue>(Serial, msg, responce);
   return CHECK_CLIENT_ERROR;
 }
 
