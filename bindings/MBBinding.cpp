@@ -55,6 +55,7 @@ PYBIND11_MODULE(Roki, m) {
 
   py::class_<MA>(m, "Motherboard")
       .def(py::init<>())
+      .def("Configure", &MA::Configure)
       .def("GetIMUFrame", &MA::GetIMUFrame)
       .def("GetBodyFrame", &MA::GetBodyFrame)
       .def("GetIMUContainerInfo", &MA::GetIMUContainerInfo)
@@ -67,7 +68,6 @@ PYBIND11_MODULE(Roki, m) {
       .def("ConfigureStrobeFilter", &MA::ConfigureStrobeFilter)
       .def("GetBodyQueueInfo", &MA::GetBodyQueueInfo)
       .def("SetBodyQueuePeriod", &MA::SetBodyQueuePeriod)
-      .def("GetVersion", &MA::GetVersion)
       .def("IsOk", &MA::IsOk)
       .def("GetError", &MA::GetError)
       .def("ResetBodyQueue", &MA::ResetBodyQueue);
@@ -98,7 +98,7 @@ PYBIND11_MODULE(Roki, m) {
   rcb4.def("setFreeSingleServo", &Rcb4::setFreeSingleServo);
   rcb4.def("setHoldSingleServo", &Rcb4::setHoldSingleServo);
   rcb4.def("setServoPos", &Rcb4::setServoPos);
-  rcb4.def("setServoPosAsync", &Rcb4::setServoPosAsync);
+  rcb4.def("setServoPosAsync", &Rcb4::setServoPosAsync, py::arg("servo_data"), py::arg("frames"), py::arg("pause") = 0);
   rcb4.def("setFreePos", &Rcb4::setFreePos);
   rcb4.def("setHoldPos", &Rcb4::setHoldPos);
   rcb4.def("getSinglePos", &Rcb4::getSinglePos);
