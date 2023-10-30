@@ -3,27 +3,26 @@
 #include "Motherboard.hpp"
 #include "Rcb4BaseClass.hpp"
 #include "RokiRcb4.hpp"
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 #include <gtest/gtest.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 using namespace Roki;
 
 #define MB_CALL(foo) ASSERT_TRUE(mb.foo) << mb.GetError() << std::endl
-#define INIT_MB   \
-  Motherboard mb; \
+#define INIT_MB                                                                \
+  Motherboard mb;                                                              \
   ASSERT_TRUE(MbDefaultConfig(mb)) << mb.GetError() << std::endl
 
-#define INIT_RCB     \
-  INIT_MB;           \
-  RokiRcb4 rcb4{mb}; \
+#define INIT_RCB                                                               \
+  INIT_MB;                                                                     \
+  RokiRcb4 rcb4{mb};                                                           \
   ASSERT_TRUE(rcb4.checkAcknowledge()) << rcb4.GetError() << std::endl;
 
 #define RCB_CALL(foo) ASSERT_TRUE(rcb4.foo) << rcb4.GetError() << std::endl;
 
-bool AskPrompt(const std::string &msg)
-{
+bool AskPrompt(const std::string &msg) {
   std::cerr << msg << "? [y/n]" << std::endl;
   char resp = getchar();
   getchar();
@@ -31,8 +30,7 @@ bool AskPrompt(const std::string &msg)
   return resp == 'y';
 }
 
-bool AskSkip()
-{
+bool AskSkip() {
   std::cerr << "Want to skip? [y/n]: " << std::endl;
   char resp = getchar();
   getchar();
@@ -41,16 +39,15 @@ bool AskSkip()
 }
 
 #define PROMPT(msg) ASSERT_TRUE(AskPrompt(msg))
-#define ASK_SKIP \
-  if (AskSkip()) \
+#define ASK_SKIP                                                               \
+  if (AskSkip())                                                               \
     ASSERT_TRUE(true);
 
-bool RokiPyTestRun(const std::string &name, /* const */ std::vector<std::string> /* & */ args = {})
-{
+bool RokiPyTestRun(const std::string &name,
+                   /* const */ std::vector<std::string> /* & */ args = {}) {
   pid_t pid = fork();
 
-  if (pid == 0)
-  { // child
+  if (pid == 0) { // child
     std::string path = "tests/" + name;
 
     std::string python3 = "python3";
@@ -69,8 +66,7 @@ bool RokiPyTestRun(const std::string &name, /* const */ std::vector<std::string>
     perror("Failed to execute");
     exit(1);
   }
-  if (pid > 0)
-  { // parent
+  if (pid > 0) { // parent
     int status;
     wait(&status);
 
@@ -84,11 +80,14 @@ bool RokiPyTestRun(const std::string &name, /* const */ std::vector<std::string>
   return false;
 }
 
-#define RPTEST(name) ASSERT_TRUE(RokiPyTestRun(name)) << "Failed to run test " << name << std::endl;
-#define RPTEST_ARG(name, args) ASSERT_TRUE(RokiPyTestRun(name, args)) << "Failed to run test " << name << std::endl;
+#define RPTEST(name)                                                           \
+  ASSERT_TRUE(RokiPyTestRun(name))                                             \
+      << "Failed to run test " << name << std::endl;
+#define RPTEST_ARG(name, args)                                                 \
+  ASSERT_TRUE(RokiPyTestRun(name, args))                                       \
+      << "Failed to run test " << name << std::endl;
 
-void PrintFrame(const IMUFrame& frame)
-{
+void PrintFrame(const IMUFrame &frame) {
   std::cerr << "Orientation:" << std::endl;
   std::cerr << "  X: " << frame.Orientation.X << std::endl;
   std::cerr << "  Y: " << frame.Orientation.Y << std::endl;
@@ -100,18 +99,18 @@ void PrintFrame(const IMUFrame& frame)
   std::cerr << "SensorId: " << +frame.SensorID << std::endl;
 }
 
-void PrintServoData(const uint8_t* data, size_t size) {
+void PrintServoData(const uint8_t *data, size_t size) {
   std::cerr << "TODO" << std::endl;
 }
 
-float QuatVal(const uint8_t* data) {
-  const int16_t* ptr = reinterpret_cast<const int16_t*>(data);
+float QuatVal(const uint8_t *data) {
+  const int16_t *ptr = reinterpret_cast<const int16_t *>(data);
   int16_t val = *ptr;
   float result = float(val) / 16384.0f;
   return result;
 }
 
-void PrintBodyIMU(const uint8_t* data, size_t size) {
+void PrintBodyIMU(const uint8_t *data, size_t size) {
   assert(size == 8);
   std::cerr << "Orientation:" << std::endl;
   std::cerr << "  X: " << QuatVal(data + 0) << std::endl;
@@ -120,8 +119,7 @@ void PrintBodyIMU(const uint8_t* data, size_t size) {
   std::cerr << "  W: " << QuatVal(data + 6) << std::endl;
 }
 
-TEST(SerialInterface, NoFile)
-{
+TEST(SerialInterface, NoFile) {
   MbSerial si;
   MbSerial::TTYConfig tty;
 
@@ -134,8 +132,7 @@ TEST(SerialInterface, NoFile)
   ASSERT_FALSE(si.Configure(tty)) << si.GetError() << std::endl;
 }
 
-TEST(SerialInterface, WrongTimeout)
-{
+TEST(SerialInterface, WrongTimeout) {
   MbSerial si;
   MbSerial::TTYConfig tty;
 
@@ -150,37 +147,32 @@ TEST(SerialInterface, WrongTimeout)
 
 TEST(Motherboard, DefaultConfigure) { INIT_MB; }
 
-TEST(Motherboard, GetIMULatest)
-{
+TEST(Motherboard, GetIMULatest) {
   INIT_MB;
 
   IMUFrame frame;
   MB_CALL(GetIMULatest(frame));
 }
 
-TEST(Motherboard, ConfigureStrobeFilter)
-{
+TEST(Motherboard, ConfigureStrobeFilter) {
   INIT_MB;
 
   MB_CALL(ConfigureStrobeFilter(0, 0));
 }
 
-TEST(Motherboard, SetIMUStrobeOffset)
-{
+TEST(Motherboard, SetIMUStrobeOffset) {
   INIT_MB;
 
   MB_CALL(SetIMUStrobeOffset(0));
 }
 
-TEST(Motherboard, SetBodyStrobeOffset)
-{
+TEST(Motherboard, SetBodyStrobeOffset) {
   INIT_MB;
 
   MB_CALL(SetBodyStrobeOffset(0));
 }
 
-TEST(Motherboard, GetIMUContainerInfo)
-{
+TEST(Motherboard, GetIMUContainerInfo) {
   INIT_MB;
 
   FrameContainerInfo info;
@@ -188,8 +180,7 @@ TEST(Motherboard, GetIMUContainerInfo)
   MB_CALL(GetIMUContainerInfo(info));
 }
 
-TEST(Motherboard, GetIMUFrame)
-{
+TEST(Motherboard, GetIMUFrame) {
   RPTEST_ARG("TakePhotos.py", {"1"});
 
   INIT_MB;
@@ -207,8 +198,7 @@ TEST(Motherboard, GetIMUFrame)
       << "This frame should not be available" << std::endl;
 }
 
-TEST(Motherboard, GetBodyContainerInfo)
-{
+TEST(Motherboard, GetBodyContainerInfo) {
   INIT_MB;
 
   FrameContainerInfo dummy;
@@ -216,8 +206,7 @@ TEST(Motherboard, GetBodyContainerInfo)
   MB_CALL(GetBodyContainerInfo(dummy));
 }
 
-TEST(Motherboard, GetBodyFrame)
-{
+TEST(Motherboard, GetBodyFrame) {
   RPTEST_ARG("TakePhotos.py", {"1"});
 
   INIT_MB;
@@ -235,13 +224,9 @@ TEST(Motherboard, GetBodyFrame)
       << "This frame should not be available" << std::endl;
 }
 
-TEST(Motherboard, ResetStrobeContatiners)
-{
-  RPTEST("TestResetSC.py");
-}
+TEST(Motherboard, ResetStrobeContatiners) { RPTEST("TestResetSC.py"); }
 
-TEST(Motherboard, BodySendForward)
-{
+TEST(Motherboard, BodySendForward) {
   INIT_MB;
 
   Rcb4BaseClass rcb4;
@@ -255,24 +240,21 @@ TEST(Motherboard, BodySendForward)
   ASSERT_EQ(requestData, responceData);
 }
 
-TEST(Motherboard, GetBodyQueueInfo)
-{
+TEST(Motherboard, GetBodyQueueInfo) {
   INIT_MB;
 
   BodyQueueInfo info;
   MB_CALL(GetBodyQueueInfo(info));
 }
 
-TEST(Motherboard, SetBodyQueuePeriod)
-{
+TEST(Motherboard, SetBodyQueuePeriod) {
   INIT_MB;
 
   MB_CALL(SetBodyQueuePeriod(20));
   ASSERT_FALSE(mb.SetBodyQueuePeriod(0));
 }
 
-TEST(Motherboard, BodySendQueue)
-{
+TEST(Motherboard, BodySendQueue) {
   INIT_MB;
   Rcb4BaseClass rcb4;
   BodyQueueInfo info;
@@ -282,26 +264,20 @@ TEST(Motherboard, BodySendQueue)
 
   MB_CALL(GetBodyQueueInfo(info));
 
-  for (int i = 0; i < info.Capacity; ++i)
-  {
+  for (int i = 0; i < info.Capacity; ++i) {
     MB_CALL(BodySendQueue(requestData.data(), 4, 4));
   }
 
   int attempts = 0;
-  while (mb.BodySendQueue(requestData.data(), 4, 4))
-  {
+  while (mb.BodySendQueue(requestData.data(), 4, 4)) {
     ASSERT_TRUE(attempts++ < info.Capacity)
         << "Failed to overflow body queue" << std::endl;
   }
 }
 
-TEST(Rcb4, Acknowledge)
-{
-  INIT_RCB;
-}
+TEST(Rcb4, Acknowledge) { INIT_RCB; }
 
-TEST(Rcb4, SetServoPosSync)
-{
+TEST(Rcb4, SetServoPosSync) {
   INIT_RCB;
 
   RokiRcb4::ServoData sd;
@@ -317,8 +293,7 @@ TEST(Rcb4, SetServoPosSync)
   RCB_CALL(setServoPos(&sd, 1, 10));
 }
 
-TEST(Rcb4, SetServoPosAsync)
-{
+TEST(Rcb4, SetServoPosAsync) {
   INIT_RCB;
 
   RokiRcb4::ServoData sd;
@@ -334,13 +309,9 @@ TEST(Rcb4, SetServoPosAsync)
   RCB_CALL(setServoPosAsync(&sd, 1, 10));
 }
 
-TEST(Motherboard, TestBodyQueue)
-{
-  RPTEST("TestBQ.py");
-}
+TEST(Motherboard, TestBodyQueue) { RPTEST("TestBQ.py"); }
 
-TEST(Rcb4, ReadRam)
-{
+TEST(Rcb4, ReadRam) {
   INIT_RCB;
 
   std::array<uint8_t, 8> zeroes = {};
@@ -351,13 +322,9 @@ TEST(Rcb4, ReadRam)
   ASSERT_NE(rxData, zeroes) << "read resulted in zeroes" << std::endl;
 }
 
-TEST(Motherboard, TestStrobeFilter)
-{
-  RPTEST("TestSF.py");
-}
+TEST(Motherboard, TestStrobeFilter) { RPTEST("TestSF.py"); }
 
-TEST(ValidateData, CurrentHeadImu)
-{
+TEST(ValidateData, CurrentHeadImu) {
   INIT_MB;
 
   IMUFrame frame;
@@ -367,9 +334,7 @@ TEST(ValidateData, CurrentHeadImu)
   PROMPT("IMU frame valid");
 }
 
-
-TEST(ValidateData, ImuBySeq)
-{
+TEST(ValidateData, ImuBySeq) {
   INIT_MB;
 
   IMUFrame frame;
@@ -384,8 +349,7 @@ TEST(ValidateData, ImuBySeq)
   PROMPT("IMU frame valid");
 }
 
-TEST(ValidateData, BodyBySeq)
-{
+TEST(ValidateData, BodyBySeq) {
   INIT_MB;
 
   BodyResponce responce;
@@ -396,16 +360,18 @@ TEST(ValidateData, BodyBySeq)
   MB_CALL(GetBodyContainerInfo(info));
   MB_CALL(GetBodyFrame(info.First, responce));
 
-  std::cerr << "Body responce: size "<< +responce.ResponceSize << std::endl;
-  
+  std::cerr << "Body responce: size " << +responce.ResponceSize << std::endl;
+
   for (int i = 0; i < responce.ResponceSize; ++i) {
     std::cerr << std::hex << +responce.Data[i] << " ";
   }
-  
+
   std::cout << std::dec << std::endl;
 
   PROMPT("Body Responce valid");
 }
+
+TEST(Binding, Signatures) { RPTEST("TestBinding.py") }
 
 #undef MB_CALL
 #undef INIT_MB
