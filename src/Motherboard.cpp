@@ -35,14 +35,16 @@ bool CheckVersion(Version version) {
 
 #define FOO_ERROR(msg) MakeFooError(__func__, msg)
 #define CHECK_CLIENT_ERROR ok ? true : FOO_ERROR(Client.GetError())
+#define CREATE_GUARD std::lock_guard<std::mutex> _(Mutex)
 
 bool Motherboard::Configure(const TTYConfig &config) {
+  CREATE_GUARD;
   Version version;
 
   if (!Serial.Configure(config))
     return FOO_ERROR(Serial.GetError());
 
-  if (!GetVersion(version))
+  if (!GetVersion_NoLock(version))
     return FOO_ERROR(GetError());
 
   if (!CheckVersion(version))
@@ -53,6 +55,8 @@ bool Motherboard::Configure(const TTYConfig &config) {
 }
 
 bool Motherboard::GetIMUFrame(uint16_t seq, IMUFrame &result) {
+  CREATE_GUARD;
+
   Messages::FrameNumber request;
   Messages::IMUFrameMsg responce;
   request.Seq = seq;
@@ -65,6 +69,8 @@ bool Motherboard::GetIMUFrame(uint16_t seq, IMUFrame &result) {
 }
 
 bool Motherboard::GetBodyFrame(uint16_t seq, BodyResponce &result) {
+  CREATE_GUARD;
+
   Messages::FrameNumber request;
   request.Seq = seq;
 
@@ -73,16 +79,22 @@ bool Motherboard::GetBodyFrame(uint16_t seq, BodyResponce &result) {
 }
 
 bool Motherboard::GetIMUContainerInfo(FrameContainerInfo &result) {
+  CREATE_GUARD;
+
   bool ok = Client.PerformRPC<Proc::GetIMUContainerInfo>(Serial, {}, result);
   return CHECK_CLIENT_ERROR;
 }
 
 bool Motherboard::GetBodyContainerInfo(FrameContainerInfo &result) {
+  CREATE_GUARD;
+
   bool ok = Client.PerformRPC<Proc::GetBodyContainerInfo>(Serial, {}, result);
   return CHECK_CLIENT_ERROR;
 }
 
 bool Motherboard::ResetStrobeContainers() {
+  CREATE_GUARD;
+
   Messages::Empty responce;
   bool ok =
       Client.PerformRPC<Proc::ResetStrobeContainers>(Serial, {}, responce);
@@ -90,6 +102,8 @@ bool Motherboard::ResetStrobeContainers() {
 }
 
 bool Motherboard::SetIMUStrobeOffset(uint8_t offset) {
+  CREATE_GUARD;
+
   Messages::Byte request;
   Messages::Empty responce;
 
@@ -101,6 +115,8 @@ bool Motherboard::SetIMUStrobeOffset(uint8_t offset) {
 }
 
 bool Motherboard::SetBodyStrobeOffset(uint8_t offset) {
+  CREATE_GUARD;
+
   Messages::Byte request;
   Messages::Empty responce;
 
@@ -112,6 +128,8 @@ bool Motherboard::SetBodyStrobeOffset(uint8_t offset) {
 }
 
 bool Motherboard::GetIMULatest(IMUFrame &result) {
+  CREATE_GUARD;
+
   Messages::IMUFrameMsg responce;
 
   bool ok = Client.PerformRPC<Proc::GetIMULatest>(Serial, {}, responce);
@@ -121,6 +139,8 @@ bool Motherboard::GetIMULatest(IMUFrame &result) {
 }
 
 bool Motherboard::GetStrobeWidth(uint8_t &result) {
+  CREATE_GUARD;
+
   Messages::Byte responce;
   bool ok = Client.PerformRPC<Proc::GetStrobeWidth>(Serial, {}, responce);
   if (ok)
@@ -130,6 +150,8 @@ bool Motherboard::GetStrobeWidth(uint8_t &result) {
 
 bool Motherboard::ConfigureStrobeFilter(uint8_t targetDuration,
                                         uint8_t durationThreshold) {
+  CREATE_GUARD;
+
   Messages::StrobeFilterConfig request;
   Messages::Empty responce;
   request.TargetDuration = targetDuration;
@@ -143,6 +165,8 @@ bool Motherboard::ConfigureStrobeFilter(uint8_t targetDuration,
 bool Motherboard::BodySendForward(const uint8_t *requestData,
                                   uint8_t requestSize, uint8_t *responceData,
                                   uint8_t responceSize) {
+  CREATE_GUARD;
+
   Messages::BodyRequest request;
   Messages::BodyResponce responce;
   request.Data = requestData;
@@ -161,7 +185,8 @@ bool Motherboard::BodySendForward(const uint8_t *requestData,
 
 bool Motherboard::BodySendQueue(const uint8_t *requestData, uint8_t requestSize,
                                 uint8_t responceSize, uint8_t pause) {
-  
+  CREATE_GUARD;
+
   Messages::BodyRequest request;
   Messages::Empty responce;
   request.Data = requestData;
@@ -177,11 +202,15 @@ bool Motherboard::BodySendQueue(const uint8_t *requestData, uint8_t requestSize,
 }
 
 bool Motherboard::GetBodyQueueInfo(BodyQueueInfo &result) {
+  CREATE_GUARD;
+
   bool ok = Client.PerformRPC<Proc::GetBodyQueueInfo>(Serial, {}, result);
   return CHECK_CLIENT_ERROR;
 }
 
 bool Motherboard::SetBodyQueuePeriod(uint8_t periodMs) {
+  CREATE_GUARD;
+
   Messages::PeriodMs request;
   Messages::Empty responce;
   request.Ms = periodMs;
@@ -191,12 +220,19 @@ bool Motherboard::SetBodyQueuePeriod(uint8_t periodMs) {
   return CHECK_CLIENT_ERROR;
 }
 
-bool Motherboard::GetVersion(Version &result) {
+bool Motherboard::GetVersion_NoLock(Version &result) {
   bool ok = Client.PerformRPC<Proc::GetVersion>(Serial, {}, result);
   return CHECK_CLIENT_ERROR;
 }
 
+bool Motherboard::GetVersion(Version &result) {
+  CREATE_GUARD;
+  return GetVersion_NoLock(result);
+}
+
 bool Motherboard::ResetBodyQueue() {
+  CREATE_GUARD;
+
   Messages::Empty responce;
   bool ok = Client.PerformRPC<Proc::ResetBodyQueue>(Serial, {}, responce);
   return CHECK_CLIENT_ERROR;
@@ -204,6 +240,7 @@ bool Motherboard::ResetBodyQueue() {
 
 #undef CHECK_CLIENT_ERROR
 #undef FOO_ERROR
+#undef CREATE_GUARD
 
 bool Motherboard::IsOk() const { return HasError; }
 std::string Motherboard::GetError() const { return Error; }

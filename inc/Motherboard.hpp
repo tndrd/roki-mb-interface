@@ -5,6 +5,8 @@
 #include "MbService.hpp"
 #include "Version.hpp"
 
+#include <mutex>
+
 namespace Roki {
 
 class Motherboard {
@@ -14,13 +16,16 @@ protected:
 private:
   MbSerial Serial;
   MbClient Client;
+
+  std::mutex Mutex;
 private:
   using Proc = MbService::Procedures;
 
 private:
   bool MakeError(const std::string &msg);
   bool MakeFooError(const std::string& fooName, const std::string& msg);
-  
+  bool GetVersion_NoLock(Version& result);
+
 public:
   Motherboard() = default;
   bool Configure(const TTYConfig &serviceConfig);
