@@ -16,6 +16,8 @@ n_frames = 0
 n_strobes_imu = 0
 n_strobes_body = 0
 
+failed = False
+
 do_compare = True
 mb = Roki.Motherboard()
 
@@ -26,6 +28,7 @@ def pre_callback(request):
     global n_frames
     global n_strobes_imu
     global n_strobes_body
+    global failed
 
     duration = request.get_metadata()['FrameDuration']
     if fits(duration, FRAME_DURATION_US):
@@ -42,9 +45,7 @@ def pre_callback(request):
         cond2 = abs(n_frames - n_strobes_body) > FRAME_TOLERANCE
 
         if (cond1 or cond2):
-            width = rpt.call(mb, mb.GetStrobeWidth())
-            rpt.eprint(f"Strobe width: {width}")
-            rpt.failure_stop(f"SFE[ got imu: {n_strobes_imu}, body: {n_strobes_body}, frames: {n_frames}]")
+            failed = True
 
 picam2 = Picamera2(camera_num=0)
 picam2.pre_callback = pre_callback
@@ -62,14 +63,18 @@ n_ticks = TEST_TIME_S // UPDATE_PERIOD_S
 ticks = 0
 while (ticks < n_ticks):
     rpt.eprint(f"\rimu: {n_strobes_imu}, body: {n_strobes_body}, frames: {n_frames}", end="")
+    if failed: break
     ticks += 1
     time.sleep(UPDATE_PERIOD_S)
-rpt.eprint("")
+rpt.eprint("\n")
 
 width = rpt.call(mb, mb.GetStrobeWidth())
 rpt.eprint(f"Strobe width: {width}")
 
 picam2.stop()
+
+if (failed):
+    rpt.failure_stop("Difference in frame count exceeded the tolerance")
 
 if (abs(width - FRAME_DURATION_MS) > DURATION_THRESHOLD):
     rpt.failure_stop("Inappropriate strobe width")

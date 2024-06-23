@@ -67,6 +67,6 @@ test_bq_period(5, 0, True)
 test_bq_period(10, 1)
 test_bq_period(20, 1)
 test_bq_period(20, 0, True)
-#test_bq_period(100)
+test_bq_period(2)
 
 rpt.end_test()

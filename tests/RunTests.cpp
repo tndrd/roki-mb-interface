@@ -193,7 +193,7 @@ TEST(Motherboard, GetIMUFrame) {
   ASSERT_GT(info.NumAv, 0) << "Queue empty" << std::endl;
 
   MB_CALL(GetIMUFrame(info.First, frame));
-
+  if (info.First == 0) return;
   ASSERT_FALSE(mb.GetIMUFrame(info.First - 1, frame))
       << "This frame should not be available" << std::endl;
 }
@@ -308,6 +308,9 @@ TEST(Rcb4, SetServoPosAsync) {
   sd.Data = 7500;
   RCB_CALL(setServoPosAsync(&sd, 1, 10));
 }
+
+TEST(Motherboard, TestHeadIMU) {RPTEST("TestHeadIMU.py");}
+TEST(Rcb4, TestBodyIMU) { RPTEST("TestBodyIMU.py"); }
 
 TEST(Motherboard, TestBodyQueue) { RPTEST("TestBQ.py"); }
 
