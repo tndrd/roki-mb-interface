@@ -69,4 +69,10 @@ rcb.motionPlay(0)
 rcb.GetError()
 rcb.IsOk()
 
+zubr = Roki.Zubr(mb)
+zubr.memISet(0, 0)
+zubr.memFSet(0, 0)
+zubr.memIGet(0)
+zubr.memFGet(0)
+
 rpt.end_test()

@@ -2,6 +2,7 @@
 #include "MbDefaultConfig.hpp"
 #include "PyBinding.hpp"
 #include "RokiRcb4Adapter.hpp"
+#include "ZubrAdapter.hpp"
 
 using namespace Roki;
 
@@ -109,4 +110,14 @@ PYBIND11_MODULE(Roki, m) {
 
   rcb4.def("GetError", &Rcb4::GetError);
   rcb4.def("IsOk", &Rcb4::IsOk);
+
+  using Zubr = ZubrAdapter;
+
+  py::class_<Zubr> zubr(m, "Zubr");
+
+  zubr.def(py::init<MotherboardAdapter &>());
+  zubr.def("memISet", &Zubr::MemISet);
+  zubr.def("memFSet", &Zubr::MemFSet);
+  zubr.def("memIGet", &Zubr::MemIGet);
+  zubr.def("memFGet", &Zubr::MemFGet);
 }
