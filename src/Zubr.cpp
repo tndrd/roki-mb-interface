@@ -72,9 +72,9 @@ bool Zubr::UnPackSetCmd() const {
 }
 
 bool Zubr::Synchronize(uint8_t responceSize) {
-  Mboard->BodySendForward(Buffer.data(), Buffer[0], Buffer.data(),
+  bool ret = Mboard->BodySendForward(Buffer.data(), Buffer[0], Buffer.data(),
                           responceSize);
-  if (!Mboard->IsOk())
+  if (!ret)
     return FOO_ERROR(Mboard->GetError());
 
   return true;
