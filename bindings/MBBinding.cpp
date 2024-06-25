@@ -120,4 +120,6 @@ PYBIND11_MODULE(Roki, m) {
   zubr.def("memFSet", &Zubr::MemFSet);
   zubr.def("memIGet", &Zubr::MemIGet);
   zubr.def("memFGet", &Zubr::MemFGet);
+  zubr.def("IsOk", &Zubr::IsOk);
+  zubr.def("GetError", &Zubr::GetError);
 }
