@@ -9,11 +9,11 @@ class ZubrAdapter : public Zubr {
 public:
   ZubrAdapter(Motherboard &mb);
 
-  bool MemISet(AddrT addr, int32_t value);
-  bool MemFSet(AddrT addr, float value);
+  bool MemISet(int addr, int value);
+  bool MemFSet(int addr, float value);
 
-  std::tuple<bool, int32_t> MemIGet(AddrT addr);
-  std::tuple<bool, float> MemFGet(AddrT addr);
+  std::tuple<bool, int> MemIGet(int addr);
+  std::tuple<bool, float> MemFGet(int addr);
 };
 
 } // namespace Roki

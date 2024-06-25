@@ -30,7 +30,7 @@ private:
   mutable bool HasError = false;
   mutable std::string Error;
 
-private:
+protected:
   bool MakeError(const std::string &msg) const;
   bool MakePrefixError(const std::string &prefix, const std::string &msg) const;
 
