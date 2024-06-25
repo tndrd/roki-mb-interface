@@ -269,3 +269,32 @@ print("SensorID: " + str(fr.SensorID))
 ```
 
 If the frame is not available right now, an error will be returned. So please check the availability of desired frame before the request.
+
+## ZubrController-specific commands
+
+### Zubr Interface
+Commands, that are not compliant with Kondo's Rcb4 protocol, are available for use from ```Roki.Zubr``` class.
+It's configuration procedure is similar to ```Roki.Rcb4```: 
+
+```python
+import Roki
+mb = Roki.Motherboard()
+
+...
+# Configuring Motherboard
+...
+
+zubr = Roki.Zubr(mb)
+```
+### Accessing variables by their address
+There are four methods for accessing the data by address: ```Zubr.memIGet``` and ```Zubr.memISet``` for reading and writing 32-bit integers at specific address; ```Zubr.memFGet``` and  ```Zubr.memFSet``` for reading and writing 32-bit floating point values. Here's the usage of first ones:
+
+```python
+ret, data = zubr.memIGet(600) # Get 32-bit integer at addr 600
+if not ret: print(zubr.GetError())
+
+ret = zubr.memISet(600, 42) # Write 32-bit int "42" at addr 600
+if not ret: print(zubr.GetError())
+```
+
+Float-related functions can be used the same way.
