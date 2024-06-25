@@ -3,7 +3,7 @@ import RokiPyTest as rpt
 
 ADDR = 600
 
-VALUE_INT = 0XDEADBEEF
+VALUE_INT = int(2**31 -1)
 VALUE_FLOAT = 0.424242
 
 FLOAT_TOLERANCE = 10**-5

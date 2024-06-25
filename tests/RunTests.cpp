@@ -383,7 +383,7 @@ TEST(ValidateData, BodyBySeq) {
 }
 
 #define ZUBR_ADDR 600
-#define ZUBR_IDATA 0xDEADBEEF
+#define ZUBR_IDATA 1<<31 - 1
 #define ZUBR_FDATA 0.424242f
 
 TEST(Zubr, MemInt) {
@@ -406,6 +406,10 @@ TEST(Zubr, MemFloat) {
   ZUBR_CHECK(std::get<0>(ret));
 
   ASSERT_EQ(std::get<1>(ret), ZUBR_FDATA);
+}
+
+TEST(Zubr, MemPython) {
+  RPTEST("ZubrMem.py")
 }
 
 TEST(Binding, Signatures) { RPTEST("TestBinding.py") }
