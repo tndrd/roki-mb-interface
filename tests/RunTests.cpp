@@ -3,6 +3,7 @@
 #include "Motherboard.hpp"
 #include "Rcb4BaseClass.hpp"
 #include "RokiRcb4.hpp"
+#include <ZubrAdapter.hpp>
 #include <gtest/gtest.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -21,6 +22,12 @@ using namespace Roki;
   ASSERT_TRUE(rcb4.checkAcknowledge()) << rcb4.GetError() << std::endl;
 
 #define RCB_CALL(foo) ASSERT_TRUE(rcb4.foo) << rcb4.GetError() << std::endl;
+
+#define INIT_ZUBR                                                              \
+  INIT_MB;                                                                     \
+  ZubrAdapter zubr{mb};
+
+#define ZUBR_CHECK(ret) ASSERT_TRUE(ret) << zubr.GetError() << std::endl;
 
 bool AskPrompt(const std::string &msg) {
   std::cerr << msg << "? [y/n]" << std::endl;
@@ -193,7 +200,8 @@ TEST(Motherboard, GetIMUFrame) {
   ASSERT_GT(info.NumAv, 0) << "Queue empty" << std::endl;
 
   MB_CALL(GetIMUFrame(info.First, frame));
-  if (info.First == 0) return;
+  if (info.First == 0)
+    return;
   ASSERT_FALSE(mb.GetIMUFrame(info.First - 1, frame))
       << "This frame should not be available" << std::endl;
 }
@@ -309,7 +317,7 @@ TEST(Rcb4, SetServoPosAsync) {
   RCB_CALL(setServoPosAsync(&sd, 1, 10));
 }
 
-TEST(Motherboard, TestHeadIMU) {RPTEST("TestHeadIMU.py");}
+TEST(Motherboard, TestHeadIMU) { RPTEST("TestHeadIMU.py"); }
 TEST(Rcb4, TestBodyIMU) { RPTEST("TestBodyIMU.py"); }
 
 TEST(Motherboard, TestBodyQueue) { RPTEST("TestBQ.py"); }
@@ -372,6 +380,32 @@ TEST(ValidateData, BodyBySeq) {
   std::cout << std::dec << std::endl;
 
   PROMPT("Body Responce valid");
+}
+
+#define ZUBR_ADDR 600
+#define ZUBR_IDATA 0xDEADBEEF
+#define ZUBR_FDATA 0.424242f
+
+TEST(Zubr, MemInt) {
+  INIT_ZUBR;
+
+  ZUBR_CHECK(zubr.MemISet(ZUBR_ADDR, ZUBR_IDATA));
+
+  auto ret = zubr.MemIGet(ZUBR_ADDR);
+  ZUBR_CHECK(std::get<0>(ret));
+
+  ASSERT_EQ(std::get<1>(ret), ZUBR_IDATA);
+}
+
+TEST(Zubr, MemFloat) {
+  INIT_ZUBR;
+  
+  ZUBR_CHECK(zubr.MemFSet(ZUBR_ADDR, ZUBR_FDATA));
+
+  auto ret = zubr.MemFGet(ZUBR_ADDR);
+  ZUBR_CHECK(std::get<0>(ret));
+
+  ASSERT_EQ(std::get<1>(ret), ZUBR_FDATA);
 }
 
 TEST(Binding, Signatures) { RPTEST("TestBinding.py") }
