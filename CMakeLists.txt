@@ -30,11 +30,17 @@ target_link_libraries(Motherboard PUBLIC MbService MbClient IMUFrame)
 add_library(RokiRcb4 src/RokiRcb4.cpp)
 target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
 
+add_library(Zubr src/Zubr.cpp)
+target_link_libraries(Zubr PUBLIC Motherboard)
+
 add_library(MotherboardAdapter src/MotherboardAdapter.cpp)
 target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
 
 add_library(RokiRcb4Adapter src/RokiRcb4Adapter.cpp)
 target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
+
+add_library(ZubrAdapter src/ZubrAdapter.cpp)
+target_link_libraries(ZubrAdapter PUBLIC Zubr)
 
 add_library(MbDefaultConfig src/MbDefaultConfig.cpp)
 target_link_libraries(MbDefaultConfig PUBLIC Motherboard)
