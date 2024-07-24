@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 echo "Downloading dependencies..."
 
 sudo apt install cmake
@@ -9,8 +12,7 @@ git submodule update --init --recursive
 
 echo "Building..."
 
-cd roki-mb-interface
-mkdir build
+mkdir -p build
 cd build
 cmake ..
 cmake --build .
