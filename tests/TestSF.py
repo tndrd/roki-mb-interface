@@ -1,5 +1,5 @@
-from picamera2 import Picamera2
 import RokiPyTest as rpt
+from RokiPyTest import Picamera2
 import Roki
 import time
 rpt.mute_picamera()
@@ -73,10 +73,10 @@ rpt.eprint(f"Strobe width: {width}")
 
 picam2.stop()
 
-if (failed):
+if rpt.check(failed):
     rpt.failure_stop("Difference in frame count exceeded the tolerance")
 
-if (abs(width - FRAME_DURATION_MS) > DURATION_THRESHOLD):
+if rpt.check(abs(width - FRAME_DURATION_MS) > DURATION_THRESHOLD):
     rpt.failure_stop("Inappropriate strobe width")
 
 rpt.call(mb, mb.ResetStrobeContainers())
@@ -84,10 +84,10 @@ rpt.call(mb, mb.ResetStrobeContainers())
 imu = rpt.call(mb, mb.GetIMUContainerInfo())
 body = rpt.call(mb, mb.GetBodyContainerInfo())
 
-if (body.NumAv != 0):
+if rpt.check(body.NumAv != 0):
     rpt.failure_stop("Body frCont did not reset")
 
-if (imu.NumAv != 0):
+if rpt.check(imu.NumAv != 0):
     rpt.failure_stop("IMU frCont did not reset")
 
 rpt.end_test()

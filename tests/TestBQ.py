@@ -47,8 +47,12 @@ def test_bq_period(period, pause = 0, TestReset = False):
     start = time.perf_counter()
     fill_bq(rcb, count, pause)
     filled = time.perf_counter()
-
-    sleep_time = queue_time - (filled - start)
+    
+    if rpt.is_mocking():
+        sleep_time = 0
+    else:
+        sleep_time = queue_time - (filled - start)
+    
     if TestReset:
         time.sleep(sleep_time / 2)
         rpt.call(mb, mb.ResetBodyQueue())

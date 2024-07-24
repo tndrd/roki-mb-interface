@@ -20,7 +20,7 @@ ret, val = zubr.memIGet(ADDR)
 if not ret:
     rpt.failure_stop(f"Failed to read data: {zubr.GetError()}")
 
-if val != VALUE_INT:
+if rpt.check(val != VALUE_INT):
     rpt.failure_stop(f"Sent and recieved values are different")
 
 rpt.call(zubr, zubr.memFSet(ADDR, VALUE_FLOAT))
@@ -30,7 +30,7 @@ ret, val = zubr.memFGet(ADDR)
 if not ret:
     rpt.failure_stop(f"Failed to read data: {zubr.GetError()}")
 
-if abs(val - VALUE_FLOAT) > FLOAT_TOLERANCE:
+if rpt.check(abs(val - VALUE_FLOAT) > FLOAT_TOLERANCE):
     rpt.failure_stop("Sent and received values are different")
 
 rpt.end_test()

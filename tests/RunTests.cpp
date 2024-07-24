@@ -30,6 +30,10 @@ using namespace Roki;
 #define ZUBR_CHECK(ret) ASSERT_TRUE(ret) << zubr.GetError() << std::endl;
 
 bool AskPrompt(const std::string &msg) {
+#ifdef USE_MB_MOCK
+  return true;
+#endif
+
   std::cerr << msg << "? [y/n]" << std::endl;
   char resp = getchar();
   getchar();
@@ -197,6 +201,7 @@ TEST(Motherboard, GetIMUFrame) {
 
   MB_CALL(GetIMUContainerInfo(info));
 
+#ifndef USE_MB_MOCK
   ASSERT_GT(info.NumAv, 0) << "Queue empty" << std::endl;
 
   MB_CALL(GetIMUFrame(info.First, frame));
@@ -204,6 +209,7 @@ TEST(Motherboard, GetIMUFrame) {
     return;
   ASSERT_FALSE(mb.GetIMUFrame(info.First - 1, frame))
       << "This frame should not be available" << std::endl;
+#endif
 }
 
 TEST(Motherboard, GetBodyContainerInfo) {
@@ -223,13 +229,14 @@ TEST(Motherboard, GetBodyFrame) {
   BodyResponce responce;
 
   MB_CALL(GetBodyContainerInfo(info));
-
+#ifndef USE_MB_MOCK
   ASSERT_GT(info.NumAv, 0) << "Queue empty" << std::endl;
 
   MB_CALL(GetBodyFrame(info.First, responce));
 
   ASSERT_FALSE(mb.GetBodyFrame(info.First - 1, responce))
       << "This frame should not be available" << std::endl;
+#endif
 }
 
 TEST(Motherboard, ResetStrobeContatiners) { RPTEST("TestResetSC.py"); }
@@ -244,8 +251,9 @@ TEST(Motherboard, BodySendForward) {
   rcb4.acknowledgeCmd(requestData.data());
 
   MB_CALL(BodySendForward(requestData.data(), 4, responceData.data(), 4));
-
+#ifndef USE_MB_MOCK
   ASSERT_EQ(requestData, responceData);
+#endif
 }
 
 TEST(Motherboard, GetBodyQueueInfo) {
@@ -259,7 +267,9 @@ TEST(Motherboard, SetBodyQueuePeriod) {
   INIT_MB;
 
   MB_CALL(SetBodyQueuePeriod(20));
+#ifndef USE_MB_MOCK
   ASSERT_FALSE(mb.SetBodyQueuePeriod(0));
+#endif
 }
 
 TEST(Motherboard, BodySendQueue) {
@@ -277,10 +287,13 @@ TEST(Motherboard, BodySendQueue) {
   }
 
   int attempts = 0;
+#ifndef USE_MB_MOCK
   while (mb.BodySendQueue(requestData.data(), 4, 4)) {
+
     ASSERT_TRUE(attempts++ < info.Capacity)
         << "Failed to overflow body queue" << std::endl;
   }
+#endif
 }
 
 TEST(Rcb4, Acknowledge) { INIT_RCB; }
@@ -383,7 +396,7 @@ TEST(ValidateData, BodyBySeq) {
 }
 
 #define ZUBR_ADDR 600
-#define ZUBR_IDATA 1<<31 - 1
+#define ZUBR_IDATA 1 << 31 - 1
 #define ZUBR_FDATA 0.424242f
 
 TEST(Zubr, MemInt) {
@@ -393,26 +406,28 @@ TEST(Zubr, MemInt) {
 
   auto ret = zubr.MemIGet(ZUBR_ADDR);
   ZUBR_CHECK(std::get<0>(ret));
-
+#ifndef USE_MB_MOCK
   ASSERT_EQ(std::get<1>(ret), ZUBR_IDATA);
+#endif
 }
 
 TEST(Zubr, MemFloat) {
   INIT_ZUBR;
-  
+
   ZUBR_CHECK(zubr.MemFSet(ZUBR_ADDR, ZUBR_FDATA));
 
   auto ret = zubr.MemFGet(ZUBR_ADDR);
   ZUBR_CHECK(std::get<0>(ret));
-
+#ifndef USE_MB_MOCK
   ASSERT_EQ(std::get<1>(ret), ZUBR_FDATA);
+#endif
 }
 
-TEST(Zubr, MemPython) {
-  RPTEST("ZubrMem.py")
-}
+TEST(Zubr, MemPython){RPTEST("ZubrMem.py")}
 
-TEST(Binding, Signatures) { RPTEST("TestBinding.py") }
+TEST(Binding, Signatures) {
+  RPTEST("TestBinding.py")
+}
 
 #undef MB_CALL
 #undef INIT_MB

@@ -37,7 +37,7 @@ for i in range(0, (1000 * TESTING_TIME_S) // UPDATE_PERIOD_MS):
 
     s = x*x + y*y + z*z + w*w
     
-    if (abs(s - 1) > SUM_TOLERANCE):
+    if rpt.check(abs(s - 1) > SUM_TOLERANCE):
         report = f"Bad quaternion sum: {round(s, ROUND_DIGITS)}\n"
         report += f"Bytes: {list(map(hex, data))}\n"
         report += f" x = {round(x, ROUND_DIGITS)}\n"

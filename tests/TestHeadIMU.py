@@ -29,7 +29,7 @@ for i in range(0, (1000 * TESTING_TIME_S) // UPDATE_PERIOD_MS):
 
     s = x*x + y*y + z*z + w*w
     
-    if (abs(s - 1) > SUM_TOLERANCE):
+    if rpt.check(abs(s - 1) > SUM_TOLERANCE):
         report = f"Bad quaternion sum: {round(s, ROUND_DIGITS)}\n"
         report += f" x = {round(x, ROUND_DIGITS)}\n"
         report += f" y = {round(y, ROUND_DIGITS)}\n"
@@ -37,7 +37,7 @@ for i in range(0, (1000 * TESTING_TIME_S) // UPDATE_PERIOD_MS):
         report += f" w = {round(w, ROUND_DIGITS)}\n"
         rpt.failure_stop(report)
 
-    if (data.SensorID != SENSOR_ID):
+    if rpt.check(data.SensorID != SENSOR_ID):
         rpt.failure_stop(f"Wrong SensorID: got {data.SensorID}, expected {SENSOR_ID}")
 
     time.sleep(UPDATE_PERIOD_MS / 1000)

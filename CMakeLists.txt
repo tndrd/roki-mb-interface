@@ -1,13 +1,29 @@
 cmake_minimum_required(VERSION 3.8)
-project(RokiMotherboard)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Werror")
+
+if(DEFINED ENV{ROKI_USE_HARDWARE_MOCKS})
+  set(USE_MB_MOCK ON)
+else()
+  set(USE_MB_MOCK OFF)
+endif()
+
+project(RokiMotherboard)
 
 add_subdirectory(deps/pybind11)
 add_subdirectory(deps/rcb4-base-class)
 add_subdirectory(deps/roki-mb-service)
 add_subdirectory(deps/googletest)
+
+if(USE_MB_MOCK)
+  message(INFO " Using hardware mocks")
+  add_library(rcb4base ALIAS rcb4base_mock)
+  add_compile_definitions(USE_MB_MOCK)
+else()
+  message(INFO " Using hardware implementation")
+  add_library(rcb4base ALIAS rcb4base_impl)
+endif()
 
 #add_definitions(-DDBGMB=1)
 

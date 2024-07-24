@@ -1,7 +1,7 @@
-from picamera2 import Picamera2
 import RokiPyTest as rpt
+from RokiPyTest import Picamera2
+
 import Roki
-import cv2
 import time
 import sys
 rpt.mute_picamera()
@@ -31,10 +31,10 @@ picam2.stop()
 imu = rpt.call(mb, mb.GetIMUContainerInfo())
 body = rpt.call(mb, mb.GetBodyContainerInfo())
 
-if (body.NumAv == 0):
+if rpt.check(body.NumAv == 0):
     rpt.failure_stop("No frames in body frCont")
 
-if (imu.NumAv == 0):
+if rpt.check(imu.NumAv == 0):
     rpt.failure_stop("No frames in IMU frCont")
 
 rpt.end_test()
