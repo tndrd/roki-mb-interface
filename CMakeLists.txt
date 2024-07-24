@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 3.8)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Werror")
 
+set(MY_INSTALL_PREFIX roki/mb/interface)
+set(TESTING_EXECUTABLE mbwtf)
+set(MB_SCRIPTS_PATH /usr/lib/${MY_INSTALL_PREFIX}/scripts)
+
+add_compile_definitions(MB_SCRIPTS_PATH=${MB_SCRIPTS_PATH})
+
 if(DEFINED ENV{ROKI_USE_HARDWARE_MOCKS})
   set(USE_MB_MOCK ON)
 else()
@@ -61,6 +67,16 @@ target_link_libraries(ZubrAdapter PUBLIC Zubr)
 add_library(MbDefaultConfig src/MbDefaultConfig.cpp)
 target_link_libraries(MbDefaultConfig PUBLIC Motherboard)
 
-include(tests/tests.cmake)
+add_executable(${TESTING_EXECUTABLE} tests/RunTests.cpp)
+target_link_libraries(${TESTING_EXECUTABLE} GTest::gtest_main Motherboard RokiRcb4 MbDefaultConfig ZubrAdapter)
+
 include(bindings/bindings.cmake)
-# include(examples/examples.cmake)
+
+# Installation rules
+install(TARGETS ${TESTING_EXECUTABLE} RUNTIME DESTINATION /usr/bin)
+
+set(CMAKE_INSTALL_PREFIX /usr/lib/${MY_INSTALL_PREFIX})
+
+install(TARGETS Motherboard RokiRcb4 Zubr)
+install(DIRECTORY inc/ DESTINATION /usr/include/${MY_INSTALL_PREFIX})
+install(DIRECTORY tests/scripts/ DESTINATION ${MB_SCRIPTS_PATH})

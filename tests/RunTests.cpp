@@ -11,6 +11,22 @@
 
 using namespace Roki;
 
+#define str(a) #a
+#define xstr(a) str(a)
+
+#ifndef MB_SCRIPTS_PATH
+#error "Scripts directory is not defined"
+#else
+#define SCRIPTS_DIR xstr(MB_SCRIPTS_PATH)
+#pragma message "Scripts directory: " SCRIPTS_DIR
+#endif
+
+#ifndef USE_MB_MOCK
+#pragma message "USE_MB_MOCK is not defined, building tests normally"
+#else
+#pragma message "USE_MB_MOCK is defined, building tests with hardware mocks"
+#endif
+
 #define MB_CALL(foo) ASSERT_TRUE(mb.foo) << mb.GetError() << std::endl
 #define INIT_MB                                                                \
   Motherboard mb;                                                              \
@@ -59,7 +75,7 @@ bool RokiPyTestRun(const std::string &name,
   pid_t pid = fork();
 
   if (pid == 0) { // child
-    std::string path = "tests/" + name;
+    std::string path = SCRIPTS_DIR "/" + name;
 
     std::string python3 = "python3";
 
