@@ -50,7 +50,6 @@ private:
   void PackSetCmd(AddrT addr, const uint8_t *data);
   bool UnPackSetCmd() const;
 
-
 public:
   template <typename ValueT> bool MemSet(AddrT addr, ValueT value) {
     static_assert(sizeof(ValueT) == DataWidth);
@@ -74,9 +73,10 @@ public:
     if (!UnPackGetCmd(addr, &data))
       return false;
 
+#ifndef USE_MB_MOCK
     assert(data);
     value = *reinterpret_cast<const ValueT *>(data);
-
+#endif
     return true;
   }
 }; // namespace Roki
