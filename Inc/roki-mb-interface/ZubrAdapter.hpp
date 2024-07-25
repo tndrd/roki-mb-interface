@@ -3,11 +3,11 @@
 #include "roki-mb-interface/Zubr.hpp"
 #include <tuple>
 
-namespace Roki {
+namespace MbProtocols {
 
 class ZubrAdapter : public Zubr {
 public:
-  ZubrAdapter(Motherboard &mb);
+  ZubrAdapter(MbInterface::Motherboard &mb);
 
   bool MemISet(int addr, int value);
   bool MemFSet(int addr, float value);
@@ -16,4 +16,4 @@ public:
   std::tuple<bool, float> MemFGet(int addr);
 };
 
-} // namespace Roki
+} // namespace MbProtocols

@@ -16,7 +16,7 @@
 #include "Helpers/DescriptorWrapper.hpp"
 #include "Version.hpp"
 
-namespace Roki {
+namespace MbInterface {
 
 class MbSerial final {
 public:
@@ -40,7 +40,7 @@ public:
 
   struct OutPackage {
     uint8_t ProcedureID;
-    
+
     const uint8_t *Data;
     uint8_t Size;
   };
@@ -88,4 +88,4 @@ public:
   bool Receive(InPackage &package);
 };
 
-} // namespace Roki
+} // namespace MbInterface

@@ -1,6 +1,6 @@
 #include "roki-mb-interface/Helpers/DescriptorWrapper.hpp"
 
-namespace Roki {
+namespace MbInterface {
 namespace Helpers {
 
 DescriptorWrapper::DescriptorWrapper(int newFd) : Fd{newFd} {}
@@ -21,5 +21,5 @@ DescriptorWrapper::~DescriptorWrapper() {
   if (IsValid())
     close(Fd);
 }
-}
-} // namespace Roki::Helpers
+} // namespace Helpers
+} // namespace MbInterface

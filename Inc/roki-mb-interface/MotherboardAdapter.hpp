@@ -4,7 +4,7 @@
 #include <limits>
 #include <tuple>
 
-namespace Roki {
+namespace MbInterface {
 
 class MotherboardAdapter : public Motherboard {
 private:
@@ -40,4 +40,4 @@ public:
   Ret<Version> GetVersion();
 };
 
-} // namespace Roki
+} // namespace MbInterface

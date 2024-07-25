@@ -2,29 +2,31 @@
 
 #include "roki-mb-interface/MbAliases.hpp"
 #include "roki-mb-interface/MbClient.hpp"
-#include "roki-mb-service/MbService.hpp"
 #include "roki-mb-interface/Version.hpp"
+#include "roki-mb-service/MbService.hpp"
 
 #include <mutex>
 
-namespace Roki {
+namespace MbInterface {
 
 class Motherboard {
 protected:
   bool HasError = false;
   std::string Error;
+
 private:
   MbSerial Serial;
   MbClient Client;
 
   std::mutex Mutex;
+
 private:
   using Proc = MbService::Procedures;
 
 private:
   bool MakeError(const std::string &msg);
-  bool MakeFooError(const std::string& fooName, const std::string& msg);
-  bool GetVersion_NoLock(Version& result);
+  bool MakeFooError(const std::string &fooName, const std::string &msg);
+  bool GetVersion_NoLock(Version &result);
 
 public:
   Motherboard() = default;
@@ -46,16 +48,18 @@ public:
   bool GetStrobeWidth(uint8_t &result);
   bool ConfigureStrobeFilter(uint8_t targetDuration, uint8_t durationThreshold);
 
-  bool BodySendForward(const uint8_t* requestData, uint8_t requestSize, uint8_t* responceData, uint8_t responceSize);
-  bool BodySendQueue(const uint8_t* requestData, uint8_t requestSize, uint8_t responceSize, uint8_t pause = 0);
-  bool GetBodyQueueInfo(BodyQueueInfo& result);
+  bool BodySendForward(const uint8_t *requestData, uint8_t requestSize,
+                       uint8_t *responceData, uint8_t responceSize);
+  bool BodySendQueue(const uint8_t *requestData, uint8_t requestSize,
+                     uint8_t responceSize, uint8_t pause = 0);
+  bool GetBodyQueueInfo(BodyQueueInfo &result);
   bool SetBodyQueuePeriod(uint8_t periodMs);
   bool ResetBodyQueue();
 
-  bool GetVersion(Version& result);
+  bool GetVersion(Version &result);
 
   bool IsOk() const;
   std::string GetError() const;
 };
 
-} // namespace Roki
+} // namespace MbInterface

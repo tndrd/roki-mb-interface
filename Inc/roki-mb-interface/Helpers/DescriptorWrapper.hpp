@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace Roki {
+namespace MbInterface {
 namespace Helpers {
 
 struct DescriptorWrapper final {
@@ -24,4 +24,4 @@ public:
   ~DescriptorWrapper();
 };
 } // namespace Helpers
-} // namespace Roki
+} // namespace MbInterface

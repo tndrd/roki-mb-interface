@@ -1,6 +1,6 @@
 #include "roki-mb-interface/Motherboard.hpp"
 
-namespace Roki {
+namespace MbInterface {
 
 bool Motherboard::MakeError(const std::string &msg) {
   HasError = true;
@@ -245,4 +245,4 @@ bool Motherboard::ResetBodyQueue() {
 bool Motherboard::IsOk() const { return HasError; }
 std::string Motherboard::GetError() const { return Error; }
 
-} // namespace Roki
+} // namespace MbInterface

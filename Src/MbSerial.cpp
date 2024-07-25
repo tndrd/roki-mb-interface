@@ -1,6 +1,6 @@
 #include "roki-mb-interface/MbSerial.hpp"
 
-namespace Roki {
+namespace MbInterface {
 
 bool MbSerial::MakeError(const std::string &msg) {
   Error = msg;
@@ -223,4 +223,4 @@ bool MbSerial::Receive(InPackage &package) {
   return true;
 }
 
-} // namespace Roki
+} // namespace MbInterface

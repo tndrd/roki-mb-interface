@@ -1,6 +1,6 @@
 #include "roki-mb-interface/Helpers/IMUFrame.hpp"
 
-namespace Roki {
+namespace MbInterface {
 namespace Helpers {
 
 float IMUFrame::NormalizeCoord(int16_t crd) {
@@ -31,4 +31,4 @@ IMUFrame IMUFrame::ConvertFrom(const Messages::IMUFrameMsg &msg) {
 }
 
 } // namespace Helpers
-} // namespace Roki
+} // namespace MbInterface

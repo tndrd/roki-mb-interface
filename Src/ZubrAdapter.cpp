@@ -1,8 +1,8 @@
 #include "roki-mb-interface/ZubrAdapter.hpp"
 
-namespace Roki {
+namespace MbProtocols {
 
-ZubrAdapter::ZubrAdapter(Motherboard &mb) : Zubr{mb} {}
+ZubrAdapter::ZubrAdapter(MbInterface::Motherboard &mb) : Zubr{mb} {}
 
 template <typename T> bool CheckIntBoundaries(int value) {
   if (value < std::numeric_limits<T>::min())
@@ -52,4 +52,4 @@ std::tuple<bool, float> ZubrAdapter::MemFGet(int addr) {
 
 #undef INT_ERROR
 
-} // namespace Roki
+} // namespace MbProtocols

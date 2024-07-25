@@ -1,7 +1,7 @@
 #pragma once
 #include "roki-mb-service/MbMessages.hpp"
 
-namespace Roki {
+namespace MbInterface {
 namespace Helpers {
 struct IMUFrame {
 public:
@@ -30,4 +30,4 @@ public:
 };
 
 } // namespace Helpers
-} // namespace Roki
+} // namespace MbInterface

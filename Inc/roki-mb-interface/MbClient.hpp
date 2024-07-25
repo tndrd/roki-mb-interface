@@ -3,7 +3,7 @@
 #include "roki-mb-interface/MbSerial.hpp"
 #include <array>
 
-namespace Roki {
+namespace MbInterface {
 
 struct MbClient {
 private:
@@ -60,4 +60,4 @@ public:
     return true;
   }
 };
-} // namespace Roki
+} // namespace MbInterface

@@ -1,6 +1,6 @@
 #include "roki-mb-interface/Zubr.hpp"
 
-namespace Roki {
+namespace MbProtocols {
 
 bool Zubr::MakeError(const std::string &msg) const {
   HasError = true;
@@ -15,7 +15,7 @@ bool Zubr::MakePrefixError(const std::string &prefix,
 
 #define FOO_ERROR(msg) MakePrefixError(__func__, msg)
 
-Zubr::Zubr(Motherboard &mb) : Mboard{&mb} {}
+Zubr::Zubr(MbInterface::Motherboard &mb) : Mboard{&mb} {}
 
 bool Zubr::IsOk() const { return HasError; }
 std::string Zubr::GetError() const { return HasError ? Error : "No error"; }
@@ -73,7 +73,7 @@ bool Zubr::UnPackSetCmd() const {
 
 bool Zubr::Synchronize(uint8_t responceSize) {
   bool ret = Mboard->BodySendForward(Buffer.data(), Buffer[0], Buffer.data(),
-                          responceSize);
+                                     responceSize);
   if (!ret)
     return FOO_ERROR(Mboard->GetError());
 
@@ -82,4 +82,4 @@ bool Zubr::Synchronize(uint8_t responceSize) {
 
 #undef FOO_ERROR
 
-} // namespace Roki
+} // namespace MbProtocols

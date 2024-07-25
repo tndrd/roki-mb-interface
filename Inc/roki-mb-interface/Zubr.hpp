@@ -4,7 +4,7 @@
 #include <array>
 #include <numeric>
 
-namespace Roki {
+namespace MbProtocols {
 
 class Zubr {
 public:
@@ -24,7 +24,7 @@ private:
 
   static constexpr size_t BufSize = 16;
 
-  Motherboard *Mboard;
+  MbInterface::Motherboard *Mboard;
   std::array<uint8_t, BufSize> Buffer;
 
   mutable bool HasError = false;
@@ -35,7 +35,7 @@ protected:
   bool MakePrefixError(const std::string &prefix, const std::string &msg) const;
 
 public:
-  Zubr(Motherboard &mb);
+  Zubr(MbInterface::Motherboard &mb);
 
   bool IsOk() const;
   std::string GetError() const;
@@ -79,6 +79,6 @@ public:
 #endif
     return true;
   }
-}; // namespace Roki
+};
 
-} // namespace Roki
+} // namespace MbProtocols

@@ -1,6 +1,6 @@
 #include "roki-mb-interface/MbClient.hpp"
 
-namespace Roki {
+namespace MbInterface {
 bool MbClient::IsOk() const { return HasError; }
 
 std::string MbClient::GetError() const {
@@ -9,4 +9,4 @@ std::string MbClient::GetError() const {
   return "OK";
 }
 
-} // namespace Roki
+} // namespace MbInterface

@@ -1,6 +1,6 @@
 #include "roki-mb-interface/Motherboard.hpp"
 
-namespace Roki {
+namespace MbInterface {
 
 #define MOCK                                                                   \
   { return true; }
@@ -62,4 +62,4 @@ bool Motherboard::MakeFooError(const std::string &fooName,
   return false;
 }
 
-} // namespace Roki
+} // namespace MbInterface
