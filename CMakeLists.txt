@@ -59,3 +59,8 @@ target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 
 add_library(ZubrAdapter Src/ZubrAdapter.cpp)
 target_link_libraries(ZubrAdapter PUBLIC Zubr)
+
+# Exported target
+add_library(roki-mb-interface INTERFACE)
+target_link_libraries(roki-mb-interface INTERFACE MotherboardAdapter RokiRcb4Adapter ZubrAdapter)
+target_include_directories(roki-mb-interface INTERFACE Inc/)
