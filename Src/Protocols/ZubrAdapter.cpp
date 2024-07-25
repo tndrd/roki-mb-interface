@@ -1,4 +1,4 @@
-#include "roki-mb-interface/ZubrAdapter.hpp"
+#include "roki-mb-interface/Protocols/ZubrAdapter.hpp"
 
 namespace MbProtocols {
 

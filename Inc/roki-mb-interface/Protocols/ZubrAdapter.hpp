@@ -1,6 +1,6 @@
 #pragma once
 
-#include "roki-mb-interface/Zubr.hpp"
+#include "roki-mb-interface/Protocols/Zubr.hpp"
 #include <tuple>
 
 namespace MbProtocols {

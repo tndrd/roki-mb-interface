@@ -1,4 +1,4 @@
-#include "roki-mb-interface/RokiRcb4Adapter.hpp"
+#include "roki-mb-interface/Protocols/RokiRcb4Adapter.hpp"
 
 namespace MbProtocols {
 

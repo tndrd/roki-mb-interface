@@ -1,6 +1,6 @@
 #pragma once
 
-#include "roki-mb-interface/RokiRcb4.hpp"
+#include "roki-mb-interface/Protocols/RokiRcb4.hpp"
 #include <tuple>
 
 namespace MbProtocols {
