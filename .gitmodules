@@ -1,6 +1,6 @@
 [submodule "deps/rcb4-base-class"]
-	path = deps/rcb4-base-class
+	path = Deps/rcb4-base-class
 	url = https://github.com/tndrd/rcb4-base-class.git
 [submodule "deps/roki-mb-service"]
-	path = deps/roki-mb-service
+	path = Deps/roki-mb-service
 	url = https://github.com/tndrd/roki-mb-service.git
