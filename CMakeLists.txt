@@ -9,10 +9,12 @@ else()
   set(USE_MB_MOCK OFF)
 endif()
 
+set(DEBUG_MB OFF)
+
 project(RokiMotherboard)
 
-add_subdirectory(deps/rcb4-base-class)
-add_subdirectory(deps/roki-mb-service)
+add_subdirectory(Deps/rcb4-base-class)
+add_subdirectory(Deps/roki-mb-service)
 
 if(USE_MB_MOCK)
   message(INFO " Using hardware mocks")
@@ -23,35 +25,37 @@ else()
   add_library(rcb4base ALIAS rcb4base_impl)
 endif()
 
-#add_definitions(-DDBGMB=1)
+if(DEBUG_MB)
+  add_compile_definitions(DBGMB)
+endif()
 
-include_directories(inc/)
+include_directories(Inc/)
 
-add_library(DescriptorWrapper src/Helpers/DescriptorWrapper.cpp)
+add_library(DescriptorWrapper Src/Helpers/DescriptorWrapper.cpp)
 
-add_library(MbSerial src/MbSerial.cpp)
+add_library(MbSerial Src/MbSerial.cpp)
 target_link_libraries(MbSerial PUBLIC DescriptorWrapper)
 
-add_library(MbClient src/MbClient.cpp)
+add_library(MbClient Src/MbClient.cpp)
 target_link_libraries(MbClient PUBLIC MbSerial)
 
-add_library(IMUFrame src/Helpers/IMUFrame.cpp)
+add_library(IMUFrame Src/Helpers/IMUFrame.cpp)
 target_link_libraries(IMUFrame PUBLIC MbService)
 
-add_library(Motherboard src/Motherboard.cpp)
+add_library(Motherboard Src/Motherboard.cpp)
 target_link_libraries(Motherboard PUBLIC MbService MbClient IMUFrame)
 
-add_library(RokiRcb4 src/RokiRcb4.cpp)
+add_library(RokiRcb4 Src/RokiRcb4.cpp)
 target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
 
-add_library(Zubr src/Zubr.cpp)
+add_library(Zubr Src/Zubr.cpp)
 target_link_libraries(Zubr PUBLIC Motherboard)
 
-add_library(MotherboardAdapter src/MotherboardAdapter.cpp)
+add_library(MotherboardAdapter Src/MotherboardAdapter.cpp)
 target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
 
-add_library(RokiRcb4Adapter src/RokiRcb4Adapter.cpp)
+add_library(RokiRcb4Adapter Src/RokiRcb4Adapter.cpp)
 target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 
-add_library(ZubrAdapter src/ZubrAdapter.cpp)
+add_library(ZubrAdapter Src/ZubrAdapter.cpp)
 target_link_libraries(ZubrAdapter PUBLIC Zubr)
