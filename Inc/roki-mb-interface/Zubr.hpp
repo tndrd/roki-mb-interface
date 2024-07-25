@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Motherboard.hpp"
+#include "roki-mb-interface/Motherboard.hpp"
 #include <array>
 #include <numeric>
 

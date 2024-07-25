@@ -1,4 +1,4 @@
-#include "Helpers/DescriptorWrapper.hpp"
+#include "roki-mb-interface/Helpers/DescriptorWrapper.hpp"
 
 namespace Roki {
 namespace Helpers {

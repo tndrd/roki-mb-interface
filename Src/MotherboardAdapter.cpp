@@ -1,4 +1,4 @@
-#include "MotherboardAdapter.hpp"
+#include "roki-mb-interface/MotherboardAdapter.hpp"
 
 namespace Roki
 {

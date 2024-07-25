@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Motherboard.hpp"
-#include "Rcb4BaseClass.hpp"
+#include "roki-mb-interface/Motherboard.hpp"
+#include "rcb4-base-class/Rcb4BaseClass.hpp"
 
 namespace Roki {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RokiRcb4.hpp"
+#include "roki-mb-interface/RokiRcb4.hpp"
 #include <tuple>
 
 namespace Roki

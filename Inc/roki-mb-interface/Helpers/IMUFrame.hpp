@@ -1,5 +1,5 @@
 #pragma once
-#include "MbMessages.hpp"
+#include "roki-mb-service/MbMessages.hpp"
 
 namespace Roki {
 namespace Helpers {

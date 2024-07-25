@@ -1,4 +1,4 @@
-#include "RokiRcb4Adapter.hpp"
+#include "roki-mb-interface/RokiRcb4Adapter.hpp"
 
 namespace Roki
 {

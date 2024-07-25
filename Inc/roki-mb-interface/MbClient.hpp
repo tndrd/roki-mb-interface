@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MbSerial.hpp"
+#include "roki-mb-interface/MbSerial.hpp"
 #include <array>
 
 namespace Roki {

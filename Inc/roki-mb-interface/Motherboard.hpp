@@ -1,9 +1,9 @@
 #pragma once
 
-#include "MbAliases.hpp"
-#include "MbClient.hpp"
-#include "MbService.hpp"
-#include "Version.hpp"
+#include "roki-mb-interface/MbAliases.hpp"
+#include "roki-mb-interface/MbClient.hpp"
+#include "roki-mb-service/MbService.hpp"
+#include "roki-mb-interface/Version.hpp"
 
 #include <mutex>
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MbMessages.hpp"
-#include "MbSerial.hpp"
-#include "Helpers/IMUFrame.hpp"
+#include "roki-mb-service/MbMessages.hpp"
+#include "roki-mb-interface/MbSerial.hpp"
+#include "roki-mb-interface/Helpers/IMUFrame.hpp"
 
 namespace Roki {
     using IMUFrame = Helpers::IMUFrame;
