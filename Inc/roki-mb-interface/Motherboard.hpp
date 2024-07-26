@@ -6,6 +6,7 @@
 #include "roki-mb-service/MbService.hpp"
 
 #include <mutex>
+#include <memory>
 
 namespace MbInterface {
 
@@ -18,7 +19,7 @@ private:
   MbSerial Serial;
   MbClient Client;
 
-  std::mutex Mutex;
+  std::unique_ptr<std::mutex> Mutex;
 
 private:
   using Proc = MbService::Procedures;
@@ -29,7 +30,7 @@ private:
   bool GetVersion_NoLock(Version &result);
 
 public:
-  Motherboard() = default;
+  Motherboard();
   bool Configure(const TTYConfig &serviceConfig);
 
   bool GetIMUFrame(uint16_t seq, IMUFrame &result);
@@ -60,6 +61,15 @@ public:
 
   bool IsOk() const;
   std::string GetError() const;
+
+  virtual ~Motherboard() = default;
+
+  Motherboard(const Motherboard&) = delete;
+  Motherboard& operator=(const Motherboard&) = delete;
+
+  Motherboard(Motherboard&&) = default;
+  Motherboard& operator=(Motherboard&&) = default;
+
 };
 
 } // namespace MbInterface

@@ -62,4 +62,6 @@ bool Motherboard::MakeFooError(const std::string &fooName,
   return false;
 }
 
+Motherboard::Motherboard(): Mutex{std::make_unique<std::mutex>()} {};
+
 } // namespace MbInterface

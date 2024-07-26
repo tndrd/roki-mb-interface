@@ -35,7 +35,7 @@ bool CheckVersion(Version version) {
 
 #define FOO_ERROR(msg) MakeFooError(__func__, msg)
 #define CHECK_CLIENT_ERROR ok ? true : FOO_ERROR(Client.GetError())
-#define CREATE_GUARD std::lock_guard<std::mutex> _(Mutex)
+#define CREATE_GUARD std::lock_guard<std::mutex> _(*Mutex)
 
 bool Motherboard::Configure(const TTYConfig &config) {
   CREATE_GUARD;
@@ -244,5 +244,7 @@ bool Motherboard::ResetBodyQueue() {
 
 bool Motherboard::IsOk() const { return HasError; }
 std::string Motherboard::GetError() const { return Error; }
+
+Motherboard::Motherboard(): Mutex{std::make_unique<std::mutex>()} {};
 
 } // namespace MbInterface

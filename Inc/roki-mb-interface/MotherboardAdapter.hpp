@@ -38,6 +38,14 @@ public:
   bool ResetBodyQueue();
 
   Ret<Version> GetVersion();
+
+  virtual ~MotherboardAdapter() = default;
+
+  MotherboardAdapter(const MotherboardAdapter &) = delete;
+  MotherboardAdapter &operator=(const MotherboardAdapter &) = delete;
+
+  MotherboardAdapter(MotherboardAdapter &&) = default;
+  MotherboardAdapter &operator=(MotherboardAdapter &&) = default;
 };
 
 } // namespace MbInterface
