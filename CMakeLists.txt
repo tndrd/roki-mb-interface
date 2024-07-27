@@ -3,6 +3,14 @@ cmake_minimum_required(VERSION 3.8)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Werror")
 
+function(ASSERT_VAR VARNAME)
+  if (NOT DEFINED ${VARNAME})
+    message(FATAL_ERROR ${VARNAME} " var is not set")
+  endif()
+endfunction()
+
+ASSERT_VAR(MODULE_NAME)
+
 if(DEFINED ENV{ROKI_USE_HARDWARE_MOCKS})
   set(USE_MB_MOCK ON)
 else()
@@ -45,31 +53,26 @@ target_link_libraries(MbSerial PUBLIC DescriptorWrapper)
 add_library(MbClient Src/MbClient.cpp)
 target_link_libraries(MbClient PUBLIC MbSerial)
 
-add_library(Motherboard Src/Motherboard.cpp)
-target_link_libraries(Motherboard PUBLIC MbService MbClient IMUFrame)
+add_library(MotherboardBase Src/Motherboard.cpp)
+target_link_libraries(MotherboardBase PUBLIC MbService MbClient IMUFrame)
 
 add_library(MotherboardAdapter Src/MotherboardAdapter.cpp)
-target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
+target_link_libraries(MotherboardAdapter PUBLIC MotherboardBase)
+target_include_directories(MotherboardAdapter PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Inc/>
+  $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 # Protocols
 
 add_library(RokiRcb4 Src/Protocols/RokiRcb4.cpp)
-target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
+target_link_libraries(RokiRcb4 PUBLIC rcb4base MotherboardBase)
 
 add_library(Zubr Src/Protocols/Zubr.cpp)
-target_link_libraries(Zubr PUBLIC Motherboard)
+target_link_libraries(Zubr PUBLIC MotherboardBase)
 
 add_library(RokiRcb4Adapter Src/Protocols/RokiRcb4Adapter.cpp)
 target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 
 add_library(ZubrAdapter Src/Protocols/ZubrAdapter.cpp)
 target_link_libraries(ZubrAdapter PUBLIC Zubr)
-
-# Exported targets
-add_library(roki-mb-interface INTERFACE)
-target_link_libraries(roki-mb-interface INTERFACE MotherboardAdapter)
-target_include_directories(roki-mb-interface INTERFACE Inc/)
-
-add_library(roki-mb-protocols INTERFACE)
-target_link_libraries(roki-mb-protocols INTERFACE RokiRcb4Adapter ZubrAdapter)
-target_include_directories(roki-mb-protocols INTERFACE Inc/)
