@@ -146,7 +146,4 @@ namespace Roki
     bool result = Motherboard::GetVersion(version);
     return {result, version};
   }
-
-  bool MbAdapterDefaultConfig(MotherboardAdapter &mb) { return MbDefaultConfig(mb); }
-
 } // namespace Roki

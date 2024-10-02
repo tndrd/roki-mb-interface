@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Motherboard.hpp"
-#include "MbDefaultConfig.hpp"
 #include <limits>
 #include <tuple>
 
@@ -40,7 +39,5 @@ public:
 
   Ret<Version> GetVersion();
 };
-
-bool MbAdapterDefaultConfig(MotherboardAdapter& mb);
 
 } // namespace Roki

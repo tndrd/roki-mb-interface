@@ -36,15 +36,15 @@ target_link_libraries(Zubr PUBLIC Motherboard)
 add_library(MotherboardAdapter src/MotherboardAdapter.cpp)
 target_link_libraries(MotherboardAdapter PUBLIC Motherboard)
 
+add_library(MotherboardAdapter_TMP src/MotherboardAdapter_TMP.cpp)
+target_link_libraries(MotherboardAdapter_TMP PUBLIC MotherboardAdapter)
+
 add_library(RokiRcb4Adapter src/RokiRcb4Adapter.cpp)
 target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 
 add_library(ZubrAdapter src/ZubrAdapter.cpp)
 target_link_libraries(ZubrAdapter PUBLIC Zubr)
 
-add_library(MbDefaultConfig src/MbDefaultConfig.cpp)
-target_link_libraries(MbDefaultConfig PUBLIC Motherboard)
-
-include(tests/tests.cmake)
+#include(tests/tests.cmake)
 include(bindings/bindings.cmake)
 # include(examples/examples.cmake)

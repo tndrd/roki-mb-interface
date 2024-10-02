@@ -1,8 +1,8 @@
 #include "MotherboardAdapter.hpp"
-#include "MbDefaultConfig.hpp"
 #include "PyBinding.hpp"
 #include "RokiRcb4Adapter.hpp"
 #include "ZubrAdapter.hpp"
+#include "MotherboardAdapter_TMP.hpp"
 
 using namespace Roki;
 
@@ -37,8 +37,8 @@ PYBIND11_MODULE(Roki, m) {
 
   py::class_<BodyQueueInfo>(m, "BodyQueueInfo")
       .def(py::init<>())
-      .def_readwrite("Size", &BodyQueueInfo::Size)
-      .def_readwrite("Capacity", &BodyQueueInfo::Capacity);
+      .def_readwrite("NumRequests", &BodyQueueInfo::Size)
+      .def_readwrite("NumResponces", &BodyQueueInfo::Capacity);
 
   py::enum_<MbSerial::TTYConfig::StopbitsCount>(m, "Stopbits", py::arithmetic())
       .value("One", MbSerial::TTYConfig::StopbitsCount::One)
@@ -52,28 +52,26 @@ PYBIND11_MODULE(Roki, m) {
       .def_readwrite("ParityBit", &MbSerial::TTYConfig::ParityBit)
       .def_readwrite("Timeout", &MbSerial::TTYConfig::Timeout);
 
-  using MA = MotherboardAdapter;
+  using MA = MotherboardAdapter_TMP;
 
   py::class_<MA>(m, "Motherboard")
       .def(py::init<>())
       .def("Configure", &MA::Configure)
-      .def("GetIMUFrame", &MA::GetIMUFrame)
-      .def("GetBodyFrame", &MA::GetBodyFrame)
-      .def("GetIMUContainerInfo", &MA::GetIMUContainerInfo)
-      .def("GetBodyContainerInfo", &MA::GetBodyContainerInfo)
-      .def("ResetStrobeContainers", &MA::ResetStrobeContainers)
-      .def("SetIMUStrobeOffset", &MA::SetIMUStrobeOffset)
-      .def("SetBodyStrobeOffset", &MA::SetBodyStrobeOffset)
-      .def("GetIMULatest", &MA::GetIMULatest)
+      .def("GetOrientationBySeq", &MA::GetIMUFrame)
+      //.def("GetBodyFrame", &MA::GetBodyFrame)
+      .def("GetIMUInfo", &MA::GetIMUContainerInfo)
+      //.def("GetBodyContainerInfo", &MA::GetBodyContainerInfo)
+      .def("ResetIMUCounter", &MA::ResetStrobeContainers)
+      .def("SetStrobeOffset", &MA::SetIMUStrobeOffset)
+      //.def("SetBodyStrobeOffset", &MA::SetBodyStrobeOffset)
+      .def("GetCurrentOrientation", &MA::GetIMULatest)
       .def("GetStrobeWidth", &MA::GetStrobeWidth)
       .def("ConfigureStrobeFilter", &MA::ConfigureStrobeFilter)
-      .def("GetBodyQueueInfo", &MA::GetBodyQueueInfo)
-      .def("SetBodyQueuePeriod", &MA::SetBodyQueuePeriod)
-      .def("IsOk", &MA::IsOk)
-      .def("GetError", &MA::GetError)
-      .def("ResetBodyQueue", &MA::ResetBodyQueue);
-
-  m.def("MbDefaultConfig", &MbAdapterDefaultConfig);
+      .def("GetQueueInfo", &MA::GetBodyQueueInfo)
+      .def("SetQueuePeriod", &MA::SetBodyQueuePeriod)
+      //.def("IsOk", &MA::IsOk)
+      //.def("GetError", &MA::GetError)
+      .def("ResetQueue", &MA::ResetBodyQueue);
   
   /* Rcb4 */
 
@@ -87,7 +85,7 @@ PYBIND11_MODULE(Roki, m) {
       .def_readwrite("Sio", &Rcb4::ServoData::Sio)
       .def_readwrite("Data", &Rcb4::ServoData::Data);
 
-  rcb4.def(py::init<MotherboardAdapter &>());
+  rcb4.def(py::init<MA&>());
   rcb4.def("checkAcknowledge", &Rcb4::checkAcknowledge);
   rcb4.def("getPio", &Rcb4::getPio);
   rcb4.def("setPio", &Rcb4::setPio);
