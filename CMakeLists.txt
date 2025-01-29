@@ -23,6 +23,7 @@ project(RokiMotherboard)
 
 add_subdirectory(Deps/rcb4-base-class)
 add_subdirectory(Deps/roki-mb-service)
+add_subdirectory(Deps/starkit-servo-control)
 
 if(USE_MB_MOCK)
   message(INFO " Using hardware mocks")
