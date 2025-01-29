@@ -17,7 +17,7 @@ bool Zubr::MakePrefixError(const std::string &prefix,
 
 Zubr::Zubr(MbInterface::Motherboard &mb) : Mboard{&mb} {}
 
-bool Zubr::IsOk() const { return HasError; }
+bool Zubr::IsOk() const { return !HasError; }
 std::string Zubr::GetError() const { return HasError ? Error : "No error"; }
 
 uint8_t Zubr::EvalCheckSum() const {

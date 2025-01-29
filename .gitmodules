@@ -4,3 +4,6 @@
 [submodule "deps/roki-mb-service"]
 	path = Deps/roki-mb-service
 	url = https://github.com/tndrd/roki-mb-service.git
+[submodule "Deps/starkit-servo-control"]
+	path = Deps/starkit-servo-control
+	url = https://github.com/tndrd/starkit-servo-control.git
