@@ -1,17 +1,15 @@
 #pragma once
 
 #include "roki-mb-interface/MbSerial.hpp"
+#include "roki-mb-interface/Helpers/MbError.hpp"
 #include <array>
 
 namespace MbInterface {
 
-struct MbClient {
+struct MbClient final: public MbError {
 private:
   static constexpr size_t BufferSize = 256;
   std::array<uint8_t, BufferSize> RequestBuffer;
-
-  bool HasError = false;
-  std::string Error;
 
 private:
   template <typename Proc> using Request = typename Proc::RequestType;
@@ -21,16 +19,9 @@ private:
 
   template <typename Proc> using ErrorType = typename ErrorCodes<Proc>::Type;
 
-private:
-  bool MakeError(const std::string &msg) {
-    HasError = true;
-    Error = msg;
-    return false;
-  }
-
 public:
-  bool IsOk() const;
-  std::string GetError() const;
+
+  MbClient();
 
   template <typename Proc>
   bool PerformRPC(MbSerial &serial, const Request<Proc> &request,
@@ -57,7 +48,7 @@ public:
       return MakeError(ErrorCodes<Proc>::GetDescription(error));
 
     responce = Responce<Proc>::Deserialize(inPackage.Data);
-    return true;
+    return MakeSuccess();
   }
 };
 } // namespace MbInterface

@@ -42,14 +42,17 @@ include_directories(Inc/)
 
 # Helpers
 add_library(DescriptorWrapper Src/Helpers/DescriptorWrapper.cpp)
+add_library(MbError Src/Helpers/MbError.cpp)
 
 add_library(IMUFrame Src/Helpers/IMUFrame.cpp)
 target_link_libraries(IMUFrame PUBLIC MbService)
 
+
+
 # Base Motherboard class
 
 add_library(MbSerial Src/MbSerial.cpp)
-target_link_libraries(MbSerial PUBLIC DescriptorWrapper)
+target_link_libraries(MbSerial PUBLIC DescriptorWrapper MbError)
 
 add_library(MbClient Src/MbClient.cpp)
 target_link_libraries(MbClient PUBLIC MbSerial)

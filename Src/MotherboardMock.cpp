@@ -51,17 +51,7 @@ bool Motherboard::GetVersion(Version &result) MOCK_RESULT;
 
 bool Motherboard::ResetBodyQueue() MOCK;
 
-bool Motherboard::IsOk() const MOCK;
-
-std::string Motherboard::GetError() const { return "OK"; }
-
-bool Motherboard::MakeError(const std::string &msg) { return false; }
-
-bool Motherboard::MakeFooError(const std::string &fooName,
-                               const std::string &msg) {
-  return false;
-}
-
-Motherboard::Motherboard(): Mutex{std::make_unique<std::mutex>()} {};
+Motherboard::Motherboard()
+    : Mutex{std::make_unique<std::mutex>()}, MbError{"Motherboard MOCK"} {};
 
 } // namespace MbInterface

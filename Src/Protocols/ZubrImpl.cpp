@@ -2,23 +2,9 @@
 
 namespace MbProtocols {
 
-bool Zubr::MakeError(const std::string &msg) const {
-  HasError = true;
-  Error = "Zubr: " + msg;
-  return false;
-}
-
-bool Zubr::MakePrefixError(const std::string &prefix,
-                           const std::string &msg) const {
-  return MakeError(prefix + ": " + msg);
-}
-
 #define FOO_ERROR(msg) MakePrefixError(__func__, msg)
 
-Zubr::Zubr(MbInterface::Motherboard &mb) : Mboard{&mb} {}
-
-bool Zubr::IsOk() const { return !HasError; }
-std::string Zubr::GetError() const { return HasError ? Error : "No error"; }
+Zubr::Zubr(MbInterface::Motherboard &mb) : Mboard{&mb}, MbError{"Zubr"} {}
 
 uint8_t Zubr::EvalCheckSum() const {
   uint8_t len = Buffer[0];
@@ -77,7 +63,7 @@ bool Zubr::Synchronize(uint8_t responceSize) {
   if (!ret)
     return FOO_ERROR(Mboard->GetError());
 
-  return true;
+  return MakeSuccess();
 }
 
 #undef FOO_ERROR

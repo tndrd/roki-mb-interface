@@ -2,11 +2,7 @@
 
 namespace MbInterface {
 
-bool MbSerial::MakeError(const std::string &msg) {
-  Error = msg;
-  HasError = true;
-  return false;
-}
+MbSerial::MbSerial() : MbError{"MbSerial"} {}
 
 bool MbSerial::MakeTTYError(const TTYConfig &tty, const std::string &msg) {
   return MakeError("Port " + tty.Port + ": " + msg + ": " +
@@ -43,7 +39,7 @@ bool MbSerial::Read(uint8_t *buf, size_t size) {
       return MakeError("Port " + TTY.Port + ": Read timeout");
     total += ret;
   }
-  return true;
+  return MakeSuccess();
 }
 
 bool MbSerial::Write(const uint8_t *buf, size_t size) {
@@ -56,12 +52,10 @@ bool MbSerial::Write(const uint8_t *buf, size_t size) {
       return MakeError("Port " + TTY.Port + ": Write timeout");
     total += ret;
   }
-  return true;
+  return MakeSuccess();
 }
 
 bool MbSerial::ReadToBuf(size_t size) { return Read(Buffer.data(), size); }
-bool MbSerial::IsOk() const { return !HasError; }
-std::string MbSerial::GetError() const { return Error; }
 
 bool MbSerial::Configure(const TTYConfig &ttyConfig) {
 
@@ -117,7 +111,7 @@ bool MbSerial::Configure(const TTYConfig &ttyConfig) {
 
   Fd = std::move(newFd);
   TTY = ttyConfig;
-  return true;
+  return MakeSuccess();
 }
 
 bool MbSerial::Send(const OutPackage &package) {
@@ -220,7 +214,7 @@ bool MbSerial::Receive(InPackage &package) {
   std::cout << "Package OK\n" << std::endl;
 #endif
 
-  return true;
+  return MakeSuccess();
 }
 
 } // namespace MbInterface

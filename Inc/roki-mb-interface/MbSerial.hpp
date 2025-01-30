@@ -15,10 +15,11 @@
 
 #include "Helpers/DescriptorWrapper.hpp"
 #include "Version.hpp"
+#include "roki-mb-interface/Helpers/MbError.hpp"
 
 namespace MbInterface {
 
-class MbSerial final {
+class MbSerial final : public MbError {
 public:
   struct TTYConfig final {
     std::string Port;
@@ -59,11 +60,7 @@ private:
   Helpers::DescriptorWrapper Fd;
   TTYConfig TTY;
 
-  bool HasError = false;
-  std::string Error;
-
 private:
-  bool MakeError(const std::string &msg);
   bool MakeTTYError(const TTYConfig &tty, const std::string &msg);
   void SerializePackageToBuf(const OutPackage &package, size_t *size);
   bool Read(uint8_t *buf, size_t size);
@@ -71,16 +68,13 @@ private:
   bool ReadToBuf(size_t size);
 
 public:
-  MbSerial() = default;
+  MbSerial();
 
   MbSerial(const MbSerial &) = delete;
   MbSerial &operator=(const MbSerial &) = delete;
 
   MbSerial(MbSerial &&) = default;
   MbSerial &operator=(MbSerial &&) = default;
-
-  bool IsOk() const;
-  std::string GetError() const;
 
   bool Configure(const TTYConfig &ttyConfig);
 

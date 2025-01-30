@@ -1,12 +1,13 @@
 #pragma once
 
 #include "roki-mb-interface/Motherboard.hpp"
+#include "roki-mb-interface/Helpers/MbError.hpp"
 #include <array>
 #include <numeric>
 
 namespace MbProtocols {
 
-class Zubr {
+class Zubr: public MbInterface::MbError {
 public:
   using AddrT = uint16_t;
   static constexpr size_t DataWidth = 4;
@@ -27,18 +28,8 @@ private:
   MbInterface::Motherboard *Mboard;
   std::array<uint8_t, BufSize> Buffer;
 
-  mutable bool HasError = false;
-  mutable std::string Error;
-
-protected:
-  bool MakeError(const std::string &msg) const;
-  bool MakePrefixError(const std::string &prefix, const std::string &msg) const;
-
 public:
   Zubr(MbInterface::Motherboard &mb);
-
-  bool IsOk() const;
-  std::string GetError() const;
 
 private:
   uint8_t EvalCheckSum() const;
@@ -77,7 +68,7 @@ public:
     assert(data);
     value = *reinterpret_cast<const ValueT *>(data);
 #endif
-    return true;
+    return MakeSuccess();
   }
 };
 

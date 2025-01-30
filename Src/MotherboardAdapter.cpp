@@ -8,12 +8,6 @@ using MA = MotherboardAdapter;
     false, {}                                                                  \
   }
 
-bool MA::MakeError(const std::string &msg) {
-  HasError = true;
-  Error = msg;
-  return false;
-}
-
 template <typename T> bool MA::CheckIntBoundaries(int value) {
   static const char *msg = "Inappropriate argument value";
 
@@ -23,7 +17,7 @@ template <typename T> bool MA::CheckIntBoundaries(int value) {
   if (value > std::numeric_limits<T>::max())
     return MakeError(msg);
 
-  return true;
+  return MakeSuccess();
 }
 
 MA::Ret<IMUFrame> MA::GetIMUFrame(int seq) {

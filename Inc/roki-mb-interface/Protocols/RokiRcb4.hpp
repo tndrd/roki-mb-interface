@@ -1,24 +1,17 @@
 #pragma once
 
 #include "rcb4-base-class/Rcb4BaseClass.hpp"
+#include "roki-mb-interface/Helpers/MbError.hpp"
 #include "roki-mb-interface/Motherboard.hpp"
 
 namespace MbProtocols {
 
-class RokiRcb4 : public Rcb4BaseClass {
+class RokiRcb4 : public Rcb4BaseClass, public MbInterface::MbError {
 private:
   MbInterface::Motherboard *Mboard;
 
-  bool HasError = false;
-  std::string Error;
-
-private:
-  bool MakeError(const std::string &msg);
-
 public:
   RokiRcb4(MbInterface::Motherboard &mb);
-  bool IsOk() const;
-  std::string GetError() const;
 
 private:
   virtual bool synchronize(byte txBuf[], byte txLen, byte rxBuf[],

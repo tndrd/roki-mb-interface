@@ -5,15 +5,12 @@
 #include "roki-mb-interface/Version.hpp"
 #include "roki-mb-service/MbService.hpp"
 
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 namespace MbInterface {
 
-class Motherboard {
-protected:
-  bool HasError = false;
-  std::string Error;
+class Motherboard : public MbError {
 
 private:
   MbSerial Serial;
@@ -25,8 +22,6 @@ private:
   using Proc = MbService::Procedures;
 
 private:
-  bool MakeError(const std::string &msg);
-  bool MakeFooError(const std::string &fooName, const std::string &msg);
   bool GetVersion_NoLock(Version &result);
 
 public:
@@ -59,17 +54,13 @@ public:
 
   bool GetVersion(Version &result);
 
-  bool IsOk() const;
-  std::string GetError() const;
-
   virtual ~Motherboard() = default;
 
-  Motherboard(const Motherboard&) = delete;
-  Motherboard& operator=(const Motherboard&) = delete;
+  Motherboard(const Motherboard &) = delete;
+  Motherboard &operator=(const Motherboard &) = delete;
 
-  Motherboard(Motherboard&&) = default;
-  Motherboard& operator=(Motherboard&&) = default;
-
+  Motherboard(Motherboard &&) = default;
+  Motherboard &operator=(Motherboard &&) = default;
 };
 
 } // namespace MbInterface

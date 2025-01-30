@@ -5,15 +5,7 @@ using namespace MbProtocols;
 #define MOCK(ret)                                                              \
   { return ret; }
 
-bool Zubr::MakeError(const std::string &msg) const MOCK(false);
-
-bool Zubr::MakePrefixError(const std::string &prefix,
-                           const std::string &msg) const MOCK(false);
-
-Zubr::Zubr(MbInterface::Motherboard &mb) : Mboard{&mb} {}
-
-bool Zubr::IsOk() const MOCK(true);
-std::string Zubr::GetError() const MOCK("OK");
+Zubr::Zubr(MbInterface::Motherboard &mb) : Mboard{&mb}, MbError{"Zubr MOCK"} {}
 
 uint8_t Zubr::EvalCheckSum() const MOCK(0);
 

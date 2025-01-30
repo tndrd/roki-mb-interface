@@ -5,7 +5,7 @@
 
 namespace MbProtocols {
 
-class ZubrAdapter : public Zubr {
+class ZubrAdapter final : public Zubr {
 public:
   ZubrAdapter(MbInterface::Motherboard &mb);
 

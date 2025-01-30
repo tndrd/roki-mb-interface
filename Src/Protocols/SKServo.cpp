@@ -17,15 +17,7 @@ void SKServo::MBoardIOImpl::Synchronize(const uint8_t *reqBuf, uint8_t reqSz,
     throw std::runtime_error("Motherboard: " + Mboard->GetError());
 }
 
-bool SKServo::MakeError(const std::string &msg) const {
-  HasError = true;
-  Error = "SKServo: " + msg;
-  return false;
-}
 
-SKServo::SKServo(MbInterface::Motherboard &mboard) : MBIO{mboard} {}
-
-bool SKServo::IsOk() const { return !HasError; }
-std::string SKServo::GetError() const { return HasError ? Error : "Ok"; }
+SKServo::SKServo(MbInterface::Motherboard &mboard) : MBIO{mboard}, MbError{"SKServo"} {}
 
 } // namespace MbProtocols

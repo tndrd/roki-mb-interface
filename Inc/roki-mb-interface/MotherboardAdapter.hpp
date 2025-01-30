@@ -8,8 +8,6 @@ namespace MbInterface {
 
 class MotherboardAdapter : public Motherboard {
 private:
-  bool MakeError(const std::string &msg);
-
   template <typename T> bool CheckIntBoundaries(int value);
 
   template <typename T> using Ret = typename std::tuple<bool, T>;

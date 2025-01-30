@@ -5,7 +5,7 @@
 
 namespace MbProtocols {
 
-class SKServoAdapter : public SKServo {
+class SKServoAdapter final : public SKServo {
 private:
   template <typename T> bool CheckParam(int param, const char *pname);
 

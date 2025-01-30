@@ -5,7 +5,7 @@
 
 namespace MbProtocols {
 
-class RokiRcb4Adapter : public RokiRcb4 {
+class RokiRcb4Adapter final : public RokiRcb4 {
 public:
   RokiRcb4Adapter(MbInterface::Motherboard &mb);
 

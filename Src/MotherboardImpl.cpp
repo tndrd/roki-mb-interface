@@ -2,17 +2,6 @@
 
 namespace MbInterface {
 
-bool Motherboard::MakeError(const std::string &msg) {
-  HasError = true;
-  Error = msg;
-  return false;
-}
-
-bool Motherboard::MakeFooError(const std::string &fooName,
-                               const std::string &msg) {
-  return MakeError(fooName + ": " + msg);
-}
-
 std::string VersionToString(Version version) {
   return "v" + std::to_string(version.Major) + "." +
          std::to_string(version.Minor);
@@ -33,8 +22,8 @@ bool CheckVersion(Version version) {
   return false;
 }
 
-#define FOO_ERROR(msg) MakeFooError(__func__, msg)
-#define CHECK_CLIENT_ERROR ok ? true : FOO_ERROR(Client.GetError())
+#define FOO_ERROR(msg) MakePrefixError(__func__, msg)
+#define CHECK_CLIENT_ERROR ok ? MakeSuccess() : FOO_ERROR(Client.GetError())
 #define CREATE_GUARD std::lock_guard<std::mutex> _(*Mutex)
 
 bool Motherboard::Configure(const TTYConfig &config) {
@@ -51,7 +40,7 @@ bool Motherboard::Configure(const TTYConfig &config) {
     return FOO_ERROR("Version conflict: library " + LibraryVersionToString() +
                      " firmware " + VersionToString(version));
 
-  return true;
+  return MakeSuccess();
 }
 
 bool Motherboard::GetIMUFrame(uint16_t seq, IMUFrame &result) {
@@ -242,9 +231,7 @@ bool Motherboard::ResetBodyQueue() {
 #undef FOO_ERROR
 #undef CREATE_GUARD
 
-bool Motherboard::IsOk() const { return HasError; }
-std::string Motherboard::GetError() const { return Error; }
-
-Motherboard::Motherboard(): Mutex{std::make_unique<std::mutex>()} {};
+Motherboard::Motherboard()
+    : Mutex{std::make_unique<std::mutex>()}, MbError{"Motherboard"} {};
 
 } // namespace MbInterface

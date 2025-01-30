@@ -11,7 +11,7 @@ bool SKServoAdapter::CheckParam(int param, const char *pname) {
   T max = std::numeric_limits<T>::max();
 
   if (param >= min && param <= max)
-    return true;
+    return MakeSuccess();
 
   return MakeError(std::string{"Parameter \""} + pname +
                    "\" doesn't fit in corresponding C++ type");

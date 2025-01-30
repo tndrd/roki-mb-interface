@@ -1,11 +1,13 @@
 #pragma once
 #include "SKSBase/SKSBase.hpp"
+#include "roki-mb-interface/Helpers/MbError.hpp"
 #include "roki-mb-interface/Motherboard.hpp"
 #include <stdexcept>
 #include <string>
 
+
 namespace MbProtocols {
-class SKServo {
+class SKServo : public MbInterface::MbError {
 public:
   using Procedures = StarkitServo::SKSBase::Procedures;
 
@@ -25,12 +27,6 @@ private:
   MBoardIOImpl MBIO;
   StarkitServo::SKSBase Servo;
 
-  mutable bool HasError = false;
-  mutable std::string Error;
-
-private:
-  bool MakeError(const std::string &msg) const;
-
 public:
   // Yup that's ugly but idk how to implement it prettier
   // in "we don't use exceptions" paradigm.
@@ -40,7 +36,7 @@ public:
   bool Call(const typename Proc::Request &req, typename Proc::Request &rsp) {
     try {
       rsp = Servo.Call<Proc>(MBIO, req);
-      return true;
+      return MakeSuccess();
     } catch (std::exception &e) {
       return MakeError(e.what());
     }
@@ -48,9 +44,6 @@ public:
 
 public:
   SKServo(MbInterface::Motherboard &mboard);
-
-  bool IsOk() const;
-  std::string GetError() const;
 
   SKServo(const SKServo &) = delete;
   SKServo &operator=(const SKServo &) = delete;
