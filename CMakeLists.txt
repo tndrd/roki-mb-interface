@@ -77,3 +77,9 @@ target_link_libraries(RokiRcb4Adapter PUBLIC RokiRcb4)
 
 add_library(ZubrAdapter Src/Protocols/ZubrAdapter.cpp)
 target_link_libraries(ZubrAdapter PUBLIC Zubr)
+
+add_library(SKServo Src/Protocols/SKServo.cpp)
+target_link_libraries(SKServo PUBLIC SKSBase MotherboardBase)
+
+add_library(SKServoAdapter Src/Protocols/SKServoAdapter.cpp)
+target_link_libraries(SKServoAdapter PUBLIC SKServo)

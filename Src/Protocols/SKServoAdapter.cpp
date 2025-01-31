@@ -1,4 +1,3 @@
-#pragma once
 #include "roki-mb-interface/Protocols/SKServoAdapter.hpp"
 
 namespace MbProtocols {
