@@ -11,7 +11,6 @@
 namespace MbInterface {
 
 class Motherboard : public MbError {
-
 private:
   MbSerial Serial;
   MbClient Client;
@@ -53,6 +52,15 @@ public:
   bool ResetBodyQueue();
 
   bool GetVersion(Version &result);
+
+  bool SetBodyTimeout(uint16_t timeoutMs);
+  bool EnableBodyARQ(const uint8_t *nackBuf, uint8_t nackSz, uint8_t attemptC);
+  bool DisableBodyARQ();
+
+  bool SetBodyStrobeCallback(const uint8_t *requestData, uint8_t reqSize,
+                             uint8_t rspSize);
+  bool ResetBodyStrobeCallback();
+
 
   virtual ~Motherboard() = default;
 

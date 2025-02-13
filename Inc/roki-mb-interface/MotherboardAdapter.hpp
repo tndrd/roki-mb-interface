@@ -11,17 +11,16 @@ private:
   template <typename T> bool CheckIntBoundaries(int value);
 
   template <typename T> using Ret = typename std::tuple<bool, T>;
+  using Buffer = std::vector<uint8_t>;
 
 public:
   MotherboardAdapter() = default;
 
   Ret<IMUFrame> GetIMUFrame(int seq);
-  Ret<std::vector<uint8_t>> GetBodyFrame(int seq);
+  Ret<Buffer> GetBodyFrame(int seq);
 
   Ret<FrameContainerInfo> GetIMUContainerInfo();
   Ret<FrameContainerInfo> GetBodyContainerInfo();
-
-  bool ResetStrobeContainers();
 
   bool SetIMUStrobeOffset(int offset);
   bool SetBodyStrobeOffset(int offset);
@@ -33,9 +32,10 @@ public:
 
   Ret<BodyQueueInfo> GetBodyQueueInfo();
   bool SetBodyQueuePeriod(int periodMs);
-  bool ResetBodyQueue();
 
   Ret<Version> GetVersion();
+
+  bool SetBodyTimeout(int timeoutMs);
 
   virtual ~MotherboardAdapter() = default;
 

@@ -1,5 +1,9 @@
 #include "roki-mb-interface/Protocols/SKServoAdapter.hpp"
 
+// Locally disabling this warning, because
+// We implicitly check the correctness of conversions
+#pragma GCC diagnostic ignored "-Wnarrowing"
+
 namespace MbProtocols {
 
 using P = SKServo::Procedures;
@@ -19,7 +23,7 @@ bool SKServoAdapter::CheckParam(int param, const char *pname) {
 #define RSPTPL(proc) std::tuple<bool, P::proc::Responce>
 
 #define VALIDATE(param, type)                                                  \
-  if (!CheckParam<type>(param), #param)                                        \
+  if (!CheckParam<type>(param, #param))                                        \
     return {false, {}};
 #define CHECK_ID VALIDATE(id, uint8_t)
 

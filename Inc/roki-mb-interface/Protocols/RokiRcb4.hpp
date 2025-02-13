@@ -8,6 +8,18 @@ namespace MbProtocols {
 
 class RokiRcb4 : public Rcb4BaseClass, public MbInterface::MbError {
 private:
+  // Hardcoded NACK sequence
+  static constexpr uint8_t NACK[] = {0x4, 0xFE, 0x15, 0x17};
+
+  // Hardcoded GetAllPostions request
+  struct GetAllPosRequest {
+    static constexpr uint8_t Data[] = {0xA, 0,    0x20, 0,    0,
+                                       0,   0x70, 0,    0x1E, 0xB8};
+    static constexpr uint8_t ReqSize = sizeof(Data);
+    static constexpr uint8_t RspSize = 33;
+  };
+
+private:
   MbInterface::Motherboard *Mboard;
 
 public:
@@ -27,5 +39,8 @@ public:
   bool motionPlay(int motionNum);
 
   bool moveRamToComCmdSynchronize(int addr, byte size, uint8_t *rxBuf);
+
+  bool enableARQ(uint8_t attemptC);
+  bool enableStrobeCallback();
 };
 } // namespace MbProtocols

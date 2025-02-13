@@ -63,18 +63,13 @@ MA::Ret<FrameContainerInfo> MA::GetBodyContainerInfo() {
   return {result, info};
 }
 
-bool MA::ResetStrobeContainers() {
-  return Motherboard::ResetStrobeContainers();
-}
-
-bool MA::ResetBodyQueue() { return Motherboard::ResetBodyQueue(); }
-
 bool MA::SetIMUStrobeOffset(int offset) {
   if (!CheckIntBoundaries<uint8_t>(offset))
     return false;
 
   return Motherboard::SetIMUStrobeOffset(offset);
 }
+
 bool MA::SetBodyStrobeOffset(int offset) {
   if (!CheckIntBoundaries<uint8_t>(offset))
     return false;
@@ -121,4 +116,12 @@ MA::Ret<Version> MA::GetVersion() {
   bool result = Motherboard::GetVersion(version);
   return {result, version};
 }
-} // namespace MbInterface
+
+bool MA::SetBodyTimeout(int timeoutMs) {
+  if (!CheckIntBoundaries<uint16_t>(timeoutMs))
+    return false;
+
+  return Motherboard::SetBodyTimeout(timeoutMs);
+}
+
+} // namespace MbInterface6

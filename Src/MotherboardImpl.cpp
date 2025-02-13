@@ -227,6 +227,69 @@ bool Motherboard::ResetBodyQueue() {
   return CHECK_CLIENT_ERROR;
 }
 
+bool Motherboard::SetBodyTimeout(uint16_t timeoutMs) {
+  CREATE_GUARD;
+
+  Messages::Empty responce;
+  Messages::Word request;
+
+  request.Value = timeoutMs;
+
+  bool ok = Client.PerformRPC<Proc::SetBodyTimeout>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::EnableBodyARQ(const uint8_t *nackBuf, uint8_t nackSz,
+                                uint8_t attemptC) {
+  CREATE_GUARD;
+
+  if (nackSz == 0)
+    return FOO_ERROR("Invalid nack size");
+
+  if (attemptC == 0)
+    return FOO_ERROR("Invalid attempt count");
+
+  Messages::Empty responce;
+  Messages::BodyARQConfig request;
+
+  request.NACK.Data = nackBuf;
+  request.NACK.ResponceSize = nackSz;
+
+  request.AttemptC.Value = attemptC;
+
+  bool ok = Client.PerformRPC<Proc::EnableBodyARQ>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::DisableBodyARQ() {
+  CREATE_GUARD;
+  Messages::Empty resp;
+  bool ok = Client.PerformRPC<Proc::DisableBodyARQ>(Serial, {}, resp);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::SetBodyStrobeCallback(const uint8_t *requestData,
+                                        uint8_t reqSize, uint8_t rspSize) {
+  CREATE_GUARD;
+
+  Messages::BodyRequest request;
+  request.Data = requestData;
+  request.RequestSize = reqSize;
+  request.ResponceSize = rspSize;
+
+  Messages::Empty responce;
+  bool ok =
+      Client.PerformRPC<Proc::SetBodyStrobeCallback>(Serial, request, responce);
+  return CHECK_CLIENT_ERROR;
+}
+
+bool Motherboard::ResetBodyStrobeCallback() {
+  CREATE_GUARD;
+  Messages::Empty resp;
+  bool ok = Client.PerformRPC<Proc::ResetBodyStrobeCallback>(Serial, {}, resp);
+  return CHECK_CLIENT_ERROR;
+}
+
 #undef CHECK_CLIENT_ERROR
 #undef FOO_ERROR
 #undef CREATE_GUARD

@@ -33,7 +33,7 @@ public:
   // I suppose I would stick to template-based interface
   // until making a python adapter, like I did in Zubr class.
   template <typename Proc>
-  bool Call(const typename Proc::Request &req, typename Proc::Request &rsp) {
+  bool Call(const typename Proc::Request &req, typename Proc::Responce &rsp) {
     try {
       rsp = Servo.Call<Proc>(MBIO, req);
       return MakeSuccess();
