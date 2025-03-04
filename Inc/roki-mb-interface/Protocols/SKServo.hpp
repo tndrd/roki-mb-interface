@@ -10,6 +10,8 @@ namespace MbProtocols {
 class SKServo : public MbInterface::MbError {
 public:
   using Procedures = StarkitServo::SKSBase::Procedures;
+  using Params = StarkitServo::SKSBase::Params;
+  using Limits = StarkitServo::SKSBase::Limits;
 
 private:
   class MBoardIOImpl {
@@ -50,5 +52,7 @@ public:
 
   SKServo(SKServo &&) = default;
   SKServo &operator=(SKServo &&) = default;
+
+  virtual ~SKServo() = default;
 };
 } // namespace MbProtocols
