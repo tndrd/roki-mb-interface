@@ -38,6 +38,18 @@ RSPTPL(Control) SKServoAdapter::SetPosition(int id, int position) {
   CALL(Control, id, position);
 }
 
+RSPTPL(Control) SKServoAdapter::SetFree(int id) {
+  return SetPosition(id, StarkitServo::Controls::Free);
+}
+
+RSPTPL(Control) SKServoAdapter::SetHold(int id) {
+  return SetPosition(id, StarkitServo::Controls::Hold);
+}
+
+RSPTPL(Control) SKServoAdapter::SetSoft(int id) {
+  return SetPosition(id, StarkitServo::Controls::Soft);
+}
+
 RSPTPL(Info) SKServoAdapter::GetInfo(int id) {
   CHECK_ID;
   CALL(Info, id);

@@ -6,6 +6,9 @@
 namespace MbProtocols {
 
 class SKServoAdapter final : public SKServo {
+public:
+  using Params = SKServo::Params;
+
 private:
   template <typename T> bool CheckParam(int param, const char *pname);
   using P = SKServo::Procedures;
@@ -14,6 +17,10 @@ public:
 #define RSPTPL(proc) std::tuple<bool, P::proc::Responce>
 
   RSPTPL(Control) SetPosition(int id, int position);
+  RSPTPL(Control) SetFree(int id);
+  RSPTPL(Control) SetHold(int id);
+  RSPTPL(Control) SetSoft(int id);
+
   RSPTPL(Info) GetInfo(int id);
   RSPTPL(Read) GetParam(int id, int index);
   RSPTPL(Write) SetParam(int id, int index, int value);
