@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <string>
 
-
 namespace MbProtocols {
 class SKServo : public MbInterface::MbError {
 public:
@@ -14,8 +13,19 @@ public:
   using Limits = StarkitServo::SKSBase::Limits;
 
 private:
+  struct UARTConfig {
+    static constexpr size_t Baudrate = 3000000;
+    static constexpr size_t ByteSize = 8;
+    static constexpr size_t StopBits = 1;
+    static constexpr size_t TimeoutMs = 200;
+
+    static constexpr size_t Parity =
+        MbInterface::Messages::BodyUARTConfig::ParityVal::None;
+  };
+
+private:
   class MBoardIOImpl {
-  private:
+  public:
     MbInterface::Motherboard *Mboard;
 
   public:
@@ -28,6 +38,9 @@ private:
 private:
   MBoardIOImpl MBIO;
   StarkitServo::SKSBase Servo;
+
+private:
+  bool ConfigureUart();
 
 public:
   // Yup that's ugly but idk how to implement it prettier

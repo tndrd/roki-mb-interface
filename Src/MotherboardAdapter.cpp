@@ -117,11 +117,4 @@ MA::Ret<Version> MA::GetVersion() {
   return {result, version};
 }
 
-bool MA::SetBodyTimeout(int timeoutMs) {
-  if (!CheckIntBoundaries<uint16_t>(timeoutMs))
-    return false;
-
-  return Motherboard::SetBodyTimeout(timeoutMs);
-}
-
 } // namespace MbInterface6

@@ -35,8 +35,6 @@ public:
 
   Ret<Version> GetVersion();
 
-  bool SetBodyTimeout(int timeoutMs);
-
   virtual ~MotherboardAdapter() = default;
 
   MotherboardAdapter(const MotherboardAdapter &) = delete;

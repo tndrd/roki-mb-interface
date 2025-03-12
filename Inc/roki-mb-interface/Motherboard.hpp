@@ -53,7 +53,8 @@ public:
 
   bool GetVersion(Version &result);
 
-  bool SetBodyTimeout(uint16_t timeoutMs);
+  bool ConfigureBodyUART(MbInterface::Messages::BodyUARTConfig config);
+
   bool EnableBodyARQ(const uint8_t *nackBuf, uint8_t nackSz, uint8_t attemptC);
   bool DisableBodyARQ();
 

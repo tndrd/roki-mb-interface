@@ -3,7 +3,12 @@
 namespace MbProtocols {
 
 RokiRcb4::RokiRcb4(MbInterface::Motherboard &mb)
-    : Mboard{&mb}, MbError{"Rcb4"} {}
+    : Mboard{&mb}, MbError{"Rcb4"} {
+  if (ConfigureUart() && EnableARQ())
+    return;
+
+  throw std::runtime_error("Failed to create Rcb4 instance: " + GetError());
+}
 
 bool RokiRcb4::synchronize(byte txBuf[], byte txLen, byte rxBuf[], byte rxLen) {
   if (!Mboard->BodySendForward(txBuf, txLen, rxBuf, rxLen))
@@ -39,17 +44,36 @@ bool RokiRcb4::moveRamToComCmdSynchronize(int addr, byte size, uint8_t *rxBuf) {
   return res ? MakeSuccess() : MakeError("Failed to read RAM");
 }
 
-bool RokiRcb4::enableARQ(uint8_t attemptC) {
-  bool res = Mboard->EnableBodyARQ(NACK, sizeof(NACK), attemptC);
+bool RokiRcb4::EnableARQ() {
+  bool res = Mboard->EnableBodyARQ(NACK, sizeof(NACK), UARTConfig::ARQAttempts);
 
-  return res ? MakeSuccess() : MakeError("Failed to enable ARQ: " + Mboard->GetError());
+  return res ? MakeSuccess()
+             : MakeError("Failed to enable ARQ: " + Mboard->GetError());
+}
+
+bool RokiRcb4::ConfigureUart() {
+  MbInterface::Messages::BodyUARTConfig config;
+
+  config.Baudrate.Value = UARTConfig::Baudrate;
+  config.ByteSize.Value = UARTConfig::ByteSize;
+  config.Parity.Value = UARTConfig::Parity;
+  config.StopBits.Value = UARTConfig::StopBits;
+  config.TimeoutMs.Value = UARTConfig::TimeoutMs;
+
+  bool ok = Mboard->ConfigureBodyUART(config);
+
+  return ok ? MakeSuccess()
+            : MakeError("Failed to configure Uart: " + Mboard->GetError());
 }
 
 bool RokiRcb4::enableStrobeCallback() {
   using Req = GetAllPosRequest;
-  bool res = Mboard->SetBodyStrobeCallback(Req::Data, Req::ReqSize, Req::RspSize);
+  bool res =
+      Mboard->SetBodyStrobeCallback(Req::Data, Req::ReqSize, Req::RspSize);
 
-  return res ? MakeSuccess() : MakeError("Failed to enable strobe callback: " + Mboard->GetError());
+  return res ? MakeSuccess()
+             : MakeError("Failed to enable strobe callback: " +
+                         Mboard->GetError());
 }
 
 } // namespace MbProtocols

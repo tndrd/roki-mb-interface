@@ -227,15 +227,11 @@ bool Motherboard::ResetBodyQueue() {
   return CHECK_CLIENT_ERROR;
 }
 
-bool Motherboard::SetBodyTimeout(uint16_t timeoutMs) {
+bool Motherboard::ConfigureBodyUART(MbInterface::Messages::BodyUARTConfig config) {
   CREATE_GUARD;
 
   Messages::Empty responce;
-  Messages::Word request;
-
-  request.Value = timeoutMs;
-
-  bool ok = Client.PerformRPC<Proc::SetBodyTimeout>(Serial, request, responce);
+  bool ok = Client.PerformRPC<Proc::ConfigureBodyUART>(Serial, config, responce);
   return CHECK_CLIENT_ERROR;
 }
 

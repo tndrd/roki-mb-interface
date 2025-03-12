@@ -19,6 +19,17 @@ private:
     static constexpr uint8_t RspSize = 33;
   };
 
+  struct UARTConfig {
+    static constexpr size_t Baudrate = 1250000;
+    static constexpr size_t ByteSize = 9;
+    static constexpr size_t StopBits = 1;
+    static constexpr size_t TimeoutMs = 200;
+    static constexpr size_t ARQAttempts = 5;
+
+    static constexpr size_t Parity =
+        MbInterface::Messages::BodyUARTConfig::ParityVal::Even;
+  };
+
 private:
   MbInterface::Motherboard *Mboard;
 
@@ -30,6 +41,8 @@ private:
                            byte rxLen) override;
 
   bool SendAsync(byte *txData, uint8_t pause);
+  bool EnableARQ();
+  bool ConfigureUart();
 
 public:
   bool setServoPosAsync(ServoData servoDatas[], byte servoCount, byte frame,
@@ -40,7 +53,6 @@ public:
 
   bool moveRamToComCmdSynchronize(int addr, byte size, uint8_t *rxBuf);
 
-  bool enableARQ(uint8_t attemptC);
   bool enableStrobeCallback();
 };
 } // namespace MbProtocols
