@@ -18,12 +18,9 @@ void SKServo::MBoardIOImpl::Synchronize(const uint8_t *reqBuf, uint8_t reqSz,
 }
 
 SKServo::SKServo(MbInterface::Motherboard &mboard)
-    : MBIO{mboard}, MbError{"SKServo"} {
-  if (!ConfigureUart())
-    throw std::runtime_error("Failed to configure Uart: " + GetError());
-}
+    : MBIO{mboard}, MbError{"SKServo"} {}
 
-bool SKServo::ConfigureUart() {
+bool SKServo::SetUpUart() {
   MbInterface::Messages::BodyUARTConfig config;
 
   config.Baudrate.Value = UARTConfig::Baudrate;

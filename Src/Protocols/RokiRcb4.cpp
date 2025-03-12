@@ -3,11 +3,12 @@
 namespace MbProtocols {
 
 RokiRcb4::RokiRcb4(MbInterface::Motherboard &mb)
-    : Mboard{&mb}, MbError{"Rcb4"} {
-  if (ConfigureUart() && EnableARQ())
-    return;
+    : Mboard{&mb}, MbError{"Rcb4"} {}
 
-  throw std::runtime_error("Failed to create Rcb4 instance: " + GetError());
+bool RokiRcb4::setUpUart() {
+  if (ConfigureUart() && EnableARQ())
+    return true;
+  return false;
 }
 
 bool RokiRcb4::synchronize(byte txBuf[], byte txLen, byte rxBuf[], byte rxLen) {

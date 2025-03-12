@@ -45,6 +45,8 @@ private:
   bool ConfigureUart();
 
 public:
+  bool setUpUart();
+
   bool setServoPosAsync(ServoData servoDatas[], byte servoCount, byte frame,
                         uint8_t pause = 0);
 

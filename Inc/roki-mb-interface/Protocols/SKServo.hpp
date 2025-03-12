@@ -39,9 +39,6 @@ private:
   MBoardIOImpl MBIO;
   StarkitServo::SKSBase Servo;
 
-private:
-  bool ConfigureUart();
-
 public:
   // Yup that's ugly but idk how to implement it prettier
   // in "we don't use exceptions" paradigm.
@@ -67,5 +64,7 @@ public:
   SKServo &operator=(SKServo &&) = default;
 
   virtual ~SKServo() = default;
+
+  bool SetUpUart();
 };
 } // namespace MbProtocols
