@@ -1,7 +1,36 @@
-# Humaniod robot "Roki" - Motherboard MCU communication library 
-Library provides communication interface between "Roki"s RaspberryPi and MCU unit embedded in motherboard PCB.
+# Roki — Motherboard Communication Library
 
-# Simple installation
+Host-side C++/Python library for communicating with the custom MCU inside the head
+of the **Roki** humanoid robot (used by the Starkit RoboCup team). Runs on the
+robot's Raspberry Pi and talks to an STM32H7 motherboard over UART.
+
+This repository is the **host side** of a two-part system:
+- **roki-mb-interface** (this repo) — host library (Raspberry Pi), C++ core + Python bindings
+- [**roki-mb-firmware**](https://github.com/tndrd/roki-mb-firmware) — STM32H7 firmware (MCU side)
+
+## What it does
+
+- **Typed binary RPC protocol** over serial: a single procedure descriptor generates
+  matching request/response types on both host and MCU, so a mismatch is caught at
+  compile time rather than on the robot.
+- **Error propagation across the device boundary** — a failure deep on the robot's
+  internal bus (bus timeout, NACK, ...) surfaces on the Python side already decoded
+  into a named error, instead of a silent failure. This is what made competition
+  debugging fast: you see *which* node failed, not just *that* something failed.
+- **IMU streaming** (BHI260) with sequence-checked frames, and body/servo control
+  via synchronous and asynchronous (queued) commands.
+- **Python bindings** (pybind11) — the whole C++ API is usable from Python for
+  high-level robot control.
+- **Automated tests** (gtest + Python) covering the protocol and every sensor link;
+  competition debugging no longer required the original author.
+
+## Stack
+
+C++17 · Python · pybind11 · CMake · Linux (termios / serial) · STM32H7 (peer device)
+
+---
+
+# Installation
 ```bash
 git clone https://github.com/tndrd/roki-mb-interface.git
 cd roki-mb-interface
