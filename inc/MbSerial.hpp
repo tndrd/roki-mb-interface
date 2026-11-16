@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "Helpers/DescriptorWrapper.hpp"
 #include "Version.hpp"
