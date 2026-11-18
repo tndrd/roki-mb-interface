@@ -28,7 +28,7 @@ add_library(Motherboard src/Motherboard.cpp)
 target_link_libraries(Motherboard PUBLIC MbService MbClient IMUFrame)
 
 add_library(RokiRcb4 src/RokiRcb4.cpp)
-target_link_libraries(RokiRcb4 PUBLIC rcb4base Motherboard)
+target_link_libraries(RokiRcb4 PUBLIC rcb4base_impl Motherboard)
 
 add_library(Zubr src/Zubr.cpp)
 target_link_libraries(Zubr PUBLIC Motherboard)

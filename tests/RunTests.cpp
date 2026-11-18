@@ -1,7 +1,7 @@
 #include "MbDefaultConfig.hpp"
 #include "MbSerial.hpp"
 #include "Motherboard.hpp"
-#include "Rcb4BaseClass.hpp"
+#include "rcb4-base-class/Rcb4BaseClass.hpp"
 #include "RokiRcb4.hpp"
 #include <ZubrAdapter.hpp>
 #include <gtest/gtest.h>
